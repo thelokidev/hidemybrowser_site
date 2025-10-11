@@ -414,8 +414,51 @@ async function handlePaymentSucceeded(payment: any, supabase: any, dodoClient: a
       } catch (e) {
         console.warn('[Webhook] Failed to refresh subscription after payment:', e)
       }
-    } else if (!subscriptionId) {
-      console.log('[Webhook] Payment is not associated with a subscription')
+    } else if (!subscriptionId && customerId && dodoClient) {
+      // No subscription ID in payment - try to fetch all subscriptions for this customer
+      console.log('[Webhook] No subscription_id in payment, fetching all customer subscriptions')
+      try {
+        const subscriptions = await dodoClient.listSubscriptions({
+          customer_id: customerId
+        })
+        
+        if (subscriptions && subscriptions.length > 0) {
+          console.log(`[Webhook] Found ${subscriptions.length} subscriptions for customer, syncing all`)
+          
+          for (const sub of subscriptions) {
+            try {
+              await supabase
+                .from('subscriptions')
+                .upsert({
+                  user_id: customer.user_id,
+                  dodo_customer_id: sub.customer_id,
+                  dodo_subscription_id: sub.id,
+                  dodo_product_id: sub.product_id,
+                  dodo_price_id: sub.price_id,
+                  status: sub.status,
+                  current_period_start: sub.current_period_start,
+                  current_period_end: sub.current_period_end,
+                  cancel_at_period_end: sub.cancel_at_period_end,
+                  canceled_at: sub.canceled_at,
+                  trial_start: sub.trial_start,
+                  trial_end: sub.trial_end,
+                  metadata: sub.metadata,
+                  updated_at: new Date().toISOString()
+                }, { onConflict: 'dodo_subscription_id' })
+              
+              console.log('[Webhook] Synced subscription after payment:', sub.id)
+            } catch (syncError) {
+              console.error('[Webhook] Failed to sync subscription:', sub.id, syncError)
+            }
+          }
+        } else {
+          console.log('[Webhook] No subscriptions found for customer after payment')
+        }
+      } catch (listError) {
+        console.error('[Webhook] Failed to list customer subscriptions:', listError)
+      }
+    } else {
+      console.log('[Webhook] Payment is not associated with a subscription (no subscription_id and no valid customer_id)')
     }
   } catch (error) {
     console.error('[Webhook] Error handling payment success:', error)
