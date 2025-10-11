@@ -106,41 +106,107 @@ export async function POST(request: NextRequest) {
         processed: false
       })
 
-    // Process the event
-    switch (event.type) {
-      case 'subscription.created':
-      case 'subscription.updated':
-      case 'subscription.active':
-      case 'subscription.renewed':
-        await handleSubscriptionEvent(event.data, supabase)
-        break
-      
-      case 'subscription.canceled':
-        await handleSubscriptionCanceled(event.data, supabase)
-        break
-      
-      case 'payment.succeeded':
-        await handlePaymentSucceeded(event.data, supabase, getDodoPayments())
-        break
-      
-      case 'payment.failed':
-        await handlePaymentFailed(event.data, supabase)
-        break
-      
-      case 'customer.created':
-      case 'customer.updated':
-        await handleCustomerEvent(event.data, supabase)
-        break
-      
-      default:
-        console.log(`Unhandled event type: ${event.type}`)
+    // Check if event was already processed (idempotency protection)
+    const { data: existingEvent } = await supabase
+      .from('dodo_webhook_events')
+      .select('processed')
+      .eq('event_id', event.id)
+      .single()
+
+    if (existingEvent?.processed === true) {
+      console.log('[Webhook] Event already processed, skipping:', event.id)
+      return NextResponse.json({ received: true, skipped: 'already_processed' })
     }
 
-    // Mark event as processed
-    await supabase
-      .from('dodo_webhook_events')
-      .update({ processed: true })
-      .eq('event_id', event.id)
+    // Process the event with enhanced error handling
+    try {
+      switch (event.type) {
+        // Subscription lifecycle events
+        case 'subscription.created':
+        case 'subscription.updated':
+        case 'subscription.active':
+        case 'subscription.renewed':
+        case 'subscription.plan_changed':
+          console.log(`[Webhook] Processing subscription event: ${event.type}`)
+          await handleSubscriptionEvent(event.data, supabase)
+          break
+        
+        case 'subscription.on_hold':
+          console.log('[Webhook] Processing subscription on hold')
+          await handleSubscriptionOnHold(event.data, supabase)
+          break
+        
+        case 'subscription.canceled':
+          console.log('[Webhook] Processing subscription cancellation')
+          await handleSubscriptionCanceled(event.data, supabase)
+          break
+        
+        case 'subscription.expired':
+          console.log('[Webhook] Processing subscription expiration')
+          await handleSubscriptionExpired(event.data, supabase)
+          break
+        
+        case 'subscription.failed':
+          console.log('[Webhook] Processing subscription failure')
+          await handleSubscriptionFailed(event.data, supabase)
+          break
+        
+        // Payment events
+        case 'payment.succeeded':
+          console.log('[Webhook] Processing successful payment')
+          await handlePaymentSucceeded(event.data, supabase, getDodoPayments())
+          break
+        
+        case 'payment.processing':
+          console.log('[Webhook] Processing payment in progress')
+          await handlePaymentProcessing(event.data, supabase)
+          break
+        
+        case 'payment.failed':
+          console.log('[Webhook] Processing failed payment')
+          await handlePaymentFailed(event.data, supabase)
+          break
+        
+        case 'payment.cancelled':
+          console.log('[Webhook] Processing cancelled payment')
+          await handlePaymentCancelled(event.data, supabase)
+          break
+        
+        // Customer events
+        case 'customer.created':
+        case 'customer.updated':
+          console.log('[Webhook] Processing customer event')
+          await handleCustomerEvent(event.data, supabase)
+          break
+        
+        default:
+          console.log(`[Webhook] Unhandled event type: ${event.type}`)
+      }
+
+      // Mark event as processed
+      await supabase
+        .from('dodo_webhook_events')
+        .update({ processed: true })
+        .eq('event_id', event.id)
+
+    } catch (eventError) {
+      console.error(`[Webhook] Failed to process ${event.type}:`, eventError)
+      
+      // Mark event as failed with error message
+      await supabase
+        .from('dodo_webhook_events')
+        .update({ 
+          processed: false,
+          error_message: eventError instanceof Error ? eventError.message : 'Unknown error'
+        })
+        .eq('event_id', event.id)
+      
+      // Return 500 so DodoPayments retries
+      return NextResponse.json({ 
+        error: 'Event processing failed',
+        details: eventError instanceof Error ? eventError.message : 'Unknown error'
+      }, { status: 500 })
+    }
 
     return NextResponse.json({ received: true })
   } catch (error) {
@@ -381,85 +447,8 @@ async function handlePaymentSucceeded(payment: any, supabase: any, dodoClient: a
       })
     
     console.log('[Webhook] Payment recorded successfully')
+    console.log('[Webhook] Note: Subscription will be created/updated by subscription.active webhook event')
     
-    // If payment corresponds to a subscription, fetch latest subscription from Dodo and upsert
-    // Check multiple possible field names for subscription ID
-    const subscriptionId = payment.subscription_id || payment.subscription?.id || payment.metadata?.subscription_id
-    if (subscriptionId && dodoClient) {
-      try {
-        console.log('[Webhook] Fetching subscription from DodoPayments:', subscriptionId)
-        const sub = await dodoClient.getSubscription(subscriptionId)
-        
-        await supabase
-          .from('subscriptions')
-          .upsert({
-            user_id: customer.user_id,
-            dodo_customer_id: sub.customer_id,
-            dodo_subscription_id: sub.id,
-            dodo_product_id: sub.product_id,
-            dodo_price_id: sub.price_id,
-            status: sub.status,
-            current_period_start: sub.current_period_start,
-            current_period_end: sub.current_period_end,
-            cancel_at_period_end: sub.cancel_at_period_end,
-            canceled_at: sub.canceled_at,
-            trial_start: sub.trial_start,
-            trial_end: sub.trial_end,
-            metadata: sub.metadata,
-            updated_at: new Date().toISOString()
-          }, { onConflict: 'dodo_subscription_id' })
-        
-        console.log('[Webhook] Subscription updated after payment:', sub.id)
-        
-      } catch (e) {
-        console.warn('[Webhook] Failed to refresh subscription after payment:', e)
-      }
-    } else if (!subscriptionId && customerId && dodoClient) {
-      // No subscription ID in payment - try to fetch all subscriptions for this customer
-      console.log('[Webhook] No subscription_id in payment, fetching all customer subscriptions')
-      try {
-        const subscriptions = await dodoClient.listSubscriptions({
-          customer_id: customerId
-        })
-        
-        if (subscriptions && subscriptions.length > 0) {
-          console.log(`[Webhook] Found ${subscriptions.length} subscriptions for customer, syncing all`)
-          
-          for (const sub of subscriptions) {
-            try {
-              await supabase
-                .from('subscriptions')
-                .upsert({
-                  user_id: customer.user_id,
-                  dodo_customer_id: sub.customer_id,
-                  dodo_subscription_id: sub.id,
-                  dodo_product_id: sub.product_id,
-                  dodo_price_id: sub.price_id,
-                  status: sub.status,
-                  current_period_start: sub.current_period_start,
-                  current_period_end: sub.current_period_end,
-                  cancel_at_period_end: sub.cancel_at_period_end,
-                  canceled_at: sub.canceled_at,
-                  trial_start: sub.trial_start,
-                  trial_end: sub.trial_end,
-                  metadata: sub.metadata,
-                  updated_at: new Date().toISOString()
-                }, { onConflict: 'dodo_subscription_id' })
-              
-              console.log('[Webhook] Synced subscription after payment:', sub.id)
-            } catch (syncError) {
-              console.error('[Webhook] Failed to sync subscription:', sub.id, syncError)
-            }
-          }
-        } else {
-          console.log('[Webhook] No subscriptions found for customer after payment')
-        }
-      } catch (listError) {
-        console.error('[Webhook] Failed to list customer subscriptions:', listError)
-      }
-    } else {
-      console.log('[Webhook] Payment is not associated with a subscription (no subscription_id and no valid customer_id)')
-    }
   } catch (error) {
     console.error('[Webhook] Error handling payment success:', error)
     throw error
@@ -498,6 +487,177 @@ async function handlePaymentFailed(payment: any, supabase: any) {
 
   } catch (error) {
     console.error('Error handling payment failure:', error)
+  }
+}
+
+async function handlePaymentProcessing(payment: any, supabase: any) {
+  try {
+    const paymentId = payment.id || payment.payment_id
+    console.log('[Webhook] Processing payment in processing state:', paymentId)
+    
+    // Extract customer data
+    const customerId = payment.customer?.id || payment.customer?.customer_id || payment.customer_id
+    const customerEmail = payment.customer?.email || payment.customer_email || payment.email
+    
+    // Get customer
+    let customer = null
+    if (customerId) {
+      const result = await supabase
+        .from('customers')
+        .select('user_id')
+        .eq('dodo_customer_id', customerId)
+        .single()
+      customer = result.data
+    }
+
+    if (!customer && customerEmail) {
+      const result = await supabase
+        .from('customers')
+        .select('user_id')
+        .eq('email', customerEmail)
+        .single()
+      customer = result.data
+    }
+
+    if (!customer) {
+      console.error('[Webhook] Customer not found for processing payment:', paymentId)
+      return
+    }
+
+    // Record payment with processing status
+    await supabase
+      .from('payments')
+      .upsert({
+        user_id: customer.user_id,
+        dodo_payment_id: paymentId,
+        dodo_checkout_session_id: payment.checkout_session_id || payment.session_id,
+        amount: payment.amount || payment.total_amount || payment.settlement_amount,
+        currency: payment.currency || 'USD',
+        status: 'processing',
+        payment_method: payment.payment_method,
+        description: payment.description,
+        metadata: payment.metadata,
+        updated_at: new Date().toISOString()
+      }, {
+        onConflict: 'dodo_payment_id'
+      })
+    
+    console.log('[Webhook] Payment processing status recorded')
+  } catch (error) {
+    console.error('[Webhook] Error handling payment processing:', error)
+    throw error
+  }
+}
+
+async function handlePaymentCancelled(payment: any, supabase: any) {
+  try {
+    const paymentId = payment.id || payment.payment_id
+    console.log('[Webhook] Processing cancelled payment:', paymentId)
+    
+    // Update payment status to cancelled
+    await supabase
+      .from('payments')
+      .update({
+        status: 'cancelled',
+        updated_at: new Date().toISOString()
+      })
+      .eq('dodo_payment_id', paymentId)
+    
+    console.log('[Webhook] Payment marked as cancelled')
+  } catch (error) {
+    console.error('[Webhook] Error handling payment cancellation:', error)
+    throw error
+  }
+}
+
+async function handleSubscriptionOnHold(subscription: any, supabase: any) {
+  try {
+    const subscriptionId = subscription.id || subscription.subscription_id
+    console.log('[Webhook] Processing subscription on hold:', subscriptionId)
+    
+    // Extract customer data
+    const customerId = subscription.customer?.id || subscription.customer?.customer_id || subscription.customer_id
+    const customerEmail = subscription.customer?.email || subscription.customer_email || subscription.email
+    
+    // Get customer
+    let customer = null
+    if (customerId) {
+      const result = await supabase
+        .from('customers')
+        .select('user_id')
+        .eq('dodo_customer_id', customerId)
+        .single()
+      customer = result.data
+    }
+
+    if (!customer && customerEmail) {
+      const result = await supabase
+        .from('customers')
+        .select('user_id')
+        .eq('email', customerEmail)
+        .single()
+      customer = result.data
+    }
+
+    if (!customer) {
+      console.error('[Webhook] Customer not found for subscription on hold:', subscriptionId)
+      return
+    }
+
+    // Update subscription status to on_hold
+    await supabase
+      .from('subscriptions')
+      .update({
+        status: 'on_hold',
+        updated_at: new Date().toISOString()
+      })
+      .eq('dodo_subscription_id', subscriptionId)
+    
+    console.log('[Webhook] Subscription marked as on hold')
+  } catch (error) {
+    console.error('[Webhook] Error handling subscription on hold:', error)
+    throw error
+  }
+}
+
+async function handleSubscriptionExpired(subscription: any, supabase: any) {
+  try {
+    const subscriptionId = subscription.id || subscription.subscription_id
+    console.log('[Webhook] Processing expired subscription:', subscriptionId)
+    
+    await supabase
+      .from('subscriptions')
+      .update({
+        status: 'expired',
+        canceled_at: subscription.canceled_at || new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .eq('dodo_subscription_id', subscriptionId)
+    
+    console.log('[Webhook] Subscription marked as expired')
+  } catch (error) {
+    console.error('[Webhook] Error handling subscription expiration:', error)
+    throw error
+  }
+}
+
+async function handleSubscriptionFailed(subscription: any, supabase: any) {
+  try {
+    const subscriptionId = subscription.id || subscription.subscription_id
+    console.log('[Webhook] Processing failed subscription:', subscriptionId)
+    
+    await supabase
+      .from('subscriptions')
+      .update({
+        status: 'failed',
+        updated_at: new Date().toISOString()
+      })
+      .eq('dodo_subscription_id', subscriptionId)
+    
+    console.log('[Webhook] Subscription marked as failed')
+  } catch (error) {
+    console.error('[Webhook] Error handling subscription failure:', error)
+    throw error
   }
 }
 
