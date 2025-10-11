@@ -1,0 +1,27 @@
+{
+  "mcpServers": {
+    "dodopayments_api": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote@latest", "https://mcp.dodopayments.com/sse"]
+    },
+    "supabase": {
+      "command": "npx",
+      "args": ["-y", "@supabase/mcp-server@latest"]
+    },
+    "github-mcp-server": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "GITHUB_PERSONAL_ACCESS_TOKEN",
+        "ghcr.io/github/github-mcp-server"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "your-github-personal-access-token"
+      }
+    }
+  }
+}
+
