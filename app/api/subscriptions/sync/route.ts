@@ -56,9 +56,12 @@ export async function POST(request: NextRequest) {
 
     // 2. Fetch all subscriptions for this customer from DodoPayments
     try {
-      const subscriptions = await dodoClient.listSubscriptions({
+      const response = await dodoClient.subscriptions.list({
         customer_id: customer.dodo_customer_id
       })
+      
+      // Extract subscriptions from paginated response
+      const subscriptions = response.data || []
 
       console.log('[SubscriptionSync] Found subscriptions:', subscriptions?.length || 0)
 
