@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button"
 import { motion, AnimatePresence } from "framer-motion"
 import { useState, useEffect } from "react"
 import { Eye, EyeOff, Play, Monitor, Command } from "lucide-react"
+import Image from "next/image"
+import demoGif from "@/content/demo.gif"
 
 const rotatingWords = [
   { text: "Otter", className: "italic" },
@@ -146,8 +148,17 @@ export function Hero() {
 
             {/* Demo Content Area */}
             <div className="relative bg-slate-950/50 rounded-xl px-8 pb-8 pt-6 sm:pt-10 aspect-video flex items-start justify-center backdrop-blur-sm border border-slate-700/30 overflow-hidden">
-              {/* Background gradient for demo */}
-              <div className="absolute inset-0 bg-gradient-to-br from-slate-900/50 via-slate-800/30 to-slate-950/50" />
+              {/* Background GIF Layer */}
+              <div className="absolute inset-0 z-0 rounded-xl pointer-events-none">
+                <Image
+                  src={demoGif}
+                  alt="HideMyBrowser demo"
+                  fill
+                  priority
+                  unoptimized
+                  className="object-cover"
+                />
+              </div>
               {/* Shared Screen Content removed */}
 
               {/* HideMyBrowser Window - Always Visible */

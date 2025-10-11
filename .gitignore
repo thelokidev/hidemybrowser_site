@@ -79,7 +79,4 @@ Reference/
 
 # MCP configuration (contains secrets)
 mcp.json
-
-# Large media files (use external hosting or Git LFS)
-content/demo.gif
 .vercel
