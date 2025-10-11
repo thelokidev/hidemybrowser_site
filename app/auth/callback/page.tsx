@@ -19,7 +19,28 @@ export default function AuthCallbackPage() {
         // Success: send user to dashboard
         router.replace("/dashboard")
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Authentication failed")
+        const errorMessage = err instanceof Error ? err.message : "Authentication failed"
+        
+        // If PKCE error, clear all auth storage and redirect to sign in
+        if (errorMessage.includes('code verifier') || errorMessage.includes('invalid request')) {
+          console.warn('[Auth] PKCE error detected, clearing auth storage...')
+          
+          // Clear all Supabase storage
+          Object.keys(localStorage).forEach(key => {
+            if (key.includes('supabase') || key.includes('sb-') || key.includes('pkce')) {
+              localStorage.removeItem(key)
+            }
+          })
+          
+          // Redirect to auth page with clean state
+          setTimeout(() => {
+            router.replace("/auth")
+          }, 1500)
+          
+          setError("Session expired. Redirecting to sign in...")
+        } else {
+          setError(errorMessage)
+        }
       }
     }
 

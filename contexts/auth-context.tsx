@@ -39,6 +39,30 @@ export function AuthProvider({
     await supabase.auth.signOut()
     setSession(null)
     setUser(null)
+    
+    // Clear all Supabase auth storage to prevent PKCE issues
+    if (typeof window !== 'undefined') {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+      if (supabaseUrl) {
+        try {
+          const url = new URL(supabaseUrl)
+          const subdomain = url.hostname.split('.')[0]
+          const storageKey = `sb-${subdomain}-auth-token`
+          
+          // Clear localStorage
+          localStorage.removeItem(storageKey)
+          
+          // Clear any PKCE verifiers
+          Object.keys(localStorage).forEach(key => {
+            if (key.includes('supabase') || key.includes('pkce')) {
+              localStorage.removeItem(key)
+            }
+          })
+        } catch (error) {
+          console.warn('Error clearing auth storage:', error)
+        }
+      }
+    }
   }
 
   return (
