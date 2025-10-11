@@ -50,9 +50,8 @@ Thumbs.db
 ngrok.exe
 ngrok.zip
 
-# Documentation and debug files
+# Documentation and debug files (but keep important guides)
 *_FIX*.md
-*_GUIDE*.md
 *_ERROR*.md
 *_DEBUG*.md
 *_SUMMARY*.md
@@ -68,6 +67,8 @@ SUBSCRIPTION*.md
 IMPLEMENTATION*.md
 CONSOLE*.md
 SETUP*.md
+# Keep DEPLOYMENT_GUIDE.md and SECURITY.md
+!DEPLOYMENT_GUIDE.md
 
 # Temporary files
 .temp/
@@ -81,3 +82,4 @@ mcp.json
 
 # Large media files (use external hosting or Git LFS)
 content/demo.gif
+.vercel
