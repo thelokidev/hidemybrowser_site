@@ -13,34 +13,62 @@ export default function AuthCallbackPage() {
   useEffect(() => {
     const run = async () => {
       try {
-        // Handles OAuth (code) and Magic Link (access_token) flows
-        const { error } = await supabase.auth.exchangeCodeForSession(window.location.href)
-        if (error) throw error
+        // Get the current session first to check if already authenticated
+        const { data: { session: existingSession } } = await supabase.auth.getSession()
+        
+        if (existingSession) {
+          // Already authenticated, go to dashboard
+          console.log('[Auth] Already authenticated, redirecting to dashboard')
+          router.replace("/dashboard")
+          return
+        }
+
+        // Try to exchange code for session
+        const { error, data } = await supabase.auth.exchangeCodeForSession(window.location.href)
+        
+        if (error) {
+          // Check if it's a PKCE error
+          if (error.message.includes('code verifier') || error.message.includes('invalid request')) {
+            console.warn('[Auth] PKCE error, checking if already authenticated...')
+            
+            // Wait a bit and check session again
+            await new Promise(resolve => setTimeout(resolve, 1000))
+            const { data: { session: retrySession } } = await supabase.auth.getSession()
+            
+            if (retrySession) {
+              // User is actually logged in!
+              console.log('[Auth] User is authenticated despite error, redirecting to dashboard')
+              router.replace("/dashboard")
+              return
+            }
+            
+            // Not logged in, clear storage and retry
+            console.warn('[Auth] Not authenticated, clearing storage...')
+            Object.keys(localStorage).forEach(key => {
+              if (key.includes('supabase') || key.includes('sb-') || key.includes('pkce')) {
+                localStorage.removeItem(key)
+              }
+            })
+            
+            setError("Session expired. Please try signing in again.")
+            setTimeout(() => {
+              router.replace("/auth")
+            }, 2000)
+            return
+          }
+          
+          throw error
+        }
+
         // Success: send user to dashboard
-        router.replace("/dashboard")
+        if (data.session) {
+          console.log('[Auth] Authentication successful, redirecting to dashboard')
+          router.replace("/dashboard")
+        }
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : "Authentication failed"
-        
-        // If PKCE error, clear all auth storage and redirect to sign in
-        if (errorMessage.includes('code verifier') || errorMessage.includes('invalid request')) {
-          console.warn('[Auth] PKCE error detected, clearing auth storage...')
-          
-          // Clear all Supabase storage
-          Object.keys(localStorage).forEach(key => {
-            if (key.includes('supabase') || key.includes('sb-') || key.includes('pkce')) {
-              localStorage.removeItem(key)
-            }
-          })
-          
-          // Redirect to auth page with clean state
-          setTimeout(() => {
-            router.replace("/auth")
-          }, 1500)
-          
-          setError("Session expired. Redirecting to sign in...")
-        } else {
-          setError(errorMessage)
-        }
+        console.error('[Auth] Error:', errorMessage)
+        setError(errorMessage)
       }
     }
 

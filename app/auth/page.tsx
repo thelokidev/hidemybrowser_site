@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import Link from "next/link"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Header } from "@/components/header"
 import { Hero } from "@/components/hero"
@@ -26,8 +26,18 @@ export default function AuthPage() {
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
   const supabase = createClient()
   const router = useRouter()
-  // Note: We no longer auto-redirect authenticated users from the auth page.
-  // This avoids potential redirect loops when sign-out is racing with middleware/session refresh.
+  
+  // Check if user is already authenticated
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+        console.log('[Auth Page] User already authenticated, redirecting to dashboard')
+        router.replace("/dashboard")
+      }
+    }
+    checkAuth()
+  }, [supabase, router])
 
   const handleMagicLink = async (e: React.FormEvent) => {
     e.preventDefault()
