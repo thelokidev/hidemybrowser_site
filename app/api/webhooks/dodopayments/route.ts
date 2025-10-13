@@ -449,6 +449,21 @@ async function handlePaymentSucceeded(payment: any, supabase: any, dodoClient: a
     console.log('[Webhook] Payment recorded successfully')
     console.log('[Webhook] Note: Subscription will be created/updated by subscription.active webhook event')
     
+    // After recording payment, add fallback subscription sync
+    const subscriptionId = payment.subscription_id || payment.subscription?.id || payment.data?.subscription_id;
+    if (subscriptionId) {
+      console.log('[Webhook] Fallback: Fetching subscription for payment:', subscriptionId);
+      try {
+        const dodoSubscription = await dodoClient.subscriptions.retrieve(subscriptionId);
+        if (dodoSubscription) {
+          console.log('[Webhook] Fallback: Processing fetched subscription');
+          await handleSubscriptionEvent(dodoSubscription, supabase);
+        }
+      } catch (fetchError) {
+        console.error('[Webhook] Fallback subscription fetch failed:', fetchError);
+      }
+    }
+    
   } catch (error) {
     console.error('[Webhook] Error handling payment success:', error)
     throw error
