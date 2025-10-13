@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { getDodoPayments } from '@/lib/dodopayments/client'
 import { DodoSubscription } from '@/types/dodopayments.types'
 
 export function useSubscription() {
@@ -50,30 +49,10 @@ export function useSubscription() {
 
         const subscriptionData = data as DodoSubscription | null
 
-        if (subscriptionData && subscriptionData.dodo_subscription_id) {
-          // Fetch latest subscription status from DodoPayments
-          const dodoClient = getDodoPayments()
-          if (dodoClient) {
-            try {
-              const dodoSubscription = await dodoClient.getSubscription(subscriptionData.dodo_subscription_id)
-              // Rely on webhook writes; just reflect latest status in UI
-              setSubscription({ 
-                ...subscriptionData, 
-                status: dodoSubscription.status,
-                current_period_start: dodoSubscription.current_period_start,
-                current_period_end: dodoSubscription.current_period_end,
-                cancel_at_period_end: dodoSubscription.cancel_at_period_end
-              })
-            } catch (dodoError) {
-              console.warn('Failed to fetch DodoPayments subscription:', dodoError)
-              setSubscription(subscriptionData)
-            }
-          } else {
-            setSubscription(subscriptionData)
-          }
-        } else {
-          setSubscription(null)
-        }
+        // Use Supabase as source of truth - webhooks keep it up-to-date
+        // No need to fetch from DodoPayments API client-side
+        console.log('[useSubscription] Subscription data from database:', subscriptionData)
+        setSubscription(subscriptionData)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred')
       } finally {
