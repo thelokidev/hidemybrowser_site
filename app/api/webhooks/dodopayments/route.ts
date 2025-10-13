@@ -369,16 +369,50 @@ async function handleSubscriptionEvent(subscription: any, supabase: any) {
 
 async function handleSubscriptionCanceled(subscription: any, supabase: any) {
   try {
-    await supabase
+    const subscriptionId = subscription.id || subscription.subscription_id
+    console.log('[Webhook] Processing subscription cancellation:', subscriptionId)
+    let existing = null
+    try {
+      const { data: existingSub, error: fetchError } = await supabase
+        .from('subscriptions')
+        .select('id, status')
+        .eq('dodo_subscription_id', subscriptionId)
+        .single()
+      if (fetchError && !existingSub) {
+        console.warn('[Webhook] No subscription found to cancel:', subscriptionId)
+        return
+      }
+      existing = existingSub
+    } catch (fetchErr) {
+      console.error('[Webhook] Failed to fetch subscription before cancellation:', fetchErr)
+      throw fetchErr
+    }
+    console.log('[Webhook] Subscription status transition:', { subscriptionId, from: existing?.status, to: 'canceled' })
+    if (existing?.status === 'canceled') {
+      console.log('[Webhook] Subscription already canceled, no-op:', subscriptionId)
+      return
+    }
+    const { data, error } = await supabase
       .from('subscriptions')
       .update({
         status: 'canceled',
         canceled_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       })
-      .eq('dodo_subscription_id', subscription.id)
+      .eq('dodo_subscription_id', subscriptionId)
+      .select('id, status')
+    if (error) {
+      console.error('[Webhook] Failed to update canceled subscription:', { subscriptionId, error })
+      throw error
+    }
+    if (!data || data.length === 0) {
+      console.warn('[Webhook] Update affected 0 rows for canceled subscription:', subscriptionId)
+    } else {
+      console.log('[Webhook] Subscription marked as canceled:', subscriptionId)
+    }
   } catch (error) {
     console.error('Error handling subscription cancellation:', error)
+    throw error
   }
 }
 
@@ -461,7 +495,7 @@ async function handlePaymentSucceeded(payment: any, supabase: any, dodoClient: a
     console.log('[Webhook] Recording payment for user:', customer.user_id)
 
     // Record payment with correct field names
-    await supabase
+    const { data: paymentUpsert, error: paymentUpsertError } = await supabase
       .from('payments')
       .upsert({
         user_id: customer.user_id,
@@ -477,8 +511,16 @@ async function handlePaymentSucceeded(payment: any, supabase: any, dodoClient: a
       }, {
         onConflict: 'dodo_payment_id'
       })
-    
-    console.log('[Webhook] Payment recorded successfully')
+      .select('dodo_payment_id')
+    if (paymentUpsertError) {
+      console.error('[Webhook] Failed to upsert succeeded payment:', { paymentId, error: paymentUpsertError })
+      throw paymentUpsertError
+    }
+    if (!paymentUpsert || paymentUpsert.length === 0) {
+      console.warn('[Webhook] Payment upsert returned no rows (succeeded):', paymentId)
+    } else {
+      console.log('[Webhook] Payment recorded successfully')
+    }
     console.log('[Webhook] Note: Subscription will be created/updated by subscription.active webhook event')
     
     // After recording payment, add fallback subscription sync
@@ -564,7 +606,7 @@ async function handlePaymentFailed(payment: any, supabase: any) {
     }
 
     // Record failed payment
-    await supabase
+    const { data: failedUpsert, error: failedError } = await supabase
       .from('payments')
       .upsert({
         user_id: customer.user_id,
@@ -578,6 +620,14 @@ async function handlePaymentFailed(payment: any, supabase: any) {
       }, {
         onConflict: 'dodo_payment_id'
       })
+      .select('dodo_payment_id')
+    if (failedError) {
+      console.error('[Webhook] Failed to upsert failed payment:', { paymentId: payment.id, error: failedError })
+      throw failedError
+    }
+    if (!failedUpsert || failedUpsert.length === 0) {
+      console.warn('[Webhook] Payment upsert returned no rows (failed):', payment.id)
+    }
 
   } catch (error) {
     console.error('Error handling payment failure:', error)
@@ -619,7 +669,7 @@ async function handlePaymentProcessing(payment: any, supabase: any) {
     }
 
     // Record payment with processing status
-    await supabase
+    const { data: processingUpsert, error: processingError } = await supabase
       .from('payments')
       .upsert({
         user_id: customer.user_id,
@@ -635,8 +685,16 @@ async function handlePaymentProcessing(payment: any, supabase: any) {
       }, {
         onConflict: 'dodo_payment_id'
       })
-    
-    console.log('[Webhook] Payment processing status recorded')
+      .select('dodo_payment_id')
+    if (processingError) {
+      console.error('[Webhook] Failed to upsert processing payment:', { paymentId, error: processingError })
+      throw processingError
+    }
+    if (!processingUpsert || processingUpsert.length === 0) {
+      console.warn('[Webhook] Payment upsert returned no rows (processing):', paymentId)
+    } else {
+      console.log('[Webhook] Payment processing status recorded')
+    }
   } catch (error) {
     console.error('[Webhook] Error handling payment processing:', error)
     throw error
@@ -649,15 +707,23 @@ async function handlePaymentCancelled(payment: any, supabase: any) {
     console.log('[Webhook] Processing cancelled payment:', paymentId)
     
     // Update payment status to cancelled
-    await supabase
+    const { data, error } = await supabase
       .from('payments')
       .update({
         status: 'cancelled',
         updated_at: new Date().toISOString()
       })
       .eq('dodo_payment_id', paymentId)
-    
-    console.log('[Webhook] Payment marked as cancelled')
+      .select('dodo_payment_id')
+    if (error) {
+      console.error('[Webhook] Failed to mark payment as cancelled:', { paymentId, error })
+      throw error
+    }
+    if (!data || data.length === 0) {
+      console.warn('[Webhook] No payment row updated for cancellation:', paymentId)
+    } else {
+      console.log('[Webhook] Payment marked as cancelled')
+    }
   } catch (error) {
     console.error('[Webhook] Error handling payment cancellation:', error)
     throw error
@@ -698,16 +764,47 @@ async function handleSubscriptionOnHold(subscription: any, supabase: any) {
       return
     }
 
+    // Fetch existing subscription to log transition and idempotency
+    let existing = null
+    try {
+      const { data: existingSub, error: fetchError } = await supabase
+        .from('subscriptions')
+        .select('id, status')
+        .eq('dodo_subscription_id', subscriptionId)
+        .single()
+      if (fetchError && !existingSub) {
+        console.warn('[Webhook] No subscription found to mark on_hold:', subscriptionId)
+        return
+      }
+      existing = existingSub
+    } catch (fetchErr) {
+      console.error('[Webhook] Failed to fetch subscription before marking on_hold:', fetchErr)
+      throw fetchErr
+    }
+    console.log('[Webhook] Subscription status transition:', { subscriptionId, from: existing?.status, to: 'on_hold' })
+    if (existing?.status === 'on_hold') {
+      console.log('[Webhook] Subscription already on_hold, no-op:', subscriptionId)
+      return
+    }
+
     // Update subscription status to on_hold
-    await supabase
+    const { data, error } = await supabase
       .from('subscriptions')
       .update({
         status: 'on_hold',
         updated_at: new Date().toISOString()
       })
       .eq('dodo_subscription_id', subscriptionId)
-    
-    console.log('[Webhook] Subscription marked as on hold')
+      .select('id, status')
+    if (error) {
+      console.error('[Webhook] Failed to mark subscription as on hold:', { subscriptionId, error })
+      throw error
+    }
+    if (!data || data.length === 0) {
+      console.warn('[Webhook] Update affected 0 rows for on_hold subscription:', subscriptionId)
+    } else {
+      console.log('[Webhook] Subscription marked as on hold')
+    }
   } catch (error) {
     console.error('[Webhook] Error handling subscription on hold:', error)
     throw error
@@ -717,18 +814,48 @@ async function handleSubscriptionOnHold(subscription: any, supabase: any) {
 async function handleSubscriptionExpired(subscription: any, supabase: any) {
   try {
     const subscriptionId = subscription.id || subscription.subscription_id
-    console.log('[Webhook] Processing expired subscription:', subscriptionId)
-    
-    await supabase
+    const canceledAt = subscription.canceled_at || subscription.cancelled_at || subscription.expires_at || new Date().toISOString()
+    const expiresAt = subscription.expires_at || subscription.current_period_end || null
+    console.log('[Webhook] Processing expired subscription:', { subscriptionId, canceledAt, expiresAt })
+    let existing = null
+    try {
+      const { data: existingSub, error: fetchError } = await supabase
+        .from('subscriptions')
+        .select('id, status')
+        .eq('dodo_subscription_id', subscriptionId)
+        .single()
+      if (fetchError && !existingSub) {
+        console.warn('[Webhook] No subscription found to expire:', subscriptionId)
+        return
+      }
+      existing = existingSub
+    } catch (fetchErr) {
+      console.error('[Webhook] Failed to fetch subscription before expiring:', fetchErr)
+      throw fetchErr
+    }
+    console.log('[Webhook] Subscription status transition:', { subscriptionId, from: existing?.status, to: 'expired' })
+    if (existing?.status === 'expired') {
+      console.log('[Webhook] Subscription already expired, no-op:', subscriptionId)
+      return
+    }
+    const { data, error } = await supabase
       .from('subscriptions')
       .update({
         status: 'expired',
-        canceled_at: subscription.canceled_at || new Date().toISOString(),
+        canceled_at: canceledAt,
         updated_at: new Date().toISOString()
       })
       .eq('dodo_subscription_id', subscriptionId)
-    
-    console.log('[Webhook] Subscription marked as expired')
+      .select('id, status')
+    if (error) {
+      console.error('[Webhook] Failed to update expired subscription:', { subscriptionId, error })
+      throw error
+    }
+    if (!data || data.length === 0) {
+      console.warn('[Webhook] Update affected 0 rows for expired subscription:', subscriptionId)
+    } else {
+      console.log('[Webhook] Subscription marked as expired:', subscriptionId)
+    }
   } catch (error) {
     console.error('[Webhook] Error handling subscription expiration:', error)
     throw error
@@ -740,15 +867,44 @@ async function handleSubscriptionFailed(subscription: any, supabase: any) {
     const subscriptionId = subscription.id || subscription.subscription_id
     console.log('[Webhook] Processing failed subscription:', subscriptionId)
     
-    await supabase
+    let existing = null
+    try {
+      const { data: existingSub, error: fetchError } = await supabase
+        .from('subscriptions')
+        .select('id, status')
+        .eq('dodo_subscription_id', subscriptionId)
+        .single()
+      if (fetchError && !existingSub) {
+        console.warn('[Webhook] No subscription found to mark failed:', subscriptionId)
+        return
+      }
+      existing = existingSub
+    } catch (fetchErr) {
+      console.error('[Webhook] Failed to fetch subscription before marking failed:', fetchErr)
+      throw fetchErr
+    }
+    console.log('[Webhook] Subscription status transition:', { subscriptionId, from: existing?.status, to: 'failed' })
+    if (existing?.status === 'failed') {
+      console.log('[Webhook] Subscription already failed, no-op:', subscriptionId)
+      return
+    }
+    const { data, error } = await supabase
       .from('subscriptions')
       .update({
         status: 'failed',
         updated_at: new Date().toISOString()
       })
       .eq('dodo_subscription_id', subscriptionId)
-    
-    console.log('[Webhook] Subscription marked as failed')
+      .select('id, status')
+    if (error) {
+      console.error('[Webhook] Failed to update failed subscription:', { subscriptionId, error })
+      throw error
+    }
+    if (!data || data.length === 0) {
+      console.warn('[Webhook] Update affected 0 rows for failed subscription:', subscriptionId)
+    } else {
+      console.log('[Webhook] Subscription marked as failed')
+    }
   } catch (error) {
     console.error('[Webhook] Error handling subscription failure:', error)
     throw error
