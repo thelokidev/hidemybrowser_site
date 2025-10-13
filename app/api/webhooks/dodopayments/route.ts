@@ -95,6 +95,8 @@ export async function POST(request: NextRequest) {
     const supabase = createAdminClient()
 
     console.log('[Webhook] Processing event:', event.type, 'ID:', event.id)
+    console.log('[Webhook] Full event payload:', JSON.stringify(event, null, 2))
+    console.log('[Webhook] Event data structure:', JSON.stringify(event.data, null, 2))
 
     // Log the webhook event
     await supabase
@@ -217,15 +219,28 @@ export async function POST(request: NextRequest) {
 
 async function handleSubscriptionEvent(subscription: any, supabase: any) {
   try {
-    // Extract subscription ID (webhook may use 'id' or 'subscription_id')
-    const subscriptionId = subscription.id || subscription.subscription_id
+    console.log('[Webhook] handleSubscriptionEvent called with:', JSON.stringify(subscription, null, 2))
+    
+    // Extract subscription ID - DodoPayments uses 'subscription_id' primarily
+    const subscriptionId = subscription.subscription_id || subscription.id
     console.log('[Webhook] Processing subscription:', subscriptionId, 'status:', subscription.status)
     
-    // Extract customer data from nested structure
-    const customerId = subscription.customer?.id || subscription.customer?.customer_id || subscription.customer_id
+    // Extract customer data from nested structure - DodoPayments uses customer.customer_id
+    const customerId = subscription.customer?.customer_id || subscription.customer?.id || subscription.customer_id
     const customerEmail = subscription.customer?.email || subscription.customer_email || subscription.email
     
     console.log('[Webhook] Customer lookup:', { customerId, customerEmail })
+    console.log('[Webhook] Subscription fields:', {
+      id: subscription.id,
+      subscription_id: subscription.subscription_id,
+      product_id: subscription.product_id,
+      price_id: subscription.price_id,
+      status: subscription.status,
+      current_period_start: subscription.current_period_start,
+      current_period_end: subscription.current_period_end,
+      expires_at: subscription.expires_at,
+      customer_structure: subscription.customer
+    })
     
     // Try to get customer by dodo_customer_id first
     let customer = null
@@ -339,30 +354,47 @@ async function handleSubscriptionEvent(subscription: any, supabase: any) {
     // - canceled_at: cancellation timestamp
     // - created_at: creation timestamp
     // - expires_at: expiration timestamp (for one-time/lifetime)
-    await supabase
+    
+    const subscriptionData = {
+      user_id: customer.user_id,
+      dodo_customer_id: customerId,
+      dodo_subscription_id: subscriptionId,
+      dodo_product_id: subscription.product_id,
+      dodo_price_id: subscription.price_id || null,
+      status: subscription.status,
+      // DodoPayments uses previous_billing_date/next_billing_date OR current_period_start/end
+      current_period_start: subscription.current_period_start || subscription.previous_billing_date || subscription.created_at,
+      current_period_end: subscription.current_period_end || subscription.next_billing_date || subscription.expires_at,
+      cancel_at_period_end: subscription.cancel_at_period_end || subscription.cancel_at_next_billing_date || false,
+      canceled_at: subscription.canceled_at || subscription.cancelled_at || null,
+      trial_start: subscription.trial_start || null,
+      trial_end: subscription.trial_end || null,
+      metadata: subscription.metadata,
+      updated_at: new Date().toISOString(),
+      ...upgradeData,
+    }
+    
+    console.log('[Webhook] Upserting subscription with data:', JSON.stringify(subscriptionData, null, 2))
+    
+    const { data: upsertData, error: upsertError } = await supabase
       .from('subscriptions')
-      .upsert({
-        user_id: customer.user_id,
-        dodo_customer_id: customerId,
-        dodo_subscription_id: subscriptionId,
-        dodo_product_id: subscription.product_id,
-        dodo_price_id: subscription.price_id,
-        status: subscription.status,
-        // Use correct period fields - DodoPayments API returns these field names
-        current_period_start: subscription.current_period_start || subscription.created_at,
-        current_period_end: subscription.current_period_end || subscription.expires_at,
-        cancel_at_period_end: subscription.cancel_at_period_end || subscription.cancel_at_next_billing_date || false,
-        canceled_at: subscription.canceled_at || subscription.cancelled_at,
-        trial_start: subscription.trial_start,
-        trial_end: subscription.trial_end,
-        metadata: subscription.metadata,
-        updated_at: new Date().toISOString(),
-        ...upgradeData,
-      }, {
+      .upsert(subscriptionData, {
         onConflict: 'dodo_subscription_id'
       })
+      .select()
 
-    console.log('[Webhook] Subscription synced successfully')
+    if (upsertError) {
+      console.error('[Webhook] Database upsert failed:', {
+        error: upsertError,
+        message: upsertError.message,
+        details: upsertError.details,
+        hint: upsertError.hint,
+        code: upsertError.code
+      })
+      throw upsertError
+    }
+
+    console.log('[Webhook] Subscription synced successfully, returned data:', JSON.stringify(upsertData, null, 2))
 
   } catch (error) {
     console.error('[Webhook] Error handling subscription event:', error)
@@ -488,13 +520,21 @@ async function handlePaymentSucceeded(payment: any, supabase: any, dodoClient: a
     // Fetch subscriptions by customer_id to ensure we get all active subscriptions
     if (customerId) {
       console.log('[Webhook] Fallback: Fetching subscriptions for customer:', customerId);
+      console.log('[Webhook] Fallback: Calling dodoClient.subscriptions.list with params:', { customer_id: customerId });
       try {
         const response = await dodoClient.subscriptions.list({
           customer_id: customerId
         });
         
-        const subscriptions = response.data || [];
+        console.log('[Webhook] Fallback: Dodo API raw response:', JSON.stringify(response, null, 2));
+        
+        // DodoPayments API returns subscriptions in 'items' not 'data'
+        const subscriptions = response.items || response.data || [];
         console.log('[Webhook] Fallback: Found', subscriptions.length, 'subscriptions for customer');
+        
+        if (subscriptions.length > 0) {
+          console.log('[Webhook] Fallback: Subscription details:', JSON.stringify(subscriptions, null, 2));
+        }
         
         // Sync all active or trialing subscriptions
         const activeSubscriptions = subscriptions.filter((sub: any) => 
@@ -505,23 +545,33 @@ async function handlePaymentSucceeded(payment: any, supabase: any, dodoClient: a
           console.log('[Webhook] Fallback: Syncing', activeSubscriptions.length, 'active subscriptions');
           for (const subscription of activeSubscriptions) {
             try {
+              console.log('[Webhook] Fallback: Processing subscription:', subscription.id);
               await handleSubscriptionEvent(subscription, supabase);
               console.log('[Webhook] Fallback: Successfully synced subscription:', subscription.id);
             } catch (syncError) {
-              console.error('[Webhook] Fallback: Failed to sync subscription:', subscription.id, syncError);
+              console.error('[Webhook] Fallback: Failed to sync subscription:', subscription.id);
+              console.error('[Webhook] Fallback sync error details:', {
+                error: syncError,
+                message: syncError instanceof Error ? syncError.message : 'Unknown error',
+                stack: syncError instanceof Error ? syncError.stack : undefined
+              });
             }
           }
         } else {
           console.log('[Webhook] Fallback: No active subscriptions found for customer');
+          console.log('[Webhook] Fallback: All subscription statuses:', subscriptions.map((s: any) => s.status));
         }
       } catch (fetchError) {
         console.error('[Webhook] Fallback subscription fetch failed:', fetchError);
         // Log detailed error for debugging
         if (fetchError instanceof Error) {
-          console.error('[Webhook] Error details:', {
+          console.error('[Webhook] Fallback error details:', {
+            name: fetchError.name,
             message: fetchError.message,
             stack: fetchError.stack
           });
+        } else {
+          console.error('[Webhook] Fallback unknown error type:', fetchError);
         }
       }
     } else {
