@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import Link from 'next/link'
 import { UserAvatar } from '@/components/user-avatar'
 import SubscriptionStatus from '@/components/subscription-status'
+import { SubscriptionDebug } from '@/components/subscription-debug'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -107,6 +108,10 @@ export default async function DashboardPage() {
             </Card>
 
             <SubscriptionStatus />
+
+            <div className="md:col-span-2">
+              <SubscriptionDebug />
+            </div>
 
             <Card className="md:col-span-2">
               <CardHeader>
