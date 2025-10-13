@@ -309,40 +309,6 @@ async function handleSubscriptionEvent(subscription: any, supabase: any) {
 
     console.log('[Webhook] Updating subscription for user:', customer.user_id)
 
-    // Check if user has a scheduled upgrade that should be activated
-    const { data: existingSubscription } = await supabase
-      .from('subscriptions')
-      .select('*')
-      .eq('user_id', customer.user_id)
-      .eq('dodo_subscription_id', subscriptionId)
-      .maybeSingle()
-
-    let upgradeData = {}
-    
-    // If this is a renewal and there's a scheduled upgrade, activate it
-    if (existingSubscription?.is_upgrade_scheduled) {
-      const currentPeriodEnd = subscription.current_period_end || subscription.expires_at
-      const scheduledStartDate = existingSubscription.scheduled_start_date
-      
-      // Check if we're at or past the scheduled start date
-      if (scheduledStartDate && new Date(currentPeriodEnd) >= new Date(scheduledStartDate)) {
-        console.log('[Webhook] Activating scheduled upgrade:', {
-          from: existingSubscription.dodo_product_id,
-          to: existingSubscription.scheduled_product_id,
-        })
-        
-        // Apply the upgrade
-        upgradeData = {
-          dodo_product_id: existingSubscription.scheduled_product_id,
-          scheduled_product_id: null,
-          scheduled_start_date: null,
-          is_upgrade_scheduled: false,
-        }
-        
-        console.log('[Webhook] Scheduled upgrade activated successfully')
-      }
-    }
-
     // Upsert subscription with correct DodoPayments field mappings
     // DodoPayments webhook subscription object structure:
     // - id/subscription_id: subscription identifier
@@ -371,7 +337,6 @@ async function handleSubscriptionEvent(subscription: any, supabase: any) {
       trial_end: subscription.trial_end || null,
       metadata: subscription.metadata,
       updated_at: new Date().toISOString(),
-      ...upgradeData,
     }
     
     console.log('[Webhook] Upserting subscription with data:', JSON.stringify(subscriptionData, null, 2))

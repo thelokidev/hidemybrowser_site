@@ -139,39 +139,7 @@ export default function PricingPage() {
       
       const planStatus = getPlanStatus(plan.dodoProductId)
 
-      // Handle upgrade scheduling
-      if (planStatus.type === 'upgrade') {
-        const response = await fetch(`${window.location.origin}/api/subscriptions/manage`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            action: 'schedule-upgrade',
-            newProductId: plan.dodoProductId,
-          }),
-        })
-
-        const result = await response.json()
-
-        if (!response.ok || !result.success) {
-          throw new Error(result.error || result.message || "Failed to schedule upgrade")
-        }
-
-        toast({
-          title: "Upgrade Scheduled ✓",
-          description: result.message,
-        })
-
-        // Refresh to show updated UI
-        setTimeout(() => {
-          window.location.reload()
-        }, 2000)
-
-        return
-      }
-
-      // Handle new subscription checkout
+      // Only handle new subscription checkout
       if (planStatus.type === 'subscribe') {
         const response = await fetch(`${window.location.origin}/checkout`, {
           method: "POST",
@@ -300,9 +268,7 @@ export default function PricingPage() {
                               className={`w-full mt-auto transition-transform duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary/60 ${
                                 isCurrentPlan
                                   ? 'bg-blue-600 text-white hover:bg-blue-700'
-                                  : isUpgrade
-                                  ? 'bg-green-600 text-white hover:bg-green-700 hover:-translate-y-0.5 active:translate-y-0'
-                                  : isDowngrade
+                                  : isBlocked
                                   ? 'bg-muted text-muted-foreground cursor-not-allowed'
                                   : 'bg-foreground text-background hover:bg-foreground/90 hover:-translate-y-0.5 active:translate-y-0'
                               }`}
@@ -312,16 +278,14 @@ export default function PricingPage() {
                                 ? 'Processing...' 
                                 : isCurrentPlan
                                 ? 'Current Plan'
-                                : isUpgrade
-                                ? 'Schedule Upgrade'
-                                : isDowngrade
-                                ? 'Downgrade Blocked'
+                                : isBlocked
+                                ? 'Plan Change Blocked'
                                 : plan.cta
                               }
                             </Button>
                           </div>
                         </TooltipTrigger>
-                        {(isDowngrade || isCurrentPlan) && (
+                        {isBlocked && (
                           <TooltipContent>
                             <p className="max-w-xs text-sm">{planStatus.reason}</p>
                           </TooltipContent>

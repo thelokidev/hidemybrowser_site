@@ -100,8 +100,7 @@ export interface PlanChangeValidation {
  * Validate if a plan change is allowed based on business rules
  * 
  * Business Rules:
- * - Upgrades: Allowed, will be scheduled for end of current period
- * - Downgrades: NOT allowed - user must wait for current plan to expire
+ * - All plan changes are blocked - user must wait for current plan to expire
  * - Same tier: Not allowed - user already has this plan
  * 
  * @param currentProductId - Current subscription product ID
@@ -121,30 +120,11 @@ export function canChangePlan(
     }
   }
 
-  // Check if upgrade
-  if (isUpgrade(currentProductId, newProductId)) {
-    const newTierName = getTierName(newProductId)
-    return {
-      allowed: true,
-      reason: `Upgrade to ${newTierName} will be scheduled to start at the end of your current billing period`,
-      changeType: 'upgrade',
-    }
-  }
-
-  // Check if downgrade
-  if (isDowngrade(currentProductId, newProductId)) {
-    return {
-      allowed: false,
-      reason: 'Downgrades are not allowed. Please wait for your current plan to expire, then you can subscribe to a different plan.',
-      changeType: 'downgrade',
-    }
-  }
-
-  // Unknown product IDs
+  // Block ALL changes - user must wait for current plan to expire
   return {
     allowed: false,
-    reason: 'Unable to validate plan change - unknown product',
-    changeType: 'unknown',
+    reason: 'Please wait for your current plan to expire, then you can subscribe to a different plan.',
+    changeType: isUpgrade(currentProductId, newProductId) ? 'upgrade' : 'downgrade',
   }
 }
 

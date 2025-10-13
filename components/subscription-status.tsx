@@ -107,8 +107,6 @@ export default function SubscriptionStatus() {
 
     const daysRemaining = getDaysRemaining()
     const planName = getPlanName(subscription?.dodo_product_id)
-    const hasScheduledUpgrade = subscription.is_upgrade_scheduled
-    const scheduledPlanName = hasScheduledUpgrade ? getPlanName(subscription.scheduled_product_id) : null
 
     return (
       <Card>
@@ -160,26 +158,10 @@ export default function SubscriptionStatus() {
             </div>
           )}
 
-          {hasScheduledUpgrade && scheduledPlanName && (
-            <div className="p-3 bg-green-500/10 border border-green-500/20 rounded-lg space-y-2">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-semibold text-green-700 dark:text-green-600">
-                  Upgrade Scheduled
-                </p>
-                <Badge variant="secondary" className="bg-green-500/20 text-green-700">
-                  Pending
-                </Badge>
-              </div>
-              <p className="text-sm text-green-700 dark:text-green-600">
-                Your plan will upgrade to <strong>{scheduledPlanName}</strong> on {formatDate(subscription.scheduled_start_date)}.
-              </p>
-            </div>
-          )}
-
           <div className="pt-2 space-y-2">
             <Link href="/pricing" className="block">
               <Button variant="outline" className="w-full">
-                {hasScheduledUpgrade ? 'Modify Plan' : 'Change Plan'}
+                View Plans
               </Button>
             </Link>
           </div>
