@@ -450,18 +450,47 @@ async function handlePaymentSucceeded(payment: any, supabase: any, dodoClient: a
     console.log('[Webhook] Note: Subscription will be created/updated by subscription.active webhook event')
     
     // After recording payment, add fallback subscription sync
-    const subscriptionId = payment.subscription_id || payment.subscription?.id || payment.data?.subscription_id;
-    if (subscriptionId) {
-      console.log('[Webhook] Fallback: Fetching subscription for payment:', subscriptionId);
+    // Fetch subscriptions by customer_id to ensure we get all active subscriptions
+    if (customerId) {
+      console.log('[Webhook] Fallback: Fetching subscriptions for customer:', customerId);
       try {
-        const dodoSubscription = await dodoClient.subscriptions.retrieve(subscriptionId);
-        if (dodoSubscription) {
-          console.log('[Webhook] Fallback: Processing fetched subscription');
-          await handleSubscriptionEvent(dodoSubscription, supabase);
+        const response = await dodoClient.subscriptions.list({
+          customer_id: customerId
+        });
+        
+        const subscriptions = response.data || [];
+        console.log('[Webhook] Fallback: Found', subscriptions.length, 'subscriptions for customer');
+        
+        // Sync all active or trialing subscriptions
+        const activeSubscriptions = subscriptions.filter((sub: any) => 
+          sub.status === 'active' || sub.status === 'trialing'
+        );
+        
+        if (activeSubscriptions.length > 0) {
+          console.log('[Webhook] Fallback: Syncing', activeSubscriptions.length, 'active subscriptions');
+          for (const subscription of activeSubscriptions) {
+            try {
+              await handleSubscriptionEvent(subscription, supabase);
+              console.log('[Webhook] Fallback: Successfully synced subscription:', subscription.id);
+            } catch (syncError) {
+              console.error('[Webhook] Fallback: Failed to sync subscription:', subscription.id, syncError);
+            }
+          }
+        } else {
+          console.log('[Webhook] Fallback: No active subscriptions found for customer');
         }
       } catch (fetchError) {
         console.error('[Webhook] Fallback subscription fetch failed:', fetchError);
+        // Log detailed error for debugging
+        if (fetchError instanceof Error) {
+          console.error('[Webhook] Error details:', {
+            message: fetchError.message,
+            stack: fetchError.stack
+          });
+        }
       }
+    } else {
+      console.warn('[Webhook] No customer_id available for fallback subscription sync');
     }
     
   } catch (error) {

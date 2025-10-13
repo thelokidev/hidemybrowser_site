@@ -216,43 +216,12 @@ export default function SubscriptionStatus() {
             <Button className="w-full">View Plans</Button>
           </Link>
           
-          {/* Show sync button if user might have a pending subscription */}
+          {/* Info about automatic subscription sync */}
           <div className="pt-4 border-t">
-            <p className="text-xs text-muted-foreground mb-3">
-              Just completed a payment? Try syncing your subscription manually:
+            <p className="text-xs text-muted-foreground">
+              After completing a payment, your subscription will be activated automatically within a few moments. 
+              If you don't see it after refreshing, please contact support.
             </p>
-            <Button 
-              variant="outline" 
-              size="sm"
-              className="w-full"
-              onClick={async () => {
-                try {
-                  const response = await fetch('/api/subscriptions/sync', { method: 'POST' })
-                  const data = await response.json()
-                  if (data.success && data.syncedCount > 0) {
-                    toast({
-                      title: 'Subscription synced!',
-                      description: 'Refreshing page...',
-                    })
-                    setTimeout(() => window.location.reload(), 1500)
-                  } else {
-                    toast({
-                      title: 'No subscriptions found',
-                      description: data.message || 'Please complete a payment first.',
-                      variant: 'default'
-                    })
-                  }
-                } catch (error) {
-                  toast({
-                    title: 'Sync failed',
-                    description: 'Please try again or contact support.',
-                    variant: 'destructive'
-                  })
-                }
-              }}
-            >
-              Sync Subscription
-            </Button>
           </div>
         </CardContent>
       </Card>
