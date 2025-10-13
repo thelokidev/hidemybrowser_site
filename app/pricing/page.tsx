@@ -159,7 +159,7 @@ export default function PricingPage() {
         }
 
         toast({
-          title: "Upgrade Scheduled",
+          title: "Upgrade Scheduled ✓",
           description: result.message,
         })
 
@@ -209,7 +209,13 @@ export default function PricingPage() {
         description: error.message || "Failed to process request. Please try again.",
         variant: "destructive",
       })
-      setLoading(null)
+    } finally {
+      // Always reset loading state to re-enable button
+      // Skip only if we're redirecting (checkout flow)
+      const planStatus = getPlanStatus(plan.dodoProductId)
+      if (planStatus.type !== 'subscribe') {
+        setLoading(null)
+      }
     }
   }
 
