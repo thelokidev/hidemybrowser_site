@@ -12,6 +12,9 @@ export interface DodoSubscription {
   canceled_at?: string
   trial_start?: string
   trial_end?: string
+  is_upgrade_scheduled?: boolean
+  scheduled_product_id?: string
+  scheduled_start_date?: string
   metadata?: Record<string, any>
   created_at: string
   updated_at: string

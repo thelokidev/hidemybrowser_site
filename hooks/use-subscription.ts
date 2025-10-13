@@ -36,24 +36,35 @@ export function useSubscription() {
       try {
         console.log('[useSubscription] Fetching subscription for user:', user.id)
         
-        // First get subscription from Supabase
+        // Get most recent active subscription from Supabase
+        // Using maybeSingle() to handle cases with multiple subscriptions
+        // Prioritize active subscriptions, then get most recent
         const { data, error } = await supabase
           .from('subscriptions')
           .select('*')
           .eq('user_id', user.id)
-          .single()
+          .in('status', ['active', 'trialing', 'renewed'])
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle()
 
         console.log('[useSubscription] Supabase response:', { data, error })
 
-        if (error && error.code !== 'PGRST116') throw error
+        if (error) {
+          console.error('[useSubscription] Error fetching subscription:', error)
+          throw error
+        }
 
         const subscriptionData = data as DodoSubscription | null
 
         // Use Supabase as source of truth - webhooks keep it up-to-date
         // No need to fetch from DodoPayments API client-side
         console.log('[useSubscription] Subscription data from database:', subscriptionData)
+        console.log('[useSubscription] Subscription status:', subscriptionData?.status)
+        console.log('[useSubscription] Product ID:', subscriptionData?.dodo_product_id)
         setSubscription(subscriptionData)
       } catch (err) {
+        console.error('[useSubscription] Error:', err)
         setError(err instanceof Error ? err.message : 'An error occurred')
       } finally {
         setLoading(false)
@@ -122,18 +133,26 @@ export function useHasActiveSubscription() {
 
     async function checkSubscription() {
       try {
+        console.log('[useHasActiveSubscription] Checking subscription for user:', user.id)
+        
         const { data, error } = await supabase
           .from('subscriptions')
           .select('status')
           .eq('user_id', user.id)
-          .eq('status', 'active')
-          .single()
+          .in('status', ['active', 'trialing', 'renewed'])
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle()
 
-        if (error && error.code !== 'PGRST116') throw error
+        if (error) {
+          console.error('[useHasActiveSubscription] Error:', error)
+          throw error
+        }
 
+        console.log('[useHasActiveSubscription] Result:', !!data)
         setHasSubscription(!!data)
       } catch (err) {
-        console.error('Error checking subscription:', err)
+        console.error('[useHasActiveSubscription] Error checking subscription:', err)
         setHasSubscription(false)
       } finally {
         setLoading(false)
