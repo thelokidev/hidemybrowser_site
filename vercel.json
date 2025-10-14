@@ -3,5 +3,22 @@
   "devCommand": "npm run dev",
   "installCommand": "npm install --legacy-peer-deps",
   "framework": "nextjs",
-  "regions": ["iad1"]
+  "regions": ["iad1"],
+  "crons": [
+    {
+      "path": "/api/cron/expiry-scanner",
+      "schedule": "0 9 * * *",
+      "method": "GET"
+    },
+    {
+      "path": "/api/cron/payment-retry",
+      "schedule": "0 */6 * * *",
+      "method": "POST"
+    },
+    {
+      "path": "/api/cron/grace-enforcer",
+      "schedule": "0 0 * * *",
+      "method": "POST"
+    }
+  ]
 }

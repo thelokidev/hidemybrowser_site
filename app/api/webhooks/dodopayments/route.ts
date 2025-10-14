@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getDodoPayments } from '@/lib/dodopayments/client'
+import { nextRetryAt } from '@/lib/payments/retry-scheduler'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { syncCustomerFromDodo } from '@/lib/supabase/webhook-helpers'
 
@@ -522,6 +523,45 @@ async function handlePaymentSucceeded(payment: any, supabase: any, dodoClient: a
       console.log('[Webhook] Payment recorded successfully')
     }
     console.log('[Webhook] Note: Subscription will be created/updated by subscription.active webhook event')
+
+    // Resolve payment attempts and clear grace period on success
+    try {
+      // Find latest subscription for this user
+      const { data: subs } = await supabase
+        .from('subscriptions')
+        .select('id, status')
+        .eq('user_id', customer.user_id)
+        .order('updated_at', { ascending: false })
+        .limit(1)
+
+      const sub = subs?.[0]
+      if (sub) {
+        // Mark attempts resolved and reset counters
+        await supabase
+          .from('payment_attempts')
+          .update({
+            status: 'resolved',
+            failure_count: 0,
+            next_retry_at: null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('subscription_id', sub.id)
+          .eq('user_id', customer.user_id)
+
+        // Reactivate subscription and clear grace fields
+        await supabase
+          .from('subscriptions')
+          .update({
+            status: 'active',
+            grace_period_start: null,
+            grace_period_end: null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', sub.id)
+      }
+    } catch (resolveErr) {
+      console.warn('[Webhook] Failed to resolve attempts/clear grace on payment success:', resolveErr)
+    }
     
     // After recording payment, add fallback subscription sync
     // Fetch subscriptions by customer_id to ensure we get all active subscriptions
@@ -627,6 +667,94 @@ async function handlePaymentFailed(payment: any, supabase: any) {
     }
     if (!failedUpsert || failedUpsert.length === 0) {
       console.warn('[Webhook] Payment upsert returned no rows (failed):', payment.id)
+    }
+
+    // --- Payment retry tracking & grace period enforcement ---
+    try {
+      // Find latest subscription for this user
+      const { data: subs } = await supabase
+        .from('subscriptions')
+        .select('id, status, grace_period_days')
+        .eq('user_id', customer.user_id)
+        .order('updated_at', { ascending: false })
+        .limit(1)
+
+      const sub = subs?.[0]
+      if (!sub) {
+        console.warn('[Webhook] No subscription found to attach payment_attempts for user:', customer.user_id)
+        return
+      }
+
+      const maxRetries = Number(process.env.MAX_PAYMENT_RETRIES || 3)
+      const graceDaysEnv = Number(process.env.GRACE_PERIOD_DAYS || 7)
+      const graceDays = Number.isFinite(sub.grace_period_days) && sub.grace_period_days != null
+        ? Number(sub.grace_period_days)
+        : graceDaysEnv
+
+      // Get last attempt
+      const { data: attempts } = await supabase
+        .from('payment_attempts')
+        .select('id, failure_count, status')
+        .eq('subscription_id', sub.id)
+        .eq('user_id', customer.user_id)
+        .order('updated_at', { ascending: false })
+        .limit(1)
+
+      const last = attempts?.[0]
+      const failureCount = (last?.failure_count || 0) + 1
+      const next = nextRetryAt(failureCount)
+      const reachedLimit = failureCount >= maxRetries
+      const attemptStatus = reachedLimit ? 'suspended' : 'retrying'
+
+      if (last) {
+        await supabase
+          .from('payment_attempts')
+          .update({
+            failure_count: failureCount,
+            last_attempt_at: new Date().toISOString(),
+            next_retry_at: next,
+            status: attemptStatus,
+            error_message: payment.error || payment.failure_reason || null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', last.id)
+      } else {
+        await supabase
+          .from('payment_attempts')
+          .insert({
+            user_id: customer.user_id,
+            subscription_id: sub.id,
+            dodo_payment_id: payment.id,
+            failure_count: failureCount,
+            last_attempt_at: new Date().toISOString(),
+            next_retry_at: next,
+            status: attemptStatus,
+            error_message: payment.error || payment.failure_reason || null,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          })
+      }
+
+      if (reachedLimit) {
+        const now = new Date()
+        const graceEnd = new Date(now.getTime() + graceDays * 24 * 60 * 60 * 1000)
+        await supabase
+          .from('subscriptions')
+          .update({
+            status: 'suspended',
+            grace_period_start: now.toISOString(),
+            grace_period_end: graceEnd.toISOString(),
+            updated_at: now.toISOString(),
+          })
+          .eq('id', sub.id)
+        console.log('[Webhook] Subscription moved to suspended with grace period', {
+          user_id: customer.user_id,
+          subscription_id: sub.id,
+          grace_end: graceEnd.toISOString(),
+        })
+      }
+    } catch (retryError) {
+      console.warn('[Webhook] Failed to record payment_attempts or enforce grace period:', retryError)
     }
 
   } catch (error) {
