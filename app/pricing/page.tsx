@@ -73,7 +73,7 @@ export default function PricingPage() {
   const [userName, setUserName] = useState<string | null>(null)
   const { toast } = useToast()
   const supabase = createClient()
-  const { subscription } = useSubscription()
+  const { subscription, loading: subLoading } = useSubscription()
 
   // Fetch user email and name on mount
   useEffect(() => {
@@ -98,7 +98,7 @@ export default function PricingPage() {
 
     const currentProductId = subscription.dodo_product_id
 
-    // Check if this is the current plan
+    // Current plan
     if (currentProductId === planProductId) {
       return {
         type: 'current' as const,
@@ -107,29 +107,12 @@ export default function PricingPage() {
       }
     }
 
-    // Validate plan change
-    const validation = canChangePlan(currentProductId, planProductId)
-
-    if (validation.changeType === 'upgrade') {
-      return {
-        type: 'upgrade' as const,
-        allowed: true,
-        reason: validation.reason,
-      }
-    }
-
-    if (validation.changeType === 'downgrade') {
-      return {
-        type: 'downgrade' as const,
-        allowed: false,
-        reason: validation.reason,
-      }
-    }
-
+    // Block ALL changes until current plan expires
+    const validation = canChangePlan(String(currentProductId || ''), String(planProductId || ''))
     return {
-      type: 'unknown' as const,
+      type: validation.changeType as 'upgrade' | 'downgrade' | 'unknown',
       allowed: false,
-      reason: validation.reason,
+      reason: 'Plan changes are blocked until your current plan expires.',
     }
   }
 
@@ -209,7 +192,8 @@ export default function PricingPage() {
               const isCurrentPlan = planStatus.type === 'current'
               const isUpgrade = planStatus.type === 'upgrade'
               const isDowngrade = planStatus.type === 'downgrade'
-              const isBlocked = !planStatus.allowed
+              // While subscription state is loading, treat all actions as blocked to avoid flicker
+              const isBlocked = subLoading || !planStatus.allowed
 
               return (
                 <motion.div
@@ -274,14 +258,15 @@ export default function PricingPage() {
                               }`}
                               size="lg"
                             >
-                              {loading === plan.name 
-                                ? 'Processing...' 
+                              {loading === plan.name
+                                ? 'Processing...'
                                 : isCurrentPlan
                                 ? 'Current Plan'
+                                : isBlocked && subLoading
+                                ? 'Checking subscription...'
                                 : isBlocked
                                 ? 'Plan Change Blocked'
-                                : plan.cta
-                              }
+                                : plan.cta}
                             </Button>
                           </div>
                         </TooltipTrigger>

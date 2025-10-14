@@ -6,6 +6,7 @@ import { useRef, useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Check } from "lucide-react"
 import { createClient } from '@/lib/supabase/client'
+import { useSubscription } from '@/hooks/use-subscription'
 
 // Product ID mapping for checkout
 const checkoutUrls: Record<string, string> = {
@@ -77,42 +78,36 @@ export function Pricing() {
   const [loading, setLoading] = useState<string | null>(null)
   const [currentPlan, setCurrentPlan] = useState<string | null>(null)
   const supabase = createClient()
+  const { subscription, loading: subLoading } = useSubscription()
 
-  // Fetch user email/name and current active subscription on mount
+  // Fetch user email/name and derive current plan from subscription hook
   useEffect(() => {
     async function fetchUser() {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
         setUserEmail(user.email || undefined)
         setUserName(user.user_metadata?.full_name || user.user_metadata?.name || undefined)
-
-        try {
-          // Find any active subscription and map product -> plan name
-          const { data: subs } = await supabase
-            .from('subscriptions')
-            .select('dodo_product_id, status')
-            .eq('user_id', user.id)
-            .eq('status', 'active')
-            .limit(1)
-          const sub = Array.isArray(subs) ? subs[0] : null
-          const productId = (sub as any)?.dodo_product_id as string | undefined
-          if (productId) {
-            const plan = idToPlan[productId]
-            if (plan) setCurrentPlan(plan)
-          }
-        } catch (e) {
-          // ignore if table or field mismatch
-        }
       }
     }
     fetchUser()
   }, [supabase])
 
+  // Keep current plan in sync with subscription hook
+  useEffect(() => {
+    const productId = subscription?.dodo_product_id || null
+    if (productId) {
+      const plan = idToPlan[productId]
+      setCurrentPlan(plan || null)
+    } else {
+      setCurrentPlan(null)
+    }
+  }, [subscription])
+
   const handleCheckout = async (plan: typeof plans[0]) => {
     try {
       setLoading(plan.name)
-      // Block plan changes while a current subscription is active
-      if (currentPlan && currentPlan !== plan.name) {
+      // While subscription is loading or an active subscription exists for another plan, block
+      if (subLoading || (currentPlan && currentPlan !== plan.name)) {
         setLoading(null)
         return
       }
@@ -207,16 +202,18 @@ export function Pricing() {
 
                 <Button
                   onClick={() => handleCheckout(plan)}
-                  disabled={loading === plan.name || (currentPlan !== null && currentPlan !== plan.name)}
+                  disabled={subLoading || loading === plan.name || (currentPlan !== null && currentPlan !== plan.name)}
                   className={`w-full mt-auto transition-transform duration-200 hover:-translate-y-0.5 active:translate-y-0 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary/60 
             ${currentPlan === plan.name ? 'bg-muted text-foreground cursor-default' : currentPlan ? 'bg-muted text-muted-foreground cursor-not-allowed' : 'bg-foreground text-background hover:bg-foreground/90'}`}
                   size="lg"
                 >
-                  {currentPlan === plan.name
-                    ? 'Current Plan'
-                    : currentPlan && currentPlan !== plan.name
-                      ? 'Plan Change Blocked'
-                      : (loading === plan.name ? 'Processing...' : plan.cta)}
+                  {subLoading
+                    ? 'Checking subscription...'
+                    : currentPlan === plan.name
+                      ? 'Current Plan'
+                      : currentPlan && currentPlan !== plan.name
+                        ? 'Plan Change Blocked'
+                        : (loading === plan.name ? 'Processing...' : plan.cta)}
                 </Button>
                 {currentPlan && currentPlan !== plan.name && (
                   <p className="text-[12px] text-muted-foreground mt-2 text-center">
