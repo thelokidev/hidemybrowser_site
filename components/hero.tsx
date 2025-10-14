@@ -57,7 +57,7 @@ export function Hero() {
   }
 
   return (
-    <section className="relative pt-20 sm:pt-24 md:pt-28 lg:pt-32 xl:pt-36 pb-12 sm:pb-16 md:pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+    <section className="relative bg-background pt-20 sm:pt-24 md:pt-28 lg:pt-32 xl:pt-36 pb-12 sm:pb-16 md:pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
       <div className="max-w-6xl mx-auto">
         {/* Hero heading */}
         <motion.div
@@ -117,15 +117,7 @@ export function Hero() {
           transition={{ duration: 0.8, delay: 0.3 }}
           className="relative max-w-6xl mx-auto"
         >
-          {/* Subtle light-green glow behind the demo */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -inset-x-24 -bottom-24 h-80 bg-emerald-400/15 blur-3xl rounded-full z-0"
-          />
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -inset-x-40 -top-10 h-40 bg-emerald-300/10 blur-2xl rounded-full z-0"
-          />
+          {/* Removed green glow overlays */}
           {/* Screen Share Window Mockup */}
           <div className="relative z-10 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 p-8 shadow-2xl border border-slate-700/50">
             {/* Window Header */}

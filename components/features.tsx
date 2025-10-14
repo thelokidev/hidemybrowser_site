@@ -60,19 +60,6 @@ export function Features() {
 
   return (
     <section id="features" ref={ref} className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 bg-muted/30">
-      {/* Blend with surrounding sections to avoid visible separators */}
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 -top-16 h-24 bg-gradient-to-b from-background to-transparent" />
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 -bottom-16 h-24 bg-gradient-to-t from-background to-transparent" />
-
-      {/* Subtle green hue leaking in from hero (softened) */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 w-[1400px] h-80 bg-emerald-400/8 blur-3xl rounded-full"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -top-24 right-1/5 w-[800px] h-72 bg-emerald-300/6 blur-3xl rounded-full"
-      />
 
       <div className="max-w-6xl mx-auto">
         <motion.div
