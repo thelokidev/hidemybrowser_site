@@ -15,7 +15,7 @@ import { Pricing } from "@/components/pricing"
 import { FAQ } from "@/components/faq"
 import { Footer } from "@/components/footer"
 import { createClient } from "@/lib/supabase/client"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 // removed auto-redirect to avoid navigation loops on sign-out
 import { Loader2, Mail, CheckCircle2 } from "lucide-react"
 
@@ -26,18 +26,21 @@ export default function AuthPage() {
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
   const supabase = createClient()
   const router = useRouter()
+  const searchParams = useSearchParams()
   
   // Check if user is already authenticated
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       if (session) {
-        console.log('[Auth Page] User already authenticated, redirecting to dashboard')
-        router.replace("/dashboard")
+        const next = searchParams.get('next')
+        const target = next && next.startsWith('/') ? next : "/dashboard"
+        console.log('[Auth Page] User already authenticated, redirecting to', target)
+        router.replace(target)
       }
     }
     checkAuth()
-  }, [supabase, router])
+  }, [supabase, router, searchParams])
 
   const handleMagicLink = async (e: React.FormEvent) => {
     e.preventDefault()

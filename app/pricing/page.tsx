@@ -15,9 +15,8 @@ import { canChangePlan, getTierName } from '@/lib/subscription-tier-utils'
 import { Badge } from "@/components/ui/badge"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Separator } from "@/components/ui/separator"
 import Link from "next/link"
+import { useSearchParams, useRouter } from "next/navigation"
 const plans = [
   {
     name: "Weekly",
@@ -77,15 +76,14 @@ export default function PricingPage() {
   const [userName, setUserName] = useState<string | null>(null)
   const [authUser, setAuthUser] = useState<any>(null)
   const [authChecking, setAuthChecking] = useState(true)
-  const [showLogin, setShowLogin] = useState(false)
-  const [loginEmail, setLoginEmail] = useState("")
-  const [loginLoading, setLoginLoading] = useState<string | null>(null)
   const [pendingPlan, setPendingPlan] = useState<typeof plans[0] | null>(null)
   const [paymentUrl, setPaymentUrl] = useState<string | null>(null)
   const [showPayment, setShowPayment] = useState(false)
   const { toast } = useToast()
   const supabase = createClient()
   const { subscription, loading: subLoading } = useSubscription()
+  const searchParams = useSearchParams()
+  const router = useRouter()
 
   // Fetch user email and name on mount
   useEffect(() => {
@@ -104,9 +102,12 @@ export default function PricingPage() {
       if (session?.user) {
         setUserEmail(session.user.email || null)
         setUserName(session.user.user_metadata?.full_name || session.user.user_metadata?.name || null)
-        setShowLogin(false)
-        // If there was a pending plan, continue to payment creation
-        if (pendingPlan) {
+        // If returned from /auth with plan param, auto-continue
+        const planSlug = searchParams.get('plan')
+        const plan = planSlug ? plans.find(p => p.name.toLowerCase().startsWith(planSlug)) : null
+        if (plan && !showPayment) {
+          void continueCheckout(plan)
+        } else if (pendingPlan && !showPayment) {
           void continueCheckout(pendingPlan)
           setPendingPlan(null)
         }
@@ -183,10 +184,11 @@ export default function PricingPage() {
 
       // Only handle new subscription checkout
       if (planStatus.type === 'subscribe') {
-        // Enforce login before payment
+        // Enforce login using existing /auth page
         if (!authUser) {
-          setPendingPlan(plan)
-          setShowLogin(true)
+          const planSlug = plan.name.toLowerCase().split(' ')[0]
+          const next = encodeURIComponent(`/pricing?plan=${planSlug}`)
+          window.location.href = `/auth?next=${next}`
           return
         }
         await continueCheckout(plan)
@@ -212,22 +214,7 @@ export default function PricingPage() {
     }
   }
 
-  const sendMagicLink = async (e: React.FormEvent) => {
-    e.preventDefault()
-    try {
-      setLoginLoading('magic')
-      const { error } = await supabase.auth.signInWithOtp({
-        email: loginEmail,
-        options: { emailRedirectTo: `${window.location.origin}/auth/callback` }
-      })
-      if (error) throw error
-      toast({ title: 'Check your email', description: 'We sent you a magic link to sign in.' })
-    } catch (err: any) {
-      toast({ title: 'Login failed', description: err.message || 'Please try again.', variant: 'destructive' })
-    } finally {
-      setLoginLoading(null)
-    }
-  }
+  // No local login modal; authentication is handled by /auth page
 
   return (
     <main className="min-h-screen bg-background">
@@ -344,33 +331,7 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* Login Modal (shown when user is not authenticated) */}
-      <Dialog open={showLogin} onOpenChange={setShowLogin}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Sign in to continue</DialogTitle>
-            <DialogDescription>
-              You must be signed in to purchase a plan. Use a magic link to sign in.
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={sendMagicLink} className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium" htmlFor="login-email">Email</label>
-              <Input id="login-email" type="email" value={loginEmail} onChange={e => setLoginEmail(e.target.value)} placeholder="you@example.com" required />
-            </div>
-            <Button type="submit" disabled={!!loginLoading} className="w-full">
-              {loginLoading ? 'Sending...' : 'Send magic link'}
-            </Button>
-            <div className="text-xs text-muted-foreground text-center">
-              We’ll email you a secure link to log in.
-            </div>
-          </form>
-          <Separator className="my-4" />
-          <div className="text-xs text-center text-muted-foreground">
-            Need help? <Link href="/support" className="underline">Contact support</Link>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Authentication uses dedicated /auth page; no local login modal */}
 
       {/* Payment Modal - embeds checkout in-place */}
       <Dialog open={showPayment} onOpenChange={setShowPayment}>

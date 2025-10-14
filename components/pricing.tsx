@@ -202,11 +202,8 @@ export function Pricing() {
 
                 <Button
                   onClick={() => {
-                    if (plan.name === 'Monthly') {
-                      window.location.href = '/pricing?plan=monthly'
-                      return
-                    }
-                    handleCheckout(plan)
+                    const slug = plan.name.toLowerCase().split(' ')[0]
+                    window.location.href = `/pricing?plan=${encodeURIComponent(slug)}`
                   }}
                   disabled={subLoading || loading === plan.name || (currentPlan !== null && currentPlan !== plan.name)}
                   className={`w-full mt-auto transition-transform duration-200 hover:-translate-y-0.5 active:translate-y-0 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary/60 
