@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useMemo, useState, useEffect } from "react"
 import { useAuth } from "@/contexts/auth-context"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+// Using plain img to avoid dependency on shadcn Avatar context
 import { createClient } from "@/lib/supabase/client"
 import styles from "./UserAvatar.module.css"
 
@@ -100,13 +100,16 @@ export function UserAvatar({ href = "/dashboard", size = 32, withLink = true, cl
 
   const avatar = (
     <div className={`${styles.container} ${isPro ? styles.pro : ''} ${className || ''}`} style={{ width: size, height: size }}>
-      <AvatarImage
-        src={imgSrc}
-        alt="User avatar"
-        className={styles.image}
-        onError={() => setImgSrc("/placeholder-user.jpg")}
-      />
-      <AvatarFallback className={styles.initials} style={{ fontSize: size * 0.4 }}>{fallback}</AvatarFallback>
+      {imgSrc ? (
+        <img
+          src={imgSrc}
+          alt="User avatar"
+          className={styles.image}
+          onError={() => setImgSrc("")}
+        />
+      ) : (
+        <div className={styles.initials} style={{ fontSize: size * 0.4 }}>{fallback}</div>
+      )}
     </div>
   )
 
