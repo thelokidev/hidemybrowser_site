@@ -67,7 +67,7 @@ export function Header() {
             }`}
           >
             <Image
-              src="/favicon.png"
+              src="/favicon.ico"
               alt="HideMyBrowser logo"
               width={24}
               height={24}

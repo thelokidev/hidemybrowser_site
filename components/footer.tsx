@@ -7,7 +7,7 @@ export function Footer() {
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <Link href="/" className="flex items-center gap-2 text-xl font-semibold hover:opacity-80 transition-opacity">
-            <Image src="/favicon.png" alt="HideMyBrowser logo" width={22} height={22} className="rounded-sm" />
+            <Image src="/favicon.ico" alt="HideMyBrowser logo" width={22} height={22} className="rounded-sm" />
             <span>HideMyBrowser</span>
           </Link>
 
