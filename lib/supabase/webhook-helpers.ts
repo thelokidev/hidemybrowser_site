@@ -14,22 +14,29 @@ export async function syncCustomerFromDodo(
   const userId = dodoCustomer.metadata?.supabase_user_id
 
   if (!userId) {
-    // Try to find by email
+    // Try to find by email using listUsers
     console.log('[WebhookHelper] No user_id in metadata, looking up by email:', dodoCustomer.email)
-    const { data: authUser } = await supabase.auth.admin.getUserByEmail(dodoCustomer.email)
+    const { data: { users }, error } = await supabase.auth.admin.listUsers()
     
-    if (!authUser?.user) {
+    if (error) {
+      console.error('[WebhookHelper] Error listing users:', error)
+      return null
+    }
+    
+    const authUser = users.find(u => u.email === dodoCustomer.email)
+    
+    if (!authUser) {
       console.warn('[WebhookHelper] Cannot find Supabase user for customer:', dodoCustomer.id)
       return null
     }
     
-    console.log('[WebhookHelper] Found user by email:', authUser.user.id)
+    console.log('[WebhookHelper] Found user by email:', authUser.id)
     
     // Update customer record with found user
     await supabase
       .from('customers')
       .upsert({
-        user_id: authUser.user.id,
+        user_id: authUser.id,
         dodo_customer_id: dodoCustomer.id,
         email: dodoCustomer.email,
         name: dodoCustomer.name,
@@ -38,7 +45,7 @@ export async function syncCustomerFromDodo(
         onConflict: 'dodo_customer_id'
       })
     
-    return authUser.user.id
+    return authUser.id
   }
 
   // Update customer record

@@ -28,7 +28,9 @@ export function SubscriptionManagement() {
         throw new Error('Payment system unavailable')
       }
 
-      await dodoClient.cancelSubscription(subscription.dodo_subscription_id)
+      await dodoClient.subscriptions.update(subscription.dodo_subscription_id, {
+        cancel_at_next_billing_date: true
+      })
 
       // Update local subscription
       await supabase
@@ -71,8 +73,8 @@ export function SubscriptionManagement() {
         throw new Error('Payment system unavailable')
       }
 
-      await dodoClient.updateSubscription(subscription.dodo_subscription_id, {
-        cancel_at_period_end: false
+      await dodoClient.subscriptions.update(subscription.dodo_subscription_id, {
+        cancel_at_next_billing_date: false
       })
 
       // Update local subscription

@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
 
     diagnosis.checks.subscriptionRecords = {
       count: subscriptions?.length || 0,
-      subscriptions: subscriptions?.map(sub => ({
+      subscriptions: subscriptions?.map((sub: any) => ({
         id: sub.dodo_subscription_id,
         status: sub.status,
         productId: sub.dodo_product_id,
@@ -84,7 +84,7 @@ export async function GET(request: NextRequest) {
         status: payments[0].status,
         createdAt: payments[0].created_at
       } : null,
-      allPayments: payments?.map(p => ({
+      allPayments: payments?.map((p: any) => ({
         id: p.dodo_payment_id,
         amount: p.amount,
         status: p.status,
@@ -104,13 +104,13 @@ export async function GET(request: NextRequest) {
 
     diagnosis.checks.webhookEvents = {
       total: webhookEvents?.length || 0,
-      processed: webhookEvents?.filter(e => e.processed).length || 0,
-      unprocessed: webhookEvents?.filter(e => !e.processed).length || 0,
-      types: webhookEvents?.reduce((acc: any, e) => {
+      processed: webhookEvents?.filter((e: any) => e.processed).length || 0,
+      unprocessed: webhookEvents?.filter((e: any) => !e.processed).length || 0,
+      types: webhookEvents?.reduce((acc: any, e: any) => {
         acc[e.event_type] = (acc[e.event_type] || 0) + 1
         return acc
       }, {}),
-      events: webhookEvents?.map(e => ({
+      events: webhookEvents?.map((e: any) => ({
         id: e.event_id,
         type: e.event_type,
         processed: e.processed,
@@ -125,15 +125,17 @@ export async function GET(request: NextRequest) {
     console.log('[Diagnose] Checking DodoPayments API...')
     if (dodoClient && customer?.dodo_customer_id) {
       try {
-        const dodoSubscriptions = await dodoClient.listSubscriptions({
+        const dodoSubscriptionsResponse = await dodoClient.subscriptions.list({
           customer_id: customer.dodo_customer_id
         })
 
+        const dodoSubscriptions = dodoSubscriptionsResponse.items || []
+
         diagnosis.checks.dodoPaymentsApi = {
           accessible: true,
-          subscriptionCount: dodoSubscriptions?.length || 0,
-          subscriptions: dodoSubscriptions?.map((sub: any) => ({
-            id: sub.id,
+          subscriptionCount: dodoSubscriptions.length,
+          subscriptions: dodoSubscriptions.map((sub: any) => ({
+            id: sub.subscription_id || sub.id,
             status: sub.status,
             productId: sub.product_id,
             currentPeriodEnd: sub.current_period_end,
@@ -188,7 +190,7 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    const subscriptionWebhooks = webhookEvents?.filter(e => 
+    const subscriptionWebhooks = webhookEvents?.filter((e: any) => 
       e.event_type.startsWith('subscription.')
     )
     if (!subscriptionWebhooks || subscriptionWebhooks.length === 0) {

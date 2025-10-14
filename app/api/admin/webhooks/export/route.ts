@@ -1,32 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { isAdminUser } from '@/lib/supabase/admin-guard'
-import { Database } from '@/types/database.types'
-
-function getSupabase(req: NextRequest, res: NextResponse) {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  return createServerClient<Database>(url, key, {
-    cookies: {
-      get: (name) => req.cookies.get(name)?.value,
-      set: (name, value, options: CookieOptions) => res.cookies.set({ name, value, ...options }),
-      remove: (name, options: CookieOptions) => res.cookies.set({ name, value: '', ...options }),
-    },
-  })
-}
+import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function GET(request: NextRequest) {
-  const response = NextResponse.next()
-  const supabase = getSupabase(request, response)
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!isAdminUser(user)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  
+  const supabaseAdmin = createAdminClient()
 
   const url = new URL(request.url)
   const q = url.searchParams.get('q') || undefined
   const type = url.searchParams.get('type') || undefined
   const processed = url.searchParams.get('processed') || undefined
 
-  let query = supabase
+  let query = supabaseAdmin
     .from('dodo_webhook_events')
     .select('event_id, event_type, processed, error_message, created_at')
     .order('created_at', { ascending: false })

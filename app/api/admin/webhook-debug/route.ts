@@ -43,9 +43,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     // Group events by status
     const stats = {
       total: events?.length || 0,
-      processed: events?.filter(e => e.processed === true).length || 0,
-      failed: events?.filter(e => e.processed === false && e.error_message).length || 0,
-      pending: events?.filter(e => e.processed === false && !e.error_message).length || 0,
+      processed: events?.filter((e: any) => e.processed === true).length || 0,
+      failed: events?.filter((e: any) => e.processed === false && e.error_message).length || 0,
+      pending: events?.filter((e: any) => e.processed === false && !e.error_message).length || 0,
     }
     
     // Group by event type
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({
       stats,
       eventTypeCounts,
-      events: events?.map(event => ({
+      events: events?.map((event: any) => ({
         id: event.id,
         event_id: event.event_id,
         event_type: event.event_type,
