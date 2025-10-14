@@ -203,6 +203,35 @@ export async function POST(request: NextRequest) {
           error_message: eventError instanceof Error ? eventError.message : 'Unknown error'
         })
         .eq('event_id', event.id)
+
+      // Enqueue for retry with exponential backoff (2^n seconds), max 3
+      try {
+        // Get existing queue row
+        const { data: existingQueue } = await supabase
+          .from('webhook_retry_queue')
+          .select('id, retry_count, max_retries')
+          .eq('event_id', event.id)
+          .limit(1)
+
+        const existing = existingQueue?.[0]
+        const retryCount = Math.min((existing?.retry_count ?? 0) + 1, (existing?.max_retries ?? 3))
+        const maxRetries = existing?.max_retries ?? 3
+        const delaySeconds = Math.pow(2, retryCount) // 2,4,8s
+        const nextRetryAt = new Date(Date.now() + delaySeconds * 1000).toISOString()
+
+        if (existing) {
+          await supabase
+            .from('webhook_retry_queue')
+            .update({ retry_count: retryCount, next_retry_at: nextRetryAt, last_error: String(eventError), updated_at: new Date().toISOString() })
+            .eq('id', existing.id)
+        } else {
+          await supabase
+            .from('webhook_retry_queue')
+            .insert({ event_id: event.id, retry_count: retryCount, max_retries: maxRetries, next_retry_at: nextRetryAt, last_error: String(eventError), created_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+        }
+      } catch (queueErr) {
+        console.warn('[Webhook] Failed to enqueue webhook for retry:', queueErr)
+      }
       
       // Return 500 so DodoPayments retries
       return NextResponse.json({ 

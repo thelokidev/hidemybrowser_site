@@ -11,11 +11,6 @@
       "method": "GET"
     },
     {
-      "path": "/api/cron/payment-retry",
-      "schedule": "0 */6 * * *",
-      "method": "POST"
-    },
-    {
       "path": "/api/cron/grace-enforcer",
       "schedule": "0 0 * * *",
       "method": "POST"
