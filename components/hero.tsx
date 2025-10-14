@@ -57,19 +57,19 @@ export function Hero() {
   }
 
   return (
-    <section className="relative pt-28 sm:pt-32 lg:pt-40 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+    <section className="relative pt-20 sm:pt-24 md:pt-28 lg:pt-32 xl:pt-36 pb-12 sm:pb-16 md:pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent pointer-events-none" />
       
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         {/* Hero heading */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="max-w-3xl mx-auto text-center mb-8"
+          className="max-w-3xl mx-auto text-center mb-6 sm:mb-8"
         >
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-normal tracking-[-0.04em] leading-[1.1] mb-8" style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' }}>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-normal tracking-[-0.04em] leading-[1.1] mb-6 sm:mb-8" style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' }}>
             <span className="block">The Truly Undetectable Browser To Hide</span>
             <span className="flex items-center justify-center gap-3 my-2">
               <span className="inline-block relative h-[1.2em]">

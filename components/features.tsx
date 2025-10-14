@@ -59,7 +59,7 @@ export function Features() {
   const isInView = useInView(ref, { once: true, margin: "-100px" })
 
   return (
-    <section id="features" ref={ref} className="relative py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-background via-muted/20 to-background overflow-hidden">
+    <section id="features" ref={ref} className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 bg-muted/30">
       {/* Blend with surrounding sections to avoid visible separators */}
       <div aria-hidden className="pointer-events-none absolute inset-x-0 -top-16 h-24 bg-gradient-to-b from-background to-transparent" />
       <div aria-hidden className="pointer-events-none absolute inset-x-0 -bottom-16 h-24 bg-gradient-to-t from-background to-transparent" />
@@ -74,28 +74,14 @@ export function Features() {
         className="pointer-events-none absolute -top-24 right-1/5 w-[800px] h-72 bg-emerald-300/6 blur-3xl rounded-full"
       />
 
-      <div className="relative max-w-7xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-20"
+          className="text-center mb-10 sm:mb-12 md:mb-16"
         >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="inline-block mb-6"
-          >
-            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-sm font-medium">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-              </span>
-              Built for Professionals
-            </span>
-          </motion.div>
-          <h2 className="text-4xl sm:text-5xl font-bold mb-6 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
+          <h2 className="text-3xl sm:text-4xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
             Why Choose HideMyBrowser?
           </h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
@@ -104,7 +90,7 @@ export function Features() {
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 md:gap-8">
           {features.map((feature, index) => {
             const Icon = feature.icon
             return (

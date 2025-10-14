@@ -142,4 +142,27 @@
     font-feature-settings: "kern" 1;
     letter-spacing: -0.011em;
   }
+  
+  /* Responsive base font size for better scaling */
+  html {
+    font-size: 16px; /* Base for mobile */
+  }
+  
+  @media (min-width: 768px) {
+    html {
+      font-size: 15px; /* Slightly smaller for tablets */
+    }
+  }
+  
+  @media (min-width: 1024px) and (max-width: 1920px) {
+    html {
+      font-size: 14px; /* Optimized for 1080p monitors */
+    }
+  }
+  
+  @media (min-width: 1921px) {
+    html {
+      font-size: 16px; /* Back to normal for 1440p+ */
+    }
+  }
 }

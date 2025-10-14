@@ -43,15 +43,15 @@ export function Download() {
   const isInView = useInView(ref, { once: true, margin: "-100px" })
 
   return (
-    <section id="download" ref={ref} className="py-20 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto">
+    <section id="download" ref={ref} className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 bg-background">
+      <div className="max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="text-center mb-10 sm:mb-12 md:mb-16"
         >
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4">Download HideMyBrowser</h2>
+          <h2 className="text-3xl sm:text-4xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4">Download HideMyBrowser</h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
             Get the truly undetectable browser for your platform. Start your stealth browsing experience today.
           </p>

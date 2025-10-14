@@ -44,12 +44,12 @@ export function Header() {
     <header
       className="fixed top-0 left-0 right-0 z-50"
     >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
         <div
           className={`mx-auto flex items-center justify-between transition-all duration-500 ${
             scrolled
-              ? "mt-3 h-14 w-full max-w-4xl rounded-2xl bg-background/95 backdrop-blur-md border border-border/50 px-3 md:px-4"
-              : "mt-0 h-20 w-full max-w-6xl px-1 md:px-2"
+              ? "mt-3 h-12 sm:h-14 w-full max-w-3xl sm:max-w-4xl rounded-2xl bg-background/95 backdrop-blur-md border border-border/50 px-3 md:px-4"
+              : "mt-0 h-16 sm:h-18 md:h-20 w-full max-w-5xl sm:max-w-6xl px-1 md:px-2"
           }`}
           style={scrolled ? {
             boxShadow: `
@@ -63,14 +63,14 @@ export function Header() {
           <Link 
             href="/" 
             className={`flex items-center gap-2 font-bold transition-all duration-300 hover:opacity-80 ${
-              scrolled ? "text-lg" : "text-xl"
+              scrolled ? "text-base sm:text-lg" : "text-lg sm:text-xl"
             }`}
           >
             <Image
               src="/favicon.png"
               alt="HideMyBrowser logo"
-              width={28}
-              height={28}
+              width={24}
+              height={24}
               priority
               className="rounded-sm"
             />
