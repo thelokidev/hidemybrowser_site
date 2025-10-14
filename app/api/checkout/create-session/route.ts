@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getDodoPayments } from '@/lib/dodopayments/client'
 import { getOrCreateDodoCustomer } from '@/lib/dodopayments/customer'
 import { createClient } from '@/lib/supabase/server'
+import { Database } from '@/types/database.types'
+
+type Subscription = Database['public']['Tables']['subscriptions']['Row']
 
 /**
  * Create a DodoPayments checkout session
@@ -21,6 +24,32 @@ export async function POST(request: NextRequest) {
 
     if (!productId) {
       return NextResponse.json({ error: 'Product ID required' }, { status: 400 })
+    }
+
+    // Guard: prevent purchase if user already has an active subscription
+    const { data: activeSub, error: subError } = await supabase
+      .from('subscriptions')
+      .select('id, status, current_period_end')
+      .eq('user_id', user.id)
+      .in('status', ['active', 'trialing', 'renewed'])
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    if (subError) {
+      console.error('[CheckoutSession] Error checking active subscription:', subError)
+    }
+
+    if (activeSub) {
+      const sub = activeSub as Pick<Subscription, 'id' | 'status' | 'current_period_end'>
+      console.log('[CheckoutSession] Blocked purchase - user has active subscription:', sub.id)
+      return NextResponse.json(
+        { 
+          error: 'You already have an active subscription. Please wait until your current plan ends before purchasing a new one.',
+          current_period_end: sub.current_period_end || null
+        },
+        { status: 409 }
+      )
     }
 
     const dodoClient = getDodoPayments()
@@ -45,8 +74,10 @@ export async function POST(request: NextRequest) {
     })
 
     // Create checkout session
-    const session = await dodoClient.createCheckoutSession({
-      customer_id: dodoCustomerId,
+    const session = await dodoClient.checkoutSessions.create({
+      customer: {
+        customer_id: dodoCustomerId
+      },
       product_cart: [{ product_id: productId, quantity: 1 }],
       return_url: `${request.nextUrl.origin}/dashboard?paid=1`,
       metadata: {

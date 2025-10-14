@@ -4,10 +4,9 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { getDodoPayments } from '@/lib/dodopayments/client'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/hooks/use-toast'
-import { TablesInsert } from '@/types/database.types'
+import { useSubscription } from '@/hooks/use-subscription'
 
 interface DodoCheckoutProps {
   products: Array<{
@@ -28,6 +27,7 @@ export function DodoCheckout({ products }: DodoCheckoutProps) {
   const [loading, setLoading] = useState<string | null>(null)
   const { toast } = useToast()
   const supabase = createClient()
+  const { subscription, loading: subLoading } = useSubscription()
 
   const handleCheckout = async (priceId: string, productId: string) => {
     setLoading(priceId)
@@ -44,74 +44,44 @@ export function DodoCheckout({ products }: DodoCheckoutProps) {
         return
       }
 
-      const dodoClient = getDodoPayments()
-      if (!dodoClient) {
+      // Prevent purchase if already subscribed
+      if (subscription) {
         toast({
-          title: "Payment system unavailable",
-          description: "Please try again later.",
+          title: "Already subscribed",
+          description: "You already have an active subscription. Manage your plan from the dashboard.",
           variant: "destructive",
         })
         return
       }
 
-      // Check if customer exists, create if not
-      let customerId: string
-      const existingCustomerRes = await supabase
-        .from('customers')
-        .select('dodo_customer_id')
-        .eq('user_id', user.id)
-        .maybeSingle()
-      const existingCustomer = existingCustomerRes.data as { dodo_customer_id: string | null } | null
-
-      if (existingCustomer?.dodo_customer_id) {
-        customerId = existingCustomer.dodo_customer_id
-      } else {
-        // Create new customer
-        const customer = await dodoClient.createCustomer({
-          email: user.email!,
-          name: user.user_metadata?.full_name || user.email!,
-          metadata: { supabase_user_id: user.id }
-        })
-
-        customerId = customer.id
-
-        // Save customer to Supabase
-        await (supabase
-          .from('customers') as any)
-          .upsert({
-            user_id: user.id,
-            dodo_customer_id: customerId,
-            email: user.email,
-            name: user.user_metadata?.full_name || user.email
-          })
-      }
-
-      // Create checkout session
-      const returnUrl = `${window.location.origin}/?paid=1`
-      console.log('Creating checkout session with return_url:', returnUrl)
-      console.log('Product ID:', productId, 'Price ID:', priceId)
-      
-      const session = await dodoClient.createCheckoutSession({
-        return_url: returnUrl,
-        customer_id: customerId,
-        product_cart: [
-          {
-            product_id: productId,
-            quantity: 1
-          }
-        ],
-        metadata: {
-          user_id: user.id,
-          product_id: productId,
-          price_id: priceId
-        }
+      // Create session via guarded API route
+      const res = await fetch('/api/checkout/create-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId }),
       })
 
-      console.log('Checkout session created:', session.session_id)
-      console.log('Checkout URL:', session.checkout_url)
-      
-      // Redirect to checkout
-      window.location.href = session.checkout_url
+      if (res.status === 409) {
+        toast({
+          title: "Purchase blocked",
+          description: "You already have an active subscription. Please wait for it to end before purchasing another plan.",
+          variant: "destructive",
+        })
+        return
+      }
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({ error: 'Failed to create checkout session' }))
+        toast({
+          title: "Checkout failed",
+          description: body.error || 'There was an error processing your request. Please try again.',
+          variant: "destructive",
+        })
+        return
+      }
+
+      const { checkoutUrl } = await res.json()
+      window.location.href = checkoutUrl
 
     } catch (error) {
       console.error('Checkout error:', error)
@@ -165,10 +135,14 @@ export function DodoCheckout({ products }: DodoCheckoutProps) {
                 </div>
                 <Button
                   onClick={() => handleCheckout(price.id, product.id)}
-                  disabled={loading === price.id}
+                  disabled={loading === price.id || subLoading || !!subscription}
                   size="sm"
                 >
-                  {loading === price.id ? 'Processing...' : 'Subscribe'}
+                  {loading === price.id
+                    ? 'Processing...'
+                    : subscription
+                      ? 'Already subscribed'
+                      : 'Subscribe'}
                 </Button>
               </div>
             ))}
