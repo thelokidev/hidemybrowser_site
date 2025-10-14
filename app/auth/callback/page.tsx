@@ -1,12 +1,13 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Loader2 } from "lucide-react"
 
 export default function AuthCallbackPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const supabase = createClient()
   const [error, setError] = useState<string | null>(null)
 
@@ -17,9 +18,11 @@ export default function AuthCallbackPage() {
         const { data: { session: existingSession } } = await supabase.auth.getSession()
         
         if (existingSession) {
-          // Already authenticated, go to dashboard
-          console.log('[Auth] Already authenticated, redirecting to dashboard')
-          router.replace("/dashboard")
+          // Already authenticated, check for next param
+          const next = searchParams.get('next')
+          const target = next && next.startsWith('/') ? next : "/dashboard"
+          console.log('[Auth] Already authenticated, redirecting to', target)
+          router.replace(target)
           return
         }
 
@@ -37,8 +40,10 @@ export default function AuthCallbackPage() {
             
             if (retrySession) {
               // User is actually logged in!
-              console.log('[Auth] User is authenticated despite error, redirecting to dashboard')
-              router.replace("/dashboard")
+              const next = searchParams.get('next')
+              const target = next && next.startsWith('/') ? next : "/dashboard"
+              console.log('[Auth] User is authenticated despite error, redirecting to', target)
+              router.replace(target)
               return
             }
             
@@ -60,10 +65,12 @@ export default function AuthCallbackPage() {
           throw error
         }
 
-        // Success: send user to dashboard
+        // Success: send user to next or dashboard
         if (data.session) {
-          console.log('[Auth] Authentication successful, redirecting to dashboard')
-          router.replace("/dashboard")
+          const next = searchParams.get('next')
+          const target = next && next.startsWith('/') ? next : "/dashboard"
+          console.log('[Auth] Authentication successful, redirecting to', target)
+          router.replace(target)
         }
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : "Authentication failed"

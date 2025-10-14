@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion"
 import { useInView } from "framer-motion"
-import { useRef, useState, useEffect } from "react"
+import { useRef, useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Check, AlertCircle } from "lucide-react"
 import { Header } from "@/components/header"
@@ -85,39 +85,6 @@ export default function PricingPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
 
-  // Fetch user email and name on mount
-  useEffect(() => {
-    async function fetchUser() {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        setUserEmail(user.email || null)
-        setUserName(user.user_metadata?.full_name || user.user_metadata?.name || null)
-      }
-      setAuthUser(user)
-      setAuthChecking(false)
-    }
-    fetchUser()
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setAuthUser(session?.user ?? null)
-      if (session?.user) {
-        setUserEmail(session.user.email || null)
-        setUserName(session.user.user_metadata?.full_name || session.user.user_metadata?.name || null)
-        // If returned from /auth with plan param, auto-continue
-        const planSlug = searchParams.get('plan')
-        const plan = planSlug ? plans.find(p => p.name.toLowerCase().startsWith(planSlug)) : null
-        if (plan && !showPayment) {
-          void continueCheckout(plan)
-        } else if (pendingPlan && !showPayment) {
-          void continueCheckout(pendingPlan)
-          setPendingPlan(null)
-        }
-      }
-    })
-    return () => {
-      listener.subscription.unsubscribe()
-    }
-  }, [supabase])
-
   /**
    * Get plan status and action for a plan
    * Returns info about whether user can subscribe, upgrade, or is blocked
@@ -147,34 +114,84 @@ export default function PricingPage() {
     }
   }
 
-  const continueCheckout = async (plan: typeof plans[0]) => {
-    // Create programmatic checkout session and show in modal iframe
-    const response = await fetch(`${window.location.origin}/checkout`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        product_cart: [{
-          product_id: plan.dodoProductId,
-          quantity: 1,
-        }],
-        customer: {
-          email: userEmail || "",
-          name: userName || userEmail?.split('@')[0] || "",
+  const continueCheckout = useCallback(async (plan: typeof plans[0]) => {
+    try {
+      // Create programmatic checkout session and show in modal iframe
+      const response = await fetch(`${window.location.origin}/checkout`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-        return_url: `${window.location.origin}/dashboard?paid=1`,
-      }),
-    })
+        body: JSON.stringify({
+          product_cart: [{
+            product_id: plan.dodoProductId,
+            quantity: 1,
+          }],
+          customer: {
+            email: userEmail || "",
+            name: userName || userEmail?.split('@')[0] || "",
+          },
+          return_url: `${window.location.origin}/dashboard?paid=1`,
+        }),
+      })
 
-    if (!response.ok) {
-      throw new Error("Failed to create checkout session")
+      if (!response.ok) {
+        throw new Error("Failed to create checkout session")
+      }
+
+      const { checkout_url } = await response.json()
+      setPaymentUrl(checkout_url)
+      setShowPayment(true)
+    } catch (error) {
+      console.error('Checkout error:', error)
+      toast({
+        title: "Error",
+        description: "Failed to create checkout session. Please try again.",
+        variant: "destructive"
+      })
     }
+  }, [userEmail, userName, toast])
 
-    const { checkout_url } = await response.json()
-    setPaymentUrl(checkout_url)
-    setShowPayment(true)
-  }
+  // Fetch user email and name on mount
+  useEffect(() => {
+    async function fetchUser() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        setUserEmail(user.email || null)
+        setUserName(user.user_metadata?.full_name || user.user_metadata?.name || null)
+      }
+      setAuthUser(user)
+      setAuthChecking(false)
+    }
+    fetchUser()
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setAuthUser(session?.user ?? null)
+      if (session?.user) {
+        setUserEmail(session.user.email || null)
+        setUserName(session.user.user_metadata?.full_name || session.user.user_metadata?.name || null)
+      }
+    })
+    return () => {
+      listener.subscription.unsubscribe()
+    }
+  }, [supabase])
+
+  // Handle auto-checkout when returning from auth with plan param
+  useEffect(() => {
+    if (authUser && !showPayment && !authChecking) {
+      const planSlug = searchParams.get('plan')
+      if (planSlug) {
+        const plan = plans.find(p => p.name.toLowerCase().startsWith(planSlug))
+        if (plan) {
+          // Small delay to ensure state is settled
+          const timer = setTimeout(() => {
+            void continueCheckout(plan)
+          }, 100)
+          return () => clearTimeout(timer)
+        }
+      }
+    }
+  }, [authUser, showPayment, authChecking, searchParams, continueCheckout])
 
   const handleCheckout = async (plan: typeof plans[0]) => {
     try {

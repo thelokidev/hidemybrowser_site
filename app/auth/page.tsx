@@ -48,10 +48,15 @@ export default function AuthPage() {
     setMessage(null)
 
     try {
+      const next = searchParams.get('next')
+      const redirectTo = next 
+        ? `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`
+        : `${window.location.origin}/auth/callback`
+      
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`
+          emailRedirectTo: redirectTo
         }
       })
 
@@ -77,10 +82,15 @@ export default function AuthPage() {
     setMessage(null)
 
     try {
+      const next = searchParams.get('next')
+      const redirectTo = next 
+        ? `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`
+        : `${window.location.origin}/auth/callback`
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`
+          redirectTo: redirectTo
         }
       })
 
