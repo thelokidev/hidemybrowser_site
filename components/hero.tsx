@@ -58,9 +58,6 @@ export function Hero() {
 
   return (
     <section className="relative pt-20 sm:pt-24 md:pt-28 lg:pt-32 xl:pt-36 pb-12 sm:pb-16 md:pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent pointer-events-none" />
-      
       <div className="max-w-6xl mx-auto">
         {/* Hero heading */}
         <motion.div
