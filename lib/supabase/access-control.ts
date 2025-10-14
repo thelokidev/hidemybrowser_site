@@ -1,4 +1,5 @@
 import { createAdminClient } from './admin'
+import * as AccessCache from '@/lib/cache/subscription-cache'
 
 export interface ServerAccessStatus {
   hasAccess: boolean
@@ -19,8 +20,23 @@ export async function getUserAccessStatus(userId: string): Promise<ServerAccessS
   const supabase = createAdminClient()
   
   try {
-    const { data, error } = await supabase.rpc('get_user_access_status', {
-      user_uuid: userId
+    // Check cache first
+    const cached = AccessCache.get(userId)
+    if (cached) {
+      return {
+        hasAccess: cached.hasAccess,
+        accessType: cached.accessType,
+        subscriptionStatus: cached.subscriptionStatus,
+        subscriptionExpiresAt: cached.subscriptionExpiresAt,
+        subscriptionProductId: cached.subscriptionProductId,
+        trialIsActive: cached.trialIsActive,
+        trialExpiresAt: cached.trialExpiresAt,
+        trialMinutesRemaining: cached.trialMinutesRemaining,
+      }
+    }
+
+    const { data, error } = await (supabase as any).rpc('get_user_access_status', {
+      user_uuid: userId,
     })
 
     if (error) {
@@ -28,13 +44,13 @@ export async function getUserAccessStatus(userId: string): Promise<ServerAccessS
       return { hasAccess: false, accessType: 'none' }
     }
 
-    const result = data?.[0]
+    const result = (data as any)?.[0]
     
     if (!result) {
       return { hasAccess: false, accessType: 'none' }
     }
 
-    return {
+    const status: ServerAccessStatus = {
       hasAccess: result.has_access ?? false,
       accessType: result.access_type ?? 'none',
       subscriptionStatus: result.subscription_status,
@@ -44,10 +60,18 @@ export async function getUserAccessStatus(userId: string): Promise<ServerAccessS
       trialExpiresAt: result.trial_expires_at,
       trialMinutesRemaining: result.trial_minutes_remaining
     }
+
+    // Save to cache
+    AccessCache.set(userId, status)
+    return status
   } catch (error) {
     console.error('[ServerAccessControl] Exception:', error)
     return { hasAccess: false, accessType: 'none' }
   }
+}
+
+export function invalidateUserAccessCache(userId: string) {
+  AccessCache.invalidate(userId)
 }
 
 /**
