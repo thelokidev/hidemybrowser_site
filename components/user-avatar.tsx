@@ -5,6 +5,7 @@ import { useMemo, useState, useEffect } from "react"
 import { useAuth } from "@/contexts/auth-context"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { createClient } from "@/lib/supabase/client"
+import styles from "./UserAvatar.module.css"
 
 function getInitials(nameOrEmail?: string | null) {
   if (!nameOrEmail) return "U"
@@ -24,6 +25,7 @@ export type UserAvatarProps = {
 
 export function UserAvatar({ href = "/dashboard", size = 32, withLink = true, className }: UserAvatarProps) {
   const { user } = useAuth()
+  const [isPro, setIsPro] = useState(false)
 
   const { src, fallback } = useMemo(() => {
     const meta = (user?.user_metadata as any) || {}
@@ -76,20 +78,36 @@ export function UserAvatar({ href = "/dashboard", size = 32, withLink = true, cl
       if (!cancelled && freshUrl && freshUrl !== imgSrc) {
         setImgSrc(freshUrl)
       }
+
+      // Fetch subscription status to determine if user is pro
+      if (!cancelled && u.id) {
+        try {
+          const { data: subs } = await supabase
+            .from('subscriptions')
+            .select('status, dodo_product_id')
+            .eq('user_id', u.id)
+            .eq('status', 'active')
+            .limit(1)
+          
+          // User is pro if they have an active subscription
+          setIsPro(!!subs && subs.length > 0)
+        } catch {}
+      }
     }
     run()
     return () => { cancelled = true }
   }, [])
 
   const avatar = (
-    <Avatar className={className} style={{ width: size, height: size }}>
+    <div className={`${styles.container} ${isPro ? styles.pro : ''} ${className || ''}`} style={{ width: size, height: size }}>
       <AvatarImage
         src={imgSrc}
         alt="User avatar"
+        className={styles.image}
         onError={() => setImgSrc("/placeholder-user.jpg")}
       />
-      <AvatarFallback>{fallback}</AvatarFallback>
-    </Avatar>
+      <AvatarFallback className={styles.initials} style={{ fontSize: size * 0.4 }}>{fallback}</AvatarFallback>
+    </div>
   )
 
   if (withLink) {
