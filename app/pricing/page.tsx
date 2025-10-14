@@ -14,6 +14,10 @@ import { useSubscription } from '@/hooks/use-subscription'
 import { canChangePlan, getTierName } from '@/lib/subscription-tier-utils'
 import { Badge } from "@/components/ui/badge"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Separator } from "@/components/ui/separator"
+import Link from "next/link"
 const plans = [
   {
     name: "Weekly",
@@ -71,6 +75,14 @@ export default function PricingPage() {
   const [loading, setLoading] = useState<string | null>(null)
   const [userEmail, setUserEmail] = useState<string | null>(null)
   const [userName, setUserName] = useState<string | null>(null)
+  const [authUser, setAuthUser] = useState<any>(null)
+  const [authChecking, setAuthChecking] = useState(true)
+  const [showLogin, setShowLogin] = useState(false)
+  const [loginEmail, setLoginEmail] = useState("")
+  const [loginLoading, setLoginLoading] = useState<string | null>(null)
+  const [pendingPlan, setPendingPlan] = useState<typeof plans[0] | null>(null)
+  const [paymentUrl, setPaymentUrl] = useState<string | null>(null)
+  const [showPayment, setShowPayment] = useState(false)
   const { toast } = useToast()
   const supabase = createClient()
   const { subscription, loading: subLoading } = useSubscription()
@@ -83,8 +95,26 @@ export default function PricingPage() {
         setUserEmail(user.email || null)
         setUserName(user.user_metadata?.full_name || user.user_metadata?.name || null)
       }
+      setAuthUser(user)
+      setAuthChecking(false)
     }
     fetchUser()
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setAuthUser(session?.user ?? null)
+      if (session?.user) {
+        setUserEmail(session.user.email || null)
+        setUserName(session.user.user_metadata?.full_name || session.user.user_metadata?.name || null)
+        setShowLogin(false)
+        // If there was a pending plan, continue to payment creation
+        if (pendingPlan) {
+          void continueCheckout(pendingPlan)
+          setPendingPlan(null)
+        }
+      }
+    })
+    return () => {
+      listener.subscription.unsubscribe()
+    }
   }, [supabase])
 
   /**
@@ -116,6 +146,35 @@ export default function PricingPage() {
     }
   }
 
+  const continueCheckout = async (plan: typeof plans[0]) => {
+    // Create programmatic checkout session and show in modal iframe
+    const response = await fetch(`${window.location.origin}/checkout`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        product_cart: [{
+          product_id: plan.dodoProductId,
+          quantity: 1,
+        }],
+        customer: {
+          email: userEmail || "",
+          name: userName || userEmail?.split('@')[0] || "",
+        },
+        return_url: `${window.location.origin}/dashboard?paid=1`,
+      }),
+    })
+
+    if (!response.ok) {
+      throw new Error("Failed to create checkout session")
+    }
+
+    const { checkout_url } = await response.json()
+    setPaymentUrl(checkout_url)
+    setShowPayment(true)
+  }
+
   const handleCheckout = async (plan: typeof plans[0]) => {
     try {
       setLoading(plan.name)
@@ -124,30 +183,13 @@ export default function PricingPage() {
 
       // Only handle new subscription checkout
       if (planStatus.type === 'subscribe') {
-        const response = await fetch(`${window.location.origin}/checkout`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            product_cart: [{
-              product_id: plan.dodoProductId,
-              quantity: 1,
-            }],
-            customer: {
-              email: userEmail || "",
-              name: userName || userEmail?.split('@')[0] || "",
-            },
-            return_url: `${window.location.origin}/dashboard?paid=1`,
-          }),
-        })
-
-        if (!response.ok) {
-          throw new Error("Failed to create checkout session")
+        // Enforce login before payment
+        if (!authUser) {
+          setPendingPlan(plan)
+          setShowLogin(true)
+          return
         }
-
-        const { checkout_url } = await response.json()
-        window.location.href = checkout_url
+        await continueCheckout(plan)
         return
       }
 
@@ -167,6 +209,23 @@ export default function PricingPage() {
       if (planStatus.type !== 'subscribe') {
         setLoading(null)
       }
+    }
+  }
+
+  const sendMagicLink = async (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      setLoginLoading('magic')
+      const { error } = await supabase.auth.signInWithOtp({
+        email: loginEmail,
+        options: { emailRedirectTo: `${window.location.origin}/auth/callback` }
+      })
+      if (error) throw error
+      toast({ title: 'Check your email', description: 'We sent you a magic link to sign in.' })
+    } catch (err: any) {
+      toast({ title: 'Login failed', description: err.message || 'Please try again.', variant: 'destructive' })
+    } finally {
+      setLoginLoading(null)
     }
   }
 
@@ -284,6 +343,51 @@ export default function PricingPage() {
           </div>
         </div>
       </section>
+
+      {/* Login Modal (shown when user is not authenticated) */}
+      <Dialog open={showLogin} onOpenChange={setShowLogin}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Sign in to continue</DialogTitle>
+            <DialogDescription>
+              You must be signed in to purchase a plan. Use a magic link to sign in.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={sendMagicLink} className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium" htmlFor="login-email">Email</label>
+              <Input id="login-email" type="email" value={loginEmail} onChange={e => setLoginEmail(e.target.value)} placeholder="you@example.com" required />
+            </div>
+            <Button type="submit" disabled={!!loginLoading} className="w-full">
+              {loginLoading ? 'Sending...' : 'Send magic link'}
+            </Button>
+            <div className="text-xs text-muted-foreground text-center">
+              We’ll email you a secure link to log in.
+            </div>
+          </form>
+          <Separator className="my-4" />
+          <div className="text-xs text-center text-muted-foreground">
+            Need help? <Link href="/support" className="underline">Contact support</Link>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Payment Modal - embeds checkout in-place */}
+      <Dialog open={showPayment} onOpenChange={setShowPayment}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Complete your purchase</DialogTitle>
+            <DialogDescription>Secure checkout</DialogDescription>
+          </DialogHeader>
+          {paymentUrl ? (
+            <div className="w-full h-[640px]">
+              <iframe src={paymentUrl} className="w-full h-full rounded-md border" title="Checkout" />
+            </div>
+          ) : (
+            <div className="text-sm text-muted-foreground">Preparing checkout...</div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <Footer />
     </main>

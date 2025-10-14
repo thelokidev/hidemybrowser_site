@@ -201,7 +201,13 @@ export function Pricing() {
                 </ul>
 
                 <Button
-                  onClick={() => handleCheckout(plan)}
+                  onClick={() => {
+                    if (plan.name === 'Monthly') {
+                      window.location.href = '/pricing?plan=monthly'
+                      return
+                    }
+                    handleCheckout(plan)
+                  }}
                   disabled={subLoading || loading === plan.name || (currentPlan !== null && currentPlan !== plan.name)}
                   className={`w-full mt-auto transition-transform duration-200 hover:-translate-y-0.5 active:translate-y-0 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary/60 
             ${currentPlan === plan.name ? 'bg-muted text-foreground cursor-default' : currentPlan ? 'bg-muted text-muted-foreground cursor-not-allowed' : 'bg-foreground text-background hover:bg-foreground/90'}`}
