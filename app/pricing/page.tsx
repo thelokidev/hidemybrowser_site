@@ -84,6 +84,7 @@ export default function PricingPage() {
   const { subscription, loading: subLoading } = useSubscription()
   const searchParams = useSearchParams()
   const router = useRouter()
+  const dismissedRef = useRef(false)
 
   /**
    * Get plan status and action for a plan
@@ -116,6 +117,8 @@ export default function PricingPage() {
 
   const continueCheckout = useCallback(async (plan: typeof plans[0]) => {
     try {
+      // User explicitly initiated checkout again; allow dialog to open
+      dismissedRef.current = false
       // Create programmatic checkout session and show in modal iframe
       const response = await fetch(`${window.location.origin}/checkout`, {
         method: "POST",
@@ -178,7 +181,7 @@ export default function PricingPage() {
 
   // Handle auto-checkout when returning from auth with plan param
   useEffect(() => {
-    if (authUser && !showPayment && !authChecking) {
+    if (authUser && !showPayment && !authChecking && !dismissedRef.current) {
       const planSlug = searchParams.get('plan')
       if (planSlug) {
         const plan = plans.find(p => p.name.toLowerCase().startsWith(planSlug))
@@ -351,7 +354,25 @@ export default function PricingPage() {
       {/* Authentication uses dedicated /auth page; no local login modal */}
 
       {/* Payment Modal - embeds checkout in-place */}
-      <Dialog open={showPayment} onOpenChange={setShowPayment}>
+      <Dialog
+        open={showPayment}
+        onOpenChange={(open) => {
+          setShowPayment(open)
+          if (!open) {
+            // Permanently dismiss until user explicitly restarts checkout
+            dismissedRef.current = true
+            setPaymentUrl(null)
+
+            // Remove auto-trigger param so it won't reopen
+            const params = new URLSearchParams(searchParams.toString())
+            if (params.has('plan')) {
+              params.delete('plan')
+              const query = params.toString()
+              router.replace(query ? `/pricing?${query}` : '/pricing')
+            }
+          }
+        }}
+      >
         <DialogContent className="max-w-3xl">
           <DialogHeader>
             <DialogTitle>Complete your purchase</DialogTitle>
