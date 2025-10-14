@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { verifyCron } from '@/lib/cron/auth'
 import { createAdminClient } from '@/lib/supabase/admin'
 
-export async function POST(request: NextRequest) {
+async function handle(request: NextRequest) {
   const unauthorized = verifyCron(request)
   if (unauthorized) return unauthorized
 
@@ -29,4 +29,12 @@ export async function POST(request: NextRequest) {
   }
 
   return NextResponse.json({ enforced: updated })
+}
+
+export async function GET(request: NextRequest) {
+  return handle(request)
+}
+
+export async function POST(request: NextRequest) {
+  return handle(request)
 }
