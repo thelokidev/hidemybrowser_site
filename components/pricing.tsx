@@ -15,6 +15,17 @@ const checkoutUrls: Record<string, string> = {
   "6 Months": "https://test.checkout.dodopayments.com/buy/pdt_Ah7DRDitJbvGcaFMrqrOf?quantity=1",
 }
 
+// Extract product IDs from URLs for reverse lookup against subscriptions
+const productIds: Record<string, string> = Object.fromEntries(
+  Object.entries(checkoutUrls).map(([name, url]) => {
+    const id = url.split('/').pop()?.split('?')[0] || ''
+    return [name, id]
+  })
+)
+const idToPlan: Record<string, string> = Object.fromEntries(
+  Object.entries(productIds).map(([plan, id]) => [id, plan])
+)
+
 const plans = [
   {
     name: "Weekly",
@@ -64,15 +75,34 @@ export function Pricing() {
   const [userEmail, setUserEmail] = useState<string | undefined>(undefined)
   const [userName, setUserName] = useState<string | undefined>(undefined)
   const [loading, setLoading] = useState<string | null>(null)
+  const [currentPlan, setCurrentPlan] = useState<string | null>(null)
   const supabase = createClient()
 
-  // Fetch user email and name on mount
+  // Fetch user email/name and current active subscription on mount
   useEffect(() => {
     async function fetchUser() {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
         setUserEmail(user.email || undefined)
         setUserName(user.user_metadata?.full_name || user.user_metadata?.name || undefined)
+
+        try {
+          // Find any active subscription and map product -> plan name
+          const { data: subs } = await supabase
+            .from('subscriptions')
+            .select('dodo_product_id, status')
+            .eq('user_id', user.id)
+            .eq('status', 'active')
+            .limit(1)
+          const sub = Array.isArray(subs) ? subs[0] : null
+          const productId = (sub as any)?.dodo_product_id as string | undefined
+          if (productId) {
+            const plan = idToPlan[productId]
+            if (plan) setCurrentPlan(plan)
+          }
+        } catch (e) {
+          // ignore if table or field mismatch
+        }
       }
     }
     fetchUser()
@@ -81,6 +111,11 @@ export function Pricing() {
   const handleCheckout = async (plan: typeof plans[0]) => {
     try {
       setLoading(plan.name)
+      // Block plan changes while a current subscription is active
+      if (currentPlan && currentPlan !== plan.name) {
+        setLoading(null)
+        return
+      }
       
       // Create programmatic checkout session with pre-filled customer data
       const response = await fetch(`${window.location.origin}/checkout`, {
@@ -172,12 +207,22 @@ export function Pricing() {
 
                 <Button
                   onClick={() => handleCheckout(plan)}
-                  disabled={loading === plan.name}
-                  className="w-full mt-auto bg-foreground text-background hover:bg-foreground/90 transition-transform duration-200 hover:-translate-y-0.5 active:translate-y-0 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary/60"
+                  disabled={loading === plan.name || (currentPlan !== null && currentPlan !== plan.name)}
+                  className={`w-full mt-auto transition-transform duration-200 hover:-translate-y-0.5 active:translate-y-0 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary/60 
+            ${currentPlan === plan.name ? 'bg-muted text-foreground cursor-default' : currentPlan ? 'bg-muted text-muted-foreground cursor-not-allowed' : 'bg-foreground text-background hover:bg-foreground/90'}`}
                   size="lg"
                 >
-                  {loading === plan.name ? 'Processing...' : plan.cta}
+                  {currentPlan === plan.name
+                    ? 'Current Plan'
+                    : currentPlan && currentPlan !== plan.name
+                      ? 'Plan Change Blocked'
+                      : (loading === plan.name ? 'Processing...' : plan.cta)}
                 </Button>
+                {currentPlan && currentPlan !== plan.name && (
+                  <p className="text-[12px] text-muted-foreground mt-2 text-center">
+                    Plan changes are blocked until your current plan expires.
+                  </p>
+                )}
               </div>
             </motion.div>
           ))}
