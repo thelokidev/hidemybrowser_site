@@ -41,21 +41,17 @@ export default function AuthCallbackPage() {
             
             if (token) {
               const redirectUrl = `${returnProto}?access_token=${encodeURIComponent(token)}`
-              const fallbackUrl = `http://127.0.0.1:47999/auth?access_token=${encodeURIComponent(token)}`
               console.log('[Auth] Full redirect URL:', redirectUrl)
               
-              // Fire-and-forget local fallback to dev loopback server
+              // Try the protocol twice and increase timeout before showing an error
+              window.location.href = redirectUrl
               setTimeout(() => {
-                try { fetch(fallbackUrl, { mode: 'no-cors' as RequestMode }).catch(() => {}) } catch {}
-                try { const img = new Image(); img.src = fallbackUrl } catch {}
-              }, 150)
-              
-              // Set a timeout message if nothing responds
+                try { window.location.href = redirectUrl } catch {}
+              }, 1500)
+              // Fallback message if the app doesn't respond in time
               setTimeout(() => {
                 setError('Desktop app did not respond. Please try again or check if the app is running.')
-              }, 3000)
-              
-              window.location.href = redirectUrl
+              }, 8000)
               return // Stop here, don't navigate to dashboard
             }
           }
@@ -91,13 +87,7 @@ export default function AuthCallbackPage() {
                 const token = retrySession.access_token
                 console.log('[Auth] Desktop mode detected (retry), redirecting to app with token')
                 if (token) {
-                  const redirectUrl = `${returnProto}?access_token=${encodeURIComponent(token)}`
-                  const fallbackUrl = `http://127.0.0.1:47999/auth?access_token=${encodeURIComponent(token)}`
-                  setTimeout(() => {
-                    try { fetch(fallbackUrl, { mode: 'no-cors' as RequestMode }).catch(() => {}) } catch {}
-                    try { const img = new Image(); img.src = fallbackUrl } catch {}
-                  }, 150)
-                  window.location.href = redirectUrl
+                  window.location.href = `${returnProto}?access_token=${encodeURIComponent(token)}`
                   return // Stop here, don't navigate to dashboard
                 }
               }
@@ -139,13 +129,7 @@ export default function AuthCallbackPage() {
             const token = data.session.access_token
             console.log('[Auth] Desktop mode detected (success), redirecting to app with token')
             if (token) {
-              const redirectUrl = `${returnProto}?access_token=${encodeURIComponent(token)}`
-              const fallbackUrl = `http://127.0.0.1:47999/auth?access_token=${encodeURIComponent(token)}`
-              setTimeout(() => {
-                try { fetch(fallbackUrl, { mode: 'no-cors' as RequestMode }).catch(() => {}) } catch {}
-                try { const img = new Image(); img.src = fallbackUrl } catch {}
-              }, 150)
-              window.location.href = redirectUrl
+              window.location.href = `${returnProto}?access_token=${encodeURIComponent(token)}`
               return // Stop here, don't navigate to dashboard
             }
           }
