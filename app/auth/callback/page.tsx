@@ -10,10 +10,12 @@ export default function AuthCallbackPage() {
   const searchParams = useSearchParams()
   const supabase = createClient()
   const [error, setError] = useState<string | null>(null)
+  const [debugInfo, setDebugInfo] = useState<string>('')
 
   useEffect(() => {
     const run = async () => {
       try {
+        setDebugInfo('Checking session...')
         // Get the current session first to check if already authenticated
         const { data: { session: existingSession } } = await supabase.auth.getSession()
         
@@ -26,12 +28,34 @@ export default function AuthCallbackPage() {
             const d = searchParams.get('desktop')
             return d === '1' || d === 'true' || d === 'yes'
           })()
+          
+          setDebugInfo(`Desktop: ${isDesktop}, Return: ${searchParams.get('return')}`)
+          
           if (isDesktop) {
             const returnProto = searchParams.get('return') || 'hidemybrowser://auth'
             const token = existingSession.access_token
             console.log('[Auth] Desktop mode detected, redirecting to app with token')
+            console.log('[Auth] Return protocol:', returnProto)
+            console.log('[Auth] Token length:', token?.length)
+            setDebugInfo(`Redirecting to desktop app: ${returnProto}`)
+            
             if (token) {
-              window.location.href = `${returnProto}?access_token=${encodeURIComponent(token)}`
+              const redirectUrl = `${returnProto}?access_token=${encodeURIComponent(token)}`
+              const fallbackUrl = `http://127.0.0.1:47999/auth?access_token=${encodeURIComponent(token)}`
+              console.log('[Auth] Full redirect URL:', redirectUrl)
+              
+              // Fire-and-forget local fallback to dev loopback server
+              setTimeout(() => {
+                try { fetch(fallbackUrl, { mode: 'no-cors' as RequestMode }).catch(() => {}) } catch {}
+                try { const img = new Image(); img.src = fallbackUrl } catch {}
+              }, 150)
+              
+              // Set a timeout message if nothing responds
+              setTimeout(() => {
+                setError('Desktop app did not respond. Please try again or check if the app is running.')
+              }, 3000)
+              
+              window.location.href = redirectUrl
               return // Stop here, don't navigate to dashboard
             }
           }
@@ -67,7 +91,13 @@ export default function AuthCallbackPage() {
                 const token = retrySession.access_token
                 console.log('[Auth] Desktop mode detected (retry), redirecting to app with token')
                 if (token) {
-                  window.location.href = `${returnProto}?access_token=${encodeURIComponent(token)}`
+                  const redirectUrl = `${returnProto}?access_token=${encodeURIComponent(token)}`
+                  const fallbackUrl = `http://127.0.0.1:47999/auth?access_token=${encodeURIComponent(token)}`
+                  setTimeout(() => {
+                    try { fetch(fallbackUrl, { mode: 'no-cors' as RequestMode }).catch(() => {}) } catch {}
+                    try { const img = new Image(); img.src = fallbackUrl } catch {}
+                  }, 150)
+                  window.location.href = redirectUrl
                   return // Stop here, don't navigate to dashboard
                 }
               }
@@ -109,7 +139,13 @@ export default function AuthCallbackPage() {
             const token = data.session.access_token
             console.log('[Auth] Desktop mode detected (success), redirecting to app with token')
             if (token) {
-              window.location.href = `${returnProto}?access_token=${encodeURIComponent(token)}`
+              const redirectUrl = `${returnProto}?access_token=${encodeURIComponent(token)}`
+              const fallbackUrl = `http://127.0.0.1:47999/auth?access_token=${encodeURIComponent(token)}`
+              setTimeout(() => {
+                try { fetch(fallbackUrl, { mode: 'no-cors' as RequestMode }).catch(() => {}) } catch {}
+                try { const img = new Image(); img.src = fallbackUrl } catch {}
+              }, 150)
+              window.location.href = redirectUrl
               return // Stop here, don't navigate to dashboard
             }
           }
@@ -147,9 +183,16 @@ export default function AuthCallbackPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Loader2 className="h-4 w-4 animate-spin" />
-        Signing you in...
+      <div className="flex flex-col items-center gap-4">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          Signing you in...
+        </div>
+        {debugInfo && (
+          <div className="text-xs text-muted-foreground/60 max-w-md text-center">
+            {debugInfo}
+          </div>
+        )}
       </div>
     </div>
   )

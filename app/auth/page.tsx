@@ -43,9 +43,9 @@ export default function AuthPage() {
         if (isDesktop) {
           // Redirect to callback with desktop params so it can trigger the protocol handler
           const returnProto = searchParams.get('return') || searchParams.get('redirect_uri') || 'hidemybrowser://auth'
-          const callbackUrl = `${window.location.origin}/auth/callback?desktop=1&return=${encodeURIComponent(returnProto)}`
           console.log('[Auth Page] User already authenticated (desktop), redirecting to callback')
-          window.location.href = callbackUrl
+          console.log('[Auth Page] Return protocol:', returnProto)
+          router.replace(`/auth/callback?desktop=1&return=${encodeURIComponent(returnProto)}`)
           return
         }
         
