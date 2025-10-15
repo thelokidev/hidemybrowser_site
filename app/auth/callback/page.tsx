@@ -29,11 +29,11 @@ export default function AuthCallbackPage() {
           if (isDesktop) {
             const returnProto = searchParams.get('return') || 'hidemybrowser://auth'
             const token = existingSession.access_token
-            try {
-              if (token) {
-                window.location.href = `${returnProto}?access_token=${encodeURIComponent(token)}`
-              }
-            } catch {}
+            console.log('[Auth] Desktop mode detected, redirecting to app with token')
+            if (token) {
+              window.location.href = `${returnProto}?access_token=${encodeURIComponent(token)}`
+              return // Stop here, don't navigate to dashboard
+            }
           }
 
           console.log('[Auth] Already authenticated, redirecting to', target)
@@ -65,11 +65,11 @@ export default function AuthCallbackPage() {
               if (isDesktop) {
                 const returnProto = searchParams.get('return') || 'hidemybrowser://auth'
                 const token = retrySession.access_token
-                try {
-                  if (token) {
-                    window.location.href = `${returnProto}?access_token=${encodeURIComponent(token)}`
-                  }
-                } catch {}
+                console.log('[Auth] Desktop mode detected (retry), redirecting to app with token')
+                if (token) {
+                  window.location.href = `${returnProto}?access_token=${encodeURIComponent(token)}`
+                  return // Stop here, don't navigate to dashboard
+                }
               }
 
               console.log('[Auth] User is authenticated despite error, redirecting to', target)
@@ -107,11 +107,11 @@ export default function AuthCallbackPage() {
           if (isDesktop) {
             const returnProto = searchParams.get('return') || 'hidemybrowser://auth'
             const token = data.session.access_token
-            try {
-              if (token) {
-                window.location.href = `${returnProto}?access_token=${encodeURIComponent(token)}`
-              }
-            } catch {}
+            console.log('[Auth] Desktop mode detected (success), redirecting to app with token')
+            if (token) {
+              window.location.href = `${returnProto}?access_token=${encodeURIComponent(token)}`
+              return // Stop here, don't navigate to dashboard
+            }
           }
 
           console.log('[Auth] Authentication successful, redirecting to', target)

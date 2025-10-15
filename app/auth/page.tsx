@@ -33,6 +33,22 @@ export default function AuthPage() {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       if (session) {
+        // Check if this is a desktop auth request
+        const isDesktop = (() => {
+          const src = searchParams.get('source')
+          const ru = searchParams.get('redirect_uri')
+          return src === 'desktop' || (ru && ru.startsWith('hidemybrowser://'))
+        })()
+        
+        if (isDesktop) {
+          // Redirect to callback with desktop params so it can trigger the protocol handler
+          const returnProto = searchParams.get('return') || searchParams.get('redirect_uri') || 'hidemybrowser://auth'
+          const callbackUrl = `${window.location.origin}/auth/callback?desktop=1&return=${encodeURIComponent(returnProto)}`
+          console.log('[Auth Page] User already authenticated (desktop), redirecting to callback')
+          window.location.href = callbackUrl
+          return
+        }
+        
         const next = searchParams.get('next')
         const target = next && next.startsWith('/') ? next : "/dashboard"
         console.log('[Auth Page] User already authenticated, redirecting to', target)
@@ -49,10 +65,21 @@ export default function AuthPage() {
 
     try {
       const next = searchParams.get('next')
-      const redirectTo = next 
-        ? `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`
-        : `${window.location.origin}/auth/callback`
-      
+      const isDesktop = (() => {
+        const src = searchParams.get('source')
+        const ru = searchParams.get('redirect_uri')
+        return src === 'desktop' || (ru && ru.startsWith('hidemybrowser://'))
+      })()
+      const returnProto = searchParams.get('return') || searchParams.get('redirect_uri') || 'hidemybrowser://auth'
+      const base = `${window.location.origin}/auth/callback`
+      const params = new URLSearchParams()
+      if (next) params.set('next', next)
+      if (isDesktop) {
+        params.set('desktop', '1')
+        params.set('return', returnProto)
+      }
+      const redirectTo = params.toString() ? `${base}?${params.toString()}` : base
+
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
@@ -83,10 +110,21 @@ export default function AuthPage() {
 
     try {
       const next = searchParams.get('next')
-      const redirectTo = next 
-        ? `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`
-        : `${window.location.origin}/auth/callback`
-      
+      const isDesktop = (() => {
+        const src = searchParams.get('source')
+        const ru = searchParams.get('redirect_uri')
+        return src === 'desktop' || (ru && ru.startsWith('hidemybrowser://'))
+      })()
+      const returnProto = searchParams.get('return') || searchParams.get('redirect_uri') || 'hidemybrowser://auth'
+      const base = `${window.location.origin}/auth/callback`
+      const params = new URLSearchParams()
+      if (next) params.set('next', next)
+      if (isDesktop) {
+        params.set('desktop', '1')
+        params.set('return', returnProto)
+      }
+      const redirectTo = params.toString() ? `${base}?${params.toString()}` : base
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
