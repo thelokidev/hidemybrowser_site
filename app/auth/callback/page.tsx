@@ -43,15 +43,33 @@ export default function AuthCallbackPage() {
               const redirectUrl = `${returnProto}?access_token=${encodeURIComponent(token)}`
               console.log('[Auth] Full redirect URL:', redirectUrl)
               
-              // Try the protocol twice and increase timeout before showing an error
+              // Try the protocol multiple times with increasing delays
               window.location.href = redirectUrl
               setTimeout(() => {
                 try { window.location.href = redirectUrl } catch {}
-              }, 1500)
-              // Fallback message if the app doesn't respond in time
+              }, 1000)
               setTimeout(() => {
-                setError('Desktop app did not respond. Please try again or check if the app is running.')
-              }, 8000)
+                try { window.location.href = redirectUrl } catch {}
+              }, 3000)
+              setTimeout(() => {
+                try { window.location.href = redirectUrl } catch {}
+              }, 6000)
+              
+              // Show success message after 2 seconds
+              setTimeout(() => {
+                setDebugInfo('✓ Authentication successful! Redirecting to desktop app...')
+              }, 2000)
+              
+              // Try to close the window after 5 seconds
+              setTimeout(() => {
+                try {
+                  window.close()
+                } catch {
+                  // If can't close, show message
+                  setDebugInfo('✓ Authentication successful! You can close this window now.')
+                }
+              }, 5000)
+              
               return // Stop here, don't navigate to dashboard
             }
           }
@@ -87,7 +105,26 @@ export default function AuthCallbackPage() {
                 const token = retrySession.access_token
                 console.log('[Auth] Desktop mode detected (retry), redirecting to app with token')
                 if (token) {
-                  window.location.href = `${returnProto}?access_token=${encodeURIComponent(token)}`
+                  const redirectUrl = `${returnProto}?access_token=${encodeURIComponent(token)}`
+                  // Try the protocol multiple times with increasing delays
+                  window.location.href = redirectUrl
+                  setTimeout(() => {
+                    try { window.location.href = redirectUrl } catch {}
+                  }, 1000)
+                  setTimeout(() => {
+                    try { window.location.href = redirectUrl } catch {}
+                  }, 3000)
+                  setTimeout(() => {
+                    try { window.location.href = redirectUrl } catch {}
+                  }, 6000)
+                  // Show success and try to close
+                  setTimeout(() => {
+                    try {
+                      window.close()
+                    } catch {
+                      console.log('[Auth] Could not auto-close window')
+                    }
+                  }, 5000)
                   return // Stop here, don't navigate to dashboard
                 }
               }
@@ -129,7 +166,26 @@ export default function AuthCallbackPage() {
             const token = data.session.access_token
             console.log('[Auth] Desktop mode detected (success), redirecting to app with token')
             if (token) {
-              window.location.href = `${returnProto}?access_token=${encodeURIComponent(token)}`
+              const redirectUrl = `${returnProto}?access_token=${encodeURIComponent(token)}`
+              // Try the protocol multiple times with increasing delays
+              window.location.href = redirectUrl
+              setTimeout(() => {
+                try { window.location.href = redirectUrl } catch {}
+              }, 1000)
+              setTimeout(() => {
+                try { window.location.href = redirectUrl } catch {}
+              }, 3000)
+              setTimeout(() => {
+                try { window.location.href = redirectUrl } catch {}
+              }, 6000)
+              // Show success and try to close
+              setTimeout(() => {
+                try {
+                  window.close()
+                } catch {
+                  console.log('[Auth] Could not auto-close window')
+                }
+              }, 5000)
               return // Stop here, don't navigate to dashboard
             }
           }
