@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; connect-src *; img-src 'self' data:; style-src 'self' 'unsafe-inline'" />
+    <title>Sign in</title>
+    <style>
+      html, body { height: 100%; margin: 0; }
+      .wrap { display: flex; height: 100%; align-items: center; justify-content: center; font-family: system-ui, sans-serif; }
+      .card { border: 1px solid #ddd; border-radius: 8px; padding: 16px; width: 360px; }
+      .btn { display: inline-block; border: 1px solid #999; border-radius: 6px; padding: 8px 12px; cursor: pointer; text-decoration: none; color: #111; }
+      .row { margin-top: 12px; }
+      input { width: 100%; padding: 8px; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="card">
+        <h3>Sign in to HideMyBrowser</h3>
+        <p>Click the button below to open your browser and sign in. When completed, the app will activate automatically.</p>
+        <div class="row">
+          <label>Server URL</label>
+          <input id="baseUrl" placeholder="https://yourapp.com" />
+        </div>
+        <div class="row">
+          <a id="signin" class="btn">Open sign in</a>
+        </div>
+        <p id="hint" style="color:#666; font-size:12px; margin-top:8px"></p>
+      </div>
+    </div>
+    <script>
+      const btn = document.getElementById('signin')
+      const baseUrlInput = document.getElementById('baseUrl')
+      const hint = document.getElementById('hint')
+      const defaultBase = (process.env?.WEB_BASE || process.env?.APP_BASE_URL || '').trim()
+      if (defaultBase) baseUrlInput.value = defaultBase
+
+      btn.addEventListener('click', () => {
+        const base = (baseUrlInput.value || '').trim().replace(/\/$/, '')
+        if (!base) {
+          hint.textContent = 'Please enter your server base URL (e.g. https://app.example.com)'
+          return
+        }
+        // Instruct server to perform OAuth and on callback page add ?desktop=1&return=hidemybrowser://auth
+        const url = base + '/auth?desktop=1&return=hidemybrowser://auth'
+        window.electron?.openExternal(url)
+      })
+    </script>
+  </body>
+</html>

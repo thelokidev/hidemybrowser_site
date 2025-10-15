@@ -21,6 +21,21 @@ export default function AuthCallbackPage() {
           // Already authenticated, check for next param
           const next = searchParams.get('next')
           const target = next && next.startsWith('/') ? next : "/dashboard"
+
+          const isDesktop = (() => {
+            const d = searchParams.get('desktop')
+            return d === '1' || d === 'true' || d === 'yes'
+          })()
+          if (isDesktop) {
+            const returnProto = searchParams.get('return') || 'hidemybrowser://auth'
+            const token = existingSession.access_token
+            try {
+              if (token) {
+                window.location.href = `${returnProto}?access_token=${encodeURIComponent(token)}`
+              }
+            } catch {}
+          }
+
           console.log('[Auth] Already authenticated, redirecting to', target)
           router.replace(target)
           return
@@ -42,6 +57,21 @@ export default function AuthCallbackPage() {
               // User is actually logged in!
               const next = searchParams.get('next')
               const target = next && next.startsWith('/') ? next : "/dashboard"
+
+              const isDesktop = (() => {
+                const d = searchParams.get('desktop')
+                return d === '1' || d === 'true' || d === 'yes'
+              })()
+              if (isDesktop) {
+                const returnProto = searchParams.get('return') || 'hidemybrowser://auth'
+                const token = retrySession.access_token
+                try {
+                  if (token) {
+                    window.location.href = `${returnProto}?access_token=${encodeURIComponent(token)}`
+                  }
+                } catch {}
+              }
+
               console.log('[Auth] User is authenticated despite error, redirecting to', target)
               router.replace(target)
               return
@@ -69,6 +99,21 @@ export default function AuthCallbackPage() {
         if (data.session) {
           const next = searchParams.get('next')
           const target = next && next.startsWith('/') ? next : "/dashboard"
+
+          const isDesktop = (() => {
+            const d = searchParams.get('desktop')
+            return d === '1' || d === 'true' || d === 'yes'
+          })()
+          if (isDesktop) {
+            const returnProto = searchParams.get('return') || 'hidemybrowser://auth'
+            const token = data.session.access_token
+            try {
+              if (token) {
+                window.location.href = `${returnProto}?access_token=${encodeURIComponent(token)}`
+              }
+            } catch {}
+          }
+
           console.log('[Auth] Authentication successful, redirecting to', target)
           router.replace(target)
         }

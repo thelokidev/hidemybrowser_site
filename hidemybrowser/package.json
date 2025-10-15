@@ -1,0 +1,14 @@
+{
+  "name": "hidemybrowser-desktop",
+  "version": "0.1.0",
+  "private": true,
+  "main": "main/main.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "electron ."
+  },
+  "dependencies": {
+    "electron": "^31",
+    "node-fetch": "^3"
+  }
+}
