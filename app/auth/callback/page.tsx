@@ -33,15 +33,18 @@ export default function AuthCallbackPage() {
           
           if (isDesktop) {
             const returnProto = searchParams.get('return') || 'hidemybrowser://auth'
+            const state = searchParams.get('state') // CSRF protection token from desktop
             const token = existingSession.access_token
             console.log('[Auth] Desktop mode detected, redirecting to app with token')
             console.log('[Auth] Return protocol:', returnProto)
             console.log('[Auth] Token length:', token?.length)
+            console.log('[Auth] State:', state ? 'present' : 'missing')
             setDebugInfo(`Redirecting to desktop app: ${returnProto}`)
             
             if (token) {
-              const redirectUrl = `${returnProto}?access_token=${encodeURIComponent(token)}`
-              console.log('[Auth] Full redirect URL:', redirectUrl)
+              // Build redirect URL with access_token and state (for CSRF protection)
+              const redirectUrl = `${returnProto}?access_token=${encodeURIComponent(token)}${state ? `&state=${encodeURIComponent(state)}` : ''}`
+              console.log('[Auth] Full redirect URL:', redirectUrl.replace(/access_token=[^&]+/, 'access_token=***'))
               
               // Try the protocol multiple times with increasing delays
               window.location.href = redirectUrl
@@ -102,10 +105,11 @@ export default function AuthCallbackPage() {
               })()
               if (isDesktop) {
                 const returnProto = searchParams.get('return') || 'hidemybrowser://auth'
+                const state = searchParams.get('state') // CSRF protection token from desktop
                 const token = retrySession.access_token
                 console.log('[Auth] Desktop mode detected (retry), redirecting to app with token')
                 if (token) {
-                  const redirectUrl = `${returnProto}?access_token=${encodeURIComponent(token)}`
+                  const redirectUrl = `${returnProto}?access_token=${encodeURIComponent(token)}${state ? `&state=${encodeURIComponent(state)}` : ''}`
                   // Try the protocol multiple times with increasing delays
                   window.location.href = redirectUrl
                   setTimeout(() => {
@@ -163,10 +167,11 @@ export default function AuthCallbackPage() {
           })()
           if (isDesktop) {
             const returnProto = searchParams.get('return') || 'hidemybrowser://auth'
+            const state = searchParams.get('state') // CSRF protection token from desktop
             const token = data.session.access_token
             console.log('[Auth] Desktop mode detected (success), redirecting to app with token')
             if (token) {
-              const redirectUrl = `${returnProto}?access_token=${encodeURIComponent(token)}`
+              const redirectUrl = `${returnProto}?access_token=${encodeURIComponent(token)}${state ? `&state=${encodeURIComponent(state)}` : ''}`
               // Try the protocol multiple times with increasing delays
               window.location.href = redirectUrl
               setTimeout(() => {

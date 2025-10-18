@@ -43,9 +43,14 @@ export default function AuthPage() {
         if (isDesktop) {
           // Redirect to callback with desktop params so it can trigger the protocol handler
           const returnProto = searchParams.get('return') || searchParams.get('redirect_uri') || 'hidemybrowser://auth'
+          const state = searchParams.get('state') // CSRF protection token from desktop
           console.log('[Auth Page] User already authenticated (desktop), redirecting to callback')
           console.log('[Auth Page] Return protocol:', returnProto)
-          router.replace(`/auth/callback?desktop=1&return=${encodeURIComponent(returnProto)}`)
+          console.log('[Auth Page] State:', state ? 'present' : 'missing')
+          
+          // Build callback URL with desktop flag, return protocol, and state
+          const callbackUrl = `/auth/callback?desktop=1&return=${encodeURIComponent(returnProto)}${state ? `&state=${encodeURIComponent(state)}` : ''}`
+          router.replace(callbackUrl)
           return
         }
         
@@ -71,12 +76,14 @@ export default function AuthPage() {
         return src === 'desktop' || (ru && ru.startsWith('hidemybrowser://'))
       })()
       const returnProto = searchParams.get('return') || searchParams.get('redirect_uri') || 'hidemybrowser://auth'
+      const state = searchParams.get('state') // CSRF protection token from desktop
       const base = `${window.location.origin}/auth/callback`
       const params = new URLSearchParams()
       if (next) params.set('next', next)
       if (isDesktop) {
         params.set('desktop', '1')
         params.set('return', returnProto)
+        if (state) params.set('state', state) // Pass state through for CSRF protection
       }
       const redirectTo = params.toString() ? `${base}?${params.toString()}` : base
 
@@ -116,12 +123,14 @@ export default function AuthPage() {
         return src === 'desktop' || (ru && ru.startsWith('hidemybrowser://'))
       })()
       const returnProto = searchParams.get('return') || searchParams.get('redirect_uri') || 'hidemybrowser://auth'
+      const state = searchParams.get('state') // CSRF protection token from desktop
       const base = `${window.location.origin}/auth/callback`
       const params = new URLSearchParams()
       if (next) params.set('next', next)
       if (isDesktop) {
         params.set('desktop', '1')
         params.set('return', returnProto)
+        if (state) params.set('state', state) // Pass state through for CSRF protection
       }
       const redirectTo = params.toString() ? `${base}?${params.toString()}` : base
 

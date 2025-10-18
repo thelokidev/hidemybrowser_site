@@ -4,15 +4,13 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { useState, useEffect } from "react"
 import { useAuth } from "@/contexts/auth-context"
-import { useRouter } from "next/navigation"
-import { UserAvatar } from "@/components/user-avatar"
+import { ProfileDropdown } from "@/components/profile-dropdown"
 import Image from "next/image"
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false)
   const [mounted, setMounted] = useState(false)
-  const { user, signOut } = useAuth()
-  const router = useRouter()
+  const { user } = useAuth()
 
   useEffect(() => {
     // Mark as mounted to avoid hydration mismatch when auth state resolves
@@ -97,19 +95,7 @@ export function Header() {
             {!mounted ? (
               <div className="h-9 w-[180px]" />
             ) : user ? (
-              <>
-                <UserAvatar size={36} className="ring-1 ring-border/60" />
-                <Button 
-                  size="sm"
-                  className="transition-all duration-300 hover:scale-105 hover:shadow-lg"
-                  onClick={async () => {
-                    await signOut()
-                    router.replace("/auth")
-                  }}
-                >
-                  Sign Out
-                </Button>
-              </>
+              <ProfileDropdown />
             ) : (
               <>
                 <Button 
