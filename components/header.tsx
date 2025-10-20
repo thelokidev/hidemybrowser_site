@@ -79,9 +79,6 @@ export function Header() {
             <NavLink href="#features" scrolled={scrolled}>
               How it works
             </NavLink>
-            <NavLink href="#download" scrolled={scrolled}>
-              Use cases
-            </NavLink>
             <NavLink href="#pricing" scrolled={scrolled}>
               Pricing
             </NavLink>

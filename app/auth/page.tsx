@@ -199,8 +199,14 @@ export default function AuthPage() {
         >
           <div className="text-center mb-8">
             <Link href="/" className="inline-block mb-6">
-              <div className="w-12 h-12 bg-foreground rounded-lg flex items-center justify-center mx-auto">
-                <span className="text-background font-bold text-xl">HMB</span>
+              <div className="w-16 h-16 rounded-2xl overflow-hidden mx-auto shadow-lg bg-transparent">
+                <img
+                  src="/icon.ico"
+                  alt="HideMyBrowser"
+                  width={64}
+                  height={64}
+                  className="w-full h-full object-contain"
+                />
               </div>
             </Link>
             <h1

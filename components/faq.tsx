@@ -27,9 +27,9 @@ const faqs = [
       "No. When hidden, HideMyBrowser is completely invisible during screen shares, video calls, and recordings. It won't appear in any shared content or recordings.",
   },
   {
-    question: "How does the free trial work?",
+    question: "Is there a free trial?",
     answer:
-      "The free trial gives you 10 minutes of stealth browsing to test the core invisibility features. No credit card required. After the trial, you can choose a paid plan to unlock unlimited usage.",
+      "No. HideMyBrowser does not offer a free trial. Access to the app requires an active license.",
   },
   {
     question: "Is my data secure?",
@@ -44,7 +44,7 @@ const faqs = [
   {
     question: "Do I need to pay before downloading?",
     answer:
-      "No. You can download HideMyBrowser for free and use the trial version. You only need to purchase a license when you want to unlock the full features and unlimited usage.",
+      "You can download the installer for free, but a valid license is required to use HideMyBrowser. There is no free trial.",
   },
 ]
 
