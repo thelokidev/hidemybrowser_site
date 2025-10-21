@@ -341,7 +341,7 @@ export default function AuthPage() {
             )}
           </div>
 
-          <p className="text-center text-xs text-muted-foreground mt-6">
+          <p className="text-center text-xs text-foreground/80 drop-shadow-sm mt-6">
             By continuing, you agree to our{" "}
             <Link href="/terms" className="underline hover:text-foreground">
               Terms of Service

@@ -68,7 +68,7 @@ export function Features() {
           transition={{ duration: 0.6 }}
           className="text-center mb-10 sm:mb-12 md:mb-16"
         >
-          <h2 className="text-3xl sm:text-4xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
+          <h2 className="text-3xl sm:text-4xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent pb-2">
             Why Choose HideMyBrowser?
           </h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed overflow-visible pb-1">

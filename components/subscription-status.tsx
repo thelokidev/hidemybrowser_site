@@ -160,7 +160,7 @@ export default function SubscriptionStatus() {
 
           <div className="pt-2 space-y-2">
             <Link href="/pricing" className="block">
-              <Button variant="outline" className="w-full">
+              <Button variant="outline" className="w-full transition-all duration-300 hover:bg-foreground hover:text-background">
                 View Plans
               </Button>
             </Link>
@@ -215,7 +215,7 @@ export default function SubscriptionStatus() {
             <p className="text-sm text-muted-foreground mb-2">Subscribe to unlock all premium features</p>
           </div>
           <Link href="/pricing">
-            <Button className="w-full">View Plans</Button>
+            <Button className="w-full transition-all duration-300 hover:bg-foreground hover:text-background">View Plans</Button>
           </Link>
           
           {/* Info about automatic subscription sync */}
