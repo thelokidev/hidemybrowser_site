@@ -8,13 +8,11 @@ import { Check, AlertCircle } from "lucide-react"
 import { Header } from "@/components/header"
 import { useToast } from '@/hooks/use-toast'
 import { Footer } from "@/components/footer"
-import { initiateCheckout } from "@/lib/dodopayments/checkout"
 import { createClient } from '@/lib/supabase/client'
 import { useSubscription } from '@/hooks/use-subscription'
 import { canChangePlan, getTierName } from '@/lib/subscription-tier-utils'
 import { Badge } from "@/components/ui/badge"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import Link from "next/link"
 import { useSearchParams, useRouter } from "next/navigation"
 const plans = [
@@ -76,15 +74,11 @@ export default function PricingPage() {
   const [userName, setUserName] = useState<string | null>(null)
   const [authUser, setAuthUser] = useState<any>(null)
   const [authChecking, setAuthChecking] = useState(true)
-  const [pendingPlan, setPendingPlan] = useState<typeof plans[0] | null>(null)
-  const [paymentUrl, setPaymentUrl] = useState<string | null>(null)
-  const [showPayment, setShowPayment] = useState(false)
   const { toast } = useToast()
   const supabase = createClient()
   const { subscription, loading: subLoading } = useSubscription()
   const searchParams = useSearchParams()
   const router = useRouter()
-  const dismissedRef = useRef(false)
 
   /**
    * Get plan status and action for a plan
@@ -117,9 +111,7 @@ export default function PricingPage() {
 
   const continueCheckout = useCallback(async (plan: typeof plans[0]) => {
     try {
-      // User explicitly initiated checkout again; allow dialog to open
-      dismissedRef.current = false
-      // Create programmatic checkout session and show in modal iframe
+      // Create programmatic checkout session and redirect to it
       const response = await fetch(`${window.location.origin}/checkout`, {
         method: "POST",
         headers: {
@@ -143,8 +135,8 @@ export default function PricingPage() {
       }
 
       const { checkout_url } = await response.json()
-      setPaymentUrl(checkout_url)
-      setShowPayment(true)
+      // Navigate directly to checkout instead of showing modal
+      window.location.href = checkout_url
     } catch (error) {
       console.error('Checkout error:', error)
       toast({
@@ -152,6 +144,7 @@ export default function PricingPage() {
         description: "Failed to create checkout session. Please try again.",
         variant: "destructive"
       })
+      setLoading(null)
     }
   }, [userEmail, userName, toast])
 
@@ -181,7 +174,7 @@ export default function PricingPage() {
 
   // Handle auto-checkout when returning from auth with plan param
   useEffect(() => {
-    if (authUser && !showPayment && !authChecking && !dismissedRef.current) {
+    if (authUser && !authChecking) {
       const planSlug = searchParams.get('plan')
       if (planSlug) {
         const plan = plans.find(p => p.name.toLowerCase().startsWith(planSlug))
@@ -194,7 +187,7 @@ export default function PricingPage() {
         }
       }
     }
-  }, [authUser, showPayment, authChecking, searchParams, continueCheckout])
+  }, [authUser, authChecking, searchParams, continueCheckout])
 
   const handleCheckout = async (plan: typeof plans[0]) => {
     try {
@@ -350,43 +343,6 @@ export default function PricingPage() {
           </div>
         </div>
       </section>
-
-      {/* Authentication uses dedicated /auth page; no local login modal */}
-
-      {/* Payment Modal - embeds checkout in-place */}
-      <Dialog
-        open={showPayment}
-        onOpenChange={(open) => {
-          setShowPayment(open)
-          if (!open) {
-            // Permanently dismiss until user explicitly restarts checkout
-            dismissedRef.current = true
-            setPaymentUrl(null)
-
-            // Remove auto-trigger param so it won't reopen
-            const params = new URLSearchParams(searchParams.toString())
-            if (params.has('plan')) {
-              params.delete('plan')
-              const query = params.toString()
-              router.replace(query ? `/pricing?${query}` : '/pricing')
-            }
-          }
-        }}
-      >
-        <DialogContent className="max-w-3xl">
-          <DialogHeader>
-            <DialogTitle>Complete your purchase</DialogTitle>
-            <DialogDescription>Secure checkout</DialogDescription>
-          </DialogHeader>
-          {paymentUrl ? (
-            <div className="w-full h-[640px]">
-              <iframe src={paymentUrl} className="w-full h-full rounded-md border" title="Checkout" />
-            </div>
-          ) : (
-            <div className="text-sm text-muted-foreground">Preparing checkout...</div>
-          )}
-        </DialogContent>
-      </Dialog>
 
       <Footer />
     </main>
