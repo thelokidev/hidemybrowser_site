@@ -137,15 +137,11 @@ export function Hero() {
             <div className="relative bg-slate-950/50 rounded-xl px-8 pb-8 pt-6 sm:pt-10 aspect-video flex items-start justify-center backdrop-blur-sm border border-slate-700/30 overflow-hidden">
               {/* Background Video (optimized from GIF) */}
               <div className="absolute inset-0 z-0 rounded-xl pointer-events-none overflow-hidden">
-                <video
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
+                <img
+                  src="/demo.webp"
+                  alt="Demo"
                   className="w-full h-full object-cover"
-                >
-                  <source src="/demo.mp4" type="video/mp4" />
-                </video>
+                />
               </div>
               {/* Shared Screen Content removed */}
 
