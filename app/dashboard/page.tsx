@@ -6,6 +6,8 @@ import Link from 'next/link'
 import { UserAvatar } from '@/components/user-avatar'
 import SubscriptionStatus from '@/components/subscription-status'
 import Image from 'next/image'
+import { Download, CreditCard, BookOpen, Mail, FileText, Shield, ChevronRight } from 'lucide-react'
+import { LicensePill } from '@/components/license-pill'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -24,7 +26,11 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative min-h-screen bg-background overflow-hidden">
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute -top-24 -right-24 w-[560px] h-[420px] bg-light/60 dark:bg-light/40 blur-[140px] rounded-[48rem]" />
+        <div className="absolute bottom-[-10%] -left-24 w-[520px] h-[420px] bg-light/40 dark:bg-light/25 blur-[130px] rounded-[48rem]" />
+      </div>
       {/* Back to home (matches auth page UX) */}
       <Link
         href="/"
@@ -48,10 +54,10 @@ export default async function DashboardPage() {
 
       <header>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto flex items-center justify-between mt-0 h-20 w-full max-w-6xl px-1 md:px-2">
+          <div className="mx-auto flex items-center justify-between mt-4 h-16 w-full max-w-6xl px-3 md:px-4 rounded-2xl border border-border/60 bg-background/70 backdrop-blur-md">
             <Link 
               href="/" 
-              className="flex items-center gap-2 font-bold transition-all duration-300 hover:opacity-80 text-xl"
+              className="flex items-center gap-2 font-bold transition-all duration-300 hover:opacity-80 text-lg"
             >
               <Image
                 src="/favicon.ico"
@@ -79,14 +85,17 @@ export default async function DashboardPage() {
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-2">Welcome to your Dashboard</h1>
-            <p className="text-muted-foreground">
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="text-4xl md:text-5xl font-medium tracking-tighter bg-linear-to-b from-sky-800 dark:from-sky-100 to-foreground dark:to-foreground bg-clip-text text-transparent">Welcome to your Dashboard</h1>
+              <LicensePill />
+            </div>
+            <p className="text-muted-foreground mt-1">
               You're successfully signed in as <span className="font-medium text-foreground">{user.email}</span>
             </p>
           </div>
 
           <div className="grid gap-6 md:grid-cols-2">
-            <Card>
+            <Card className="border border-white/10 bg-white/60 dark:bg-white/5 backdrop-blur-xl">
               <CardHeader>
                 <CardTitle>Account Information</CardTitle>
                 <CardDescription>Your account details</CardDescription>
@@ -117,7 +126,7 @@ export default async function DashboardPage() {
 
             <SubscriptionStatus />
 
-            <Card className="md:col-span-2">
+            <Card className="md:col-span-2 border border-white/10 bg-white/60 dark:bg-white/5 backdrop-blur-xl">
               <CardHeader>
                 <CardTitle>Quick Actions</CardTitle>
                 <CardDescription>Get started with HideMyBrowser</CardDescription>
@@ -125,30 +134,48 @@ export default async function DashboardPage() {
               <CardContent>
                 <div className="grid gap-4 md:grid-cols-3">
                   <Link href="/#download">
-                    <Button variant="outline" className="w-full h-auto py-4 flex flex-col items-center gap-2 transition-all duration-300 hover:bg-foreground hover:text-background">
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                      </svg>
+                    <Button variant="outline" className="w-full h-auto py-4 flex flex-col items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-lg">
+                      <Download className="w-6 h-6" />
                       <span>Download App</span>
                     </Button>
                   </Link>
 
                   <Link href="/#pricing">
-                    <Button variant="outline" className="w-full h-auto py-4 flex flex-col items-center gap-2 transition-all duration-300 hover:bg-foreground hover:text-background">
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
+                    <Button variant="outline" className="w-full h-auto py-4 flex flex-col items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-lg">
+                      <CreditCard className="w-6 h-6" />
                       <span>View Pricing</span>
                     </Button>
                   </Link>
 
                   <Link href="/#faq">
-                    <Button variant="outline" className="w-full h-auto py-4 flex flex-col items-center gap-2 transition-all duration-300 hover:bg-foreground hover:text-background">
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                      </svg>
+                    <Button variant="outline" className="w-full h-auto py-4 flex flex-col items-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-lg">
+                      <BookOpen className="w-6 h-6" />
                       <span>Documentation</span>
                     </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Resources */}
+            <Card className="md:col-span-2 border border-white/10 bg-white/60 dark:bg-white/5 backdrop-blur-xl">
+              <CardHeader>
+                <CardTitle>Resources</CardTitle>
+                <CardDescription>Helpful links and support</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <Link href="mailto:support@hidemybrowser.app" className="group inline-flex items-center justify-between rounded-lg border border-border bg-background/50 px-4 py-3 hover:shadow-md transition-shadow">
+                    <span className="inline-flex items-center gap-2 text-sm"><Mail className="w-4 h-4" /> Support</span>
+                    <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-0.5 transition-transform" />
+                  </Link>
+                  <Link href="/terms" className="group inline-flex items-center justify-between rounded-lg border border-border bg-background/50 px-4 py-3 hover:shadow-md transition-shadow">
+                    <span className="inline-flex items-center gap-2 text-sm"><FileText className="w-4 h-4" /> Terms of Service</span>
+                    <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-0.5 transition-transform" />
+                  </Link>
+                  <Link href="/privacy" className="group inline-flex items-center justify-between rounded-lg border border-border bg-background/50 px-4 py-3 hover:shadow-md transition-shadow">
+                    <span className="inline-flex items-center gap-2 text-sm"><Shield className="w-4 h-4" /> Privacy Policy</span>
+                    <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:translate-x-0.5 transition-transform" />
                   </Link>
                 </div>
               </CardContent>

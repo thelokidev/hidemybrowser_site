@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF--8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stealth Workflow UI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @keyframes subtle-rotate {
+        0% {
+          transform: rotateY(-10deg) rotateX(15deg);
+        }
+        50% {
+          transform: rotateY(10deg) rotateX(15deg);
+        }
+        100% {
+          transform: rotateY(-10deg) rotateX(15deg);
+        }
+      }
+      @keyframes workflow-window-animation {
+        0%, 100% { top: 30%; left: 35%; opacity: 1; }
+        25% { top: 5%; left: 5%; opacity: 1; } /* Snap */
+        50% { top: 40%; left: 50%; opacity: 0.4; } /* Opacity */
+        75% { top: 50%; left: 20%; opacity: 1; } /* Drag */
+      }
+      @keyframes workflow-cursor-animation {
+        0%, 100% { top: 35%; left: 40%; }
+        25% { top: 10%; left: 10%; }
+        50% { top: 45%; left: 55%; }
+        75% { top: 55%; left: 25%; }
+      }
+      .animation-subtle-rotate {
+        animation: subtle-rotate 12s ease-in-out infinite;
+      }
+      .animation-workflow-window {
+        animation: workflow-window-animation 10s ease-in-out infinite;
+      }
+      .animation-workflow-cursor {
+        animation: workflow-cursor-animation 10s ease-in-out infinite;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="bg-black">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>

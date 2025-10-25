@@ -4,6 +4,9 @@ import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 import { Suspense } from "react"
 import { AuthProviderWrapper } from "@/components/auth-provider-wrapper"
+import { Geist } from "next/font/google"
+
+const geist = Geist({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "HideMyBrowser - The Truly Undetectable Browser",
@@ -23,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="font-sans antialiased">
+      <body className={`${geist.className} font-sans antialiased`}>
         <AuthProviderWrapper>
           <Suspense fallback={null}>{children}</Suspense>
         </AuthProviderWrapper>

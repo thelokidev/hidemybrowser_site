@@ -44,10 +44,10 @@ export function Header() {
     >
       <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
         <div
-          className={`mx-auto flex items-center justify-between transition-all duration-500 ${
+          className={`relative mx-auto flex items-center justify-between transition-all duration-500 rounded-2xl overflow-hidden transform-gpu ${
             scrolled
-              ? "mt-3 h-12 sm:h-14 w-full max-w-3xl sm:max-w-4xl rounded-2xl bg-background/95 backdrop-blur-md border border-border/50 px-3 md:px-4"
-              : "mt-0 h-16 sm:h-18 md:h-20 w-full max-w-5xl sm:max-w-6xl px-1 md:px-2"
+              ? "mt-3 h-12 sm:h-14 w-full max-w-3xl sm:max-w-4xl border border-border/50 px-3 md:px-4"
+              : "mt-0 h-16 sm:h-18 md:h-20 w-full max-w-5xl sm:max-w-6xl border border-transparent px-1 md:px-2"
           }`}
           style={scrolled ? {
             boxShadow: `
@@ -58,9 +58,14 @@ export function Header() {
             `
           } : undefined}
         >
+          <div
+            className={`pointer-events-none absolute inset-0 z-0 bg-background/90 backdrop-blur-md transition-opacity duration-300 ${
+              scrolled ? "opacity-100" : "opacity-0"
+            }`}
+          />
           <Link 
             href="/" 
-            className={`flex items-center gap-2 font-bold transition-all duration-300 hover:opacity-80 ${
+            className={`relative z-10 shrink-0 flex items-center gap-2 font-bold transition-all duration-300 hover:opacity-80 ${
               scrolled ? "text-base sm:text-lg" : "text-lg sm:text-xl"
             }`}
           >
@@ -75,7 +80,7 @@ export function Header() {
             <span>HideMyBrowser</span>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="relative z-10 hidden md:flex flex-1 items-center justify-center gap-1 min-w-0">
             <NavLink href="#features" scrolled={scrolled}>
               How it works
             </NavLink>
@@ -87,7 +92,7 @@ export function Header() {
             </NavLink>
           </nav>
 
-          <div className="flex items-center gap-2">
+          <div className="relative z-10 shrink-0 flex items-center gap-2">
             {/* Keep server and first client render identical to avoid hydration mismatch */}
             {!mounted ? (
               <div className="h-9 w-[180px]" />

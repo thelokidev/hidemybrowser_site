@@ -4,7 +4,7 @@ import { motion } from "framer-motion"
 import { useInView } from "framer-motion"
 import { useRef } from "react"
 import { Button } from "@/components/ui/button"
-import { DownloadIcon, Check, Monitor, Apple } from "lucide-react"
+import { DownloadIcon, Monitor, Apple, Check } from "lucide-react"
 
 const platforms = [
   {
@@ -29,21 +29,12 @@ const platforms = [
   },
 ]
 
-const benefits = [
-  "Complete Invisibility",
-  "Undetectable during screen shares and recordings",
-  "Instant Toggle",
-  "Alt+\\\\ to hide/show instantly",
-  "Meeting Ready",
-  "Optimized for Otter.ai and transcription",
-]
-
 export function Download() {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
 
   return (
-    <section id="download" ref={ref} className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 bg-background">
+    <section id="download" ref={ref} className="relative py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 bg-background overflow-hidden">
       <div className="max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -51,7 +42,7 @@ export function Download() {
           transition={{ duration: 0.6 }}
           className="text-center mb-10 sm:mb-12 md:mb-16"
         >
-          <h2 className="text-3xl sm:text-4xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4">Download HideMyBrowser</h2>
+          <h2 className="text-3xl sm:text-4xl md:text-4xl lg:text-5xl font-medium tracking-tighter mx-auto text-pretty bg-linear-to-b from-sky-800 dark:from-sky-100 to-foreground dark:to-foreground bg-clip-text text-transparent mb-3 sm:mb-4">Download HideMyBrowser</h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
             Get the truly undetectable browser for your platform. Start your stealth browsing experience today.
           </p>
@@ -108,44 +99,7 @@ export function Download() {
           })}
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="relative bg-gradient-to-br from-muted/50 to-muted/30 rounded-2xl p-8 border border-border overflow-hidden"
-        >
-          {/* Decorative elements */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -z-0" />
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-accent/5 rounded-full blur-3xl -z-0" />
-          
-          <div className="relative z-10">
-            <h3 className="text-2xl font-bold mb-8 text-center">What You Get</h3>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {benefits.map((benefit, index) => (
-                <motion.div 
-                  key={index} 
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.3, delay: 0.4 + index * 0.05 }}
-                  className="flex items-start gap-3 p-4 rounded-xl bg-background/50 backdrop-blur-sm border border-border/50 hover:border-border transition-colors"
-                >
-                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-green-500/10 flex items-center justify-center">
-                    <Check className="w-4 h-4 text-green-600 dark:text-green-500" />
-                  </div>
-                  <span className="text-sm font-medium leading-relaxed">{benefit}</span>
-                </motion.div>
-              ))}
-            </div>
-            <div className="text-center space-y-2">
-              <p className="text-sm font-medium">
-                Installation takes less than 2 minutes
-              </p>
-              <p className="text-xs text-muted-foreground">
-                No browser extensions required - Works with all major applications
-              </p>
-            </div>
-          </div>
-        </motion.div>
+        {/* Removed 'What You Get' section */}
       </div>
     </section>
   )

@@ -53,7 +53,7 @@ export function FAQ() {
   const isInView = useInView(ref, { once: true, margin: "-100px" })
 
   return (
-    <section id="faq" ref={ref} className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 bg-background">
+    <section id="faq" ref={ref} className="relative py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 bg-background overflow-hidden">
       <div className="max-w-3xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -61,7 +61,7 @@ export function FAQ() {
           transition={{ duration: 0.6 }}
           className="text-center mb-10 sm:mb-12 md:mb-16"
         >
-          <h2 className="text-3xl sm:text-4xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4">Frequently Asked Questions</h2>
+          <h2 className="text-3xl sm:text-4xl md:text-4xl lg:text-5xl font-medium tracking-tighter mx-auto text-pretty bg-linear-to-b from-sky-800 dark:from-sky-100 to-foreground dark:to-foreground bg-clip-text text-transparent mb-3 sm:mb-4">Frequently Asked Questions</h2>
           <p className="text-lg text-muted-foreground">Have questions? We've got answers.</p>
         </motion.div>
 

@@ -2,40 +2,27 @@
 
 import { Button } from "@/components/ui/button"
 import { motion, AnimatePresence } from "framer-motion"
-import { useState, useEffect } from "react"
-import { Eye, EyeOff, Play, Monitor, Command } from "lucide-react"
-
-const rotatingWords = [
-  { text: "Otter", className: "italic" },
-  { text: "Notes", className: "" },
-  { text: "Research", className: "" },
-  { text: "Prep Notes", className: "" },
-  { text: "Cheat sheet", className: "" },
-  { text: "Backup Slides", className: "" },
-]
+import { FeatureDemo } from "@/components/feature-demo"
+import { useEffect, useState } from "react"
 
 export function Hero() {
+  const rotatingWords = [
+    { text: "Otter", className: "italic" },
+    { text: "Notes", className: "" },
+    { text: "Research", className: "" },
+    { text: "Prep Notes", className: "" },
+    { text: "Cheat sheet", className: "" },
+    { text: "Backup Slides", className: "" },
+  ]
+
   const [currentWordIndex, setCurrentWordIndex] = useState(0)
-  const [isVisible, setIsVisible] = useState(true)
-  const [autoToggle, setAutoToggle] = useState(true)
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentWordIndex((prev) => (prev + 1) % rotatingWords.length)
     }, 2500)
-
     return () => clearInterval(interval)
   }, [])
-
-  useEffect(() => {
-    if (!autoToggle) return
-    
-    const interval = setInterval(() => {
-      setIsVisible((prev) => !prev)
-    }, 3000)
-
-    return () => clearInterval(interval)
-  }, [autoToggle])
 
   const scrollToDownload = () => {
     const downloadSection = document.getElementById("download")
@@ -51,156 +38,67 @@ export function Hero() {
     }
   }
 
-  const handleToggle = () => {
-    setAutoToggle(false)
-    setIsVisible(!isVisible)
-  }
-
   return (
-    <section className="relative bg-background pt-20 sm:pt-24 md:pt-28 lg:pt-32 xl:pt-36 pb-12 sm:pb-16 md:pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
-      <div className="max-w-6xl mx-auto">
-        {/* Hero heading */}
+    <div className="relative justify-center items-center">
+      <section className="max-w-(--breakpoint-xl) mx-auto px-4 py-28 gap-12 md:px-8 flex flex-col justify-center items-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="max-w-3xl mx-auto text-center mb-6 sm:mb-8"
+          transition={{ duration: 0.6, type: "spring", bounce: 0 }}
+          className="flex flex-col justify-center items-center space-y-5 max-w-4xl mx-auto text-center"
         >
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-normal tracking-[-0.04em] leading-[1.1] mb-6 sm:mb-8" style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' }}>
-            <span className="block">The Truly Undetectable Browser To Hide</span>
+          <h1 className="text-4xl md:text-6xl font-medium tracking-tighter mx-auto text-pretty">
+            <span className="block bg-linear-to-b from-sky-800 dark:from-sky-100 to-foreground dark:to-foreground bg-clip-text text-transparent">The Truly Undetectable Browser To Hide</span>
             <span className="flex items-center justify-center gap-3 my-2">
-              <span className="inline-block relative h-[1.2em]">
+              <span className="inline-flex w-[14ch] justify-center">
                 <AnimatePresence mode="wait">
                   <motion.span
                     key={currentWordIndex}
-                    initial={{ opacity: 0, scale: 0.8, filter: "blur(4px)" }}
-                    animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-                    exit={{ opacity: 0, scale: 0.8, filter: "blur(4px)" }}
-                    transition={{ duration: 0.5, ease: "easeInOut" }}
-                    className="absolute left-1/2 -translate-x-1/2 top-0 whitespace-nowrap font-normal"
+                    initial={{ opacity: 0, y: 6, filter: "blur(4px)" }}
+                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                    exit={{ opacity: 0, y: -6, filter: "blur(4px)" }}
+                    transition={{ duration: 0.35, ease: "easeInOut" }}
+                    className="whitespace-nowrap font-medium inline-block bg-gradient-to-r from-sky-500 via-cyan-400 to-indigo-500 dark:from-sky-300 dark:via-cyan-300 dark:to-indigo-400 bg-clip-text text-transparent drop-shadow"
                   >
                     {rotatingWords[currentWordIndex].text}
                   </motion.span>
                 </AnimatePresence>
-                <span className="invisible whitespace-nowrap font-normal">{rotatingWords.reduce((a, b) => a.text.length > b.text.length ? a : b).text}</span>
               </span>
             </span>
-            <span className="block">From Screenshare.</span>
+            <span className="block bg-linear-to-b from-sky-800 dark:from-sky-100 to-foreground dark:to-foreground bg-clip-text text-transparent">From Screenshare.</span>
           </h1>
-
-          <p className="text-base sm:text-lg lg:text-xl text-muted-foreground mb-6 max-w-2xl mx-auto leading-relaxed">
+          <p className="max-w-2xl text-lg mx-auto text-muted-foreground text-balance">
             Share your screen, not your secrets.
           </p>
-
           <p className="text-sm sm:text-base text-muted-foreground/80">Perfect for Interviews - Presentations - Demos</p>
-        </motion.div>
-
-        {/* CTA Buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12"
-        >
-          <Button size="lg" className="text-[15px] px-8 h-12" onClick={scrollToDownload}>
-            Download Now
-          </Button>
-          <Button size="lg" variant="outline" className="text-[15px] px-8 h-12 bg-transparent" onClick={scrollToFeatures}>
-            Learn More
-          </Button>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="items-center justify-center gap-x-3 space-y-3 sm:flex sm:space-y-0"
+          >
+            <Button size="lg" className="text-[15px] px-8 h-12 shadow-lg" onClick={scrollToDownload}>
+              Download Now
+            </Button>
+            <Button size="lg" variant="outline" className="text-[15px] px-8 h-12 bg-transparent" onClick={scrollToFeatures}>
+              Learn More
+            </Button>
+          </motion.div>
         </motion.div>
 
         {/* Interactive Demo */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          className="relative max-w-6xl mx-auto"
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="relative w-full max-w-7xl mx-auto"
         >
-          {/* Removed green glow overlays */}
-          {/* Screen Share Window Mockup */}
-          <div className="relative z-10 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 p-8 shadow-2xl border border-slate-700/50">
-            {/* Window Header */}
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex gap-2">
-                <div className="w-3 h-3 rounded-full bg-red-500/80" />
-                <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
-                <div className="w-3 h-3 rounded-full bg-green-500/80" />
-              </div>
-              <div className="flex items-center gap-3">
-                <Monitor className="w-5 h-5 text-slate-400" />
-                <span className="text-sm text-slate-300 font-medium">Video Call - Screen Sharing</span>
-              </div>
-            </div>
-
-            {/* Demo Content Area */}
-            <div className="relative bg-slate-950/50 rounded-xl px-8 pb-8 pt-6 sm:pt-10 aspect-video flex items-start justify-center backdrop-blur-sm border border-slate-700/30 overflow-hidden">
-              {/* Background Video (optimized from GIF) */}
-              <div className="absolute inset-0 z-0 rounded-xl pointer-events-none overflow-hidden">
-                <img
-                  src="/demo.webp"
-                  alt="Demo"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              {/* Shared Screen Content removed */}
-
-              {/* HideMyBrowser Window - Always Visible */
-              }
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key="browser-window"
-                  initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.9, y: -20 }}
-                  transition={{ duration: 0.4, ease: "easeInOut" }}
-                  className="relative z-10 w-full max-w-md mt-20 sm:mt-32"
-                >
-                  {/* Browser Window */}
-                  <div className="bg-slate-900 rounded-xl shadow-2xl overflow-hidden border border-slate-700">
-                    {/* Browser Header */}
-                    <div className="flex items-center justify-between px-4 py-3 bg-slate-800 border-b border-slate-700">
-                      <div className="flex items-center gap-3">
-                        <div className="flex gap-2">
-                          <div className="w-3 h-3 rounded-full bg-red-500" />
-                          <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                          <div className="w-3 h-3 rounded-full bg-green-500" />
-                        </div>
-                        {/* URL Tab */}
-                        <div className="px-3 py-1 bg-slate-700/50 rounded text-xs text-slate-300 font-medium">
-                          hidemybrowser.com
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 text-xs">
-                        {isVisible ? (
-                          <>
-                            <Eye className="w-3 h-3 text-slate-300" />
-                            <span className="font-medium text-slate-300">Visible</span>
-                          </>
-                        ) : (
-                          <>
-                            <EyeOff className="w-3 h-3 text-red-500" />
-                            <span className="font-medium text-red-500">Invisible</span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Browser Content - Empty lines */}
-                    <div className="p-6 space-y-3">
-                      <div className="h-3 bg-slate-700/30 rounded w-3/4"></div>
-                      <div className="h-3 bg-slate-700/30 rounded w-1/2"></div>
-                    </div>
-                  </div>
-                </motion.div>
-              </AnimatePresence>
-            </div>
-
-          </div>
+          <FeatureDemo />
         </motion.div>
+      </section>
 
-        
-      </div>
-    </section>
+      
+    </div>
   )
 }
+
