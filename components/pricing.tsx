@@ -147,18 +147,21 @@ export function Pricing() {
 
   return (
     <section id="pricing" ref={ref} className="relative py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 bg-background overflow-hidden">
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 -top-24 -z-10 opacity-60 blur-3xl [mask-image:radial-gradient(closest-side,white,transparent)]">
+        <div className="mx-auto h-60 w-[70%] rounded-full bg-gradient-to-b from-sky-400/30 via-cyan-400/20 to-indigo-500/10" />
+      </div>
       <div className="max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-10 sm:mb-12 md:mb-16"
+          className="text-center mb-10 sm:mb-12 md:mb-14"
         >
-          <h2 className="text-3xl sm:text-4xl md:text-4xl lg:text-5xl font-medium tracking-tighter mx-auto text-pretty bg-linear-to-b from-sky-800 dark:from-sky-100 to-foreground dark:to-foreground bg-clip-text text-transparent mb-3 sm:mb-4">Simple, transparent pricing</h2>
+          <h2 className="text-[34px] sm:text-4xl md:text-5xl font-medium tracking-tighter mx-auto text-pretty bg-linear-to-b from-sky-800 dark:from-sky-100 to-foreground dark:to-foreground bg-clip-text text-transparent mb-3 sm:mb-4">Simple, transparent pricing</h2>
           <p className="text-base sm:text-lg text-muted-foreground">Choose the perfect plan for your needs</p>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6 max-w-[1100px] mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6 max-w-[1100px] mx-auto">
           {plans.map((plan, index) => (
             <motion.div
               key={plan.name}
@@ -170,31 +173,37 @@ export function Pricing() {
             >
               {plan.badge && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
-                  <div className="bg-foreground text-background px-4 py-1 rounded-full text-xs font-semibold">
+                  <div className="px-4 py-1 rounded-full text-xs font-semibold text-white bg-gradient-to-r from-sky-600 to-indigo-600 shadow ring-1 ring-white/20">
                     {plan.badge}
                   </div>
                 </div>
               )}
 
               <div
-                className={`h-full p-6 rounded-xl border transition-all duration-300 flex flex-col ${
+                className={`h-full p-6 rounded-2xl border transition-all duration-300 flex flex-col backdrop-blur-xl ${
                   plan.highlighted
-                    ? "border-2 border-foreground shadow-md bg-gradient-to-b from-background to-background/70 ring-1 ring-foreground/20"
-                    : "bg-background border-border hover:border-foreground/20"
-                } hover:shadow-xl hover:ring-1 hover:ring-sky-400/25`}
+                    ? "border-white/10 bg-white/70 dark:bg-white/5 ring-1 ring-sky-400/30 shadow-2xl"
+                    : "border-white/10 bg-white/60 dark:bg-white/5 hover:ring-1 hover:ring-foreground/15"
+                } hover:shadow-xl`}
               >
                 <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
                 <div className="mb-1">
-                  <span className="text-4xl font-bold">{plan.price}</span>
+                  <span className="text-4xl md:text-5xl font-bold">{plan.price}</span>
                   <span className="text-muted-foreground text-sm">{plan.period}</span>
                 </div>
 
-                {plan.savings && <p className="text-sm font-semibold text-green-600 mb-4">{plan.savings}</p>}
+                {plan.savings && (
+                  <div className="mb-4">
+                    <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 ring-1 ring-emerald-500/20">
+                      {plan.savings}
+                    </span>
+                  </div>
+                )}
 
                 <ul className="space-y-3 mb-6 mt-6 flex-1">
                   {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-2 text-sm">
-                      <Check className="w-4 h-4 flex-shrink-0 mt-0.5 text-green-600" />
+                    <li key={feature} className="flex items-center gap-2.5 text-sm">
+                      <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-300"><Check className="w-3.5 h-3.5" /></span>
                       <span className="text-muted-foreground">{feature}</span>
                     </li>
                   ))}
@@ -207,7 +216,7 @@ export function Pricing() {
                   }}
                   disabled={subLoading || loading === plan.name || (currentPlan !== null && currentPlan !== plan.name)}
                   className={`w-full mt-auto transition-transform duration-200 hover:-translate-y-0.5 active:translate-y-0 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary/60 
-            ${currentPlan === plan.name ? 'bg-muted text-foreground cursor-default' : currentPlan ? 'bg-muted text-muted-foreground cursor-not-allowed' : 'bg-foreground text-background hover:bg-foreground/90'}`}
+            ${currentPlan === plan.name ? 'bg-muted text-foreground cursor-default' : currentPlan ? 'bg-muted text-muted-foreground cursor-not-allowed' : 'bg-foreground text-background hover:bg-foreground/90'} hover:shadow-lg`}
                   size="lg"
                 >
                   {subLoading

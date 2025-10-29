@@ -42,12 +42,12 @@ export function Header() {
     <header
       className="fixed top-0 left-0 right-0 z-50"
     >
-      <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4">
         <div
-          className={`relative mx-auto flex items-center justify-between transition-all duration-500 rounded-2xl overflow-hidden transform-gpu ${
+          className={`relative flex items-center justify-between transition-all duration-500 rounded-2xl overflow-hidden transform-gpu ${
             scrolled
-              ? "mt-3 h-12 sm:h-14 w-full max-w-3xl sm:max-w-4xl border border-border/50 px-3 md:px-4"
-              : "mt-0 h-16 sm:h-18 md:h-20 w-full max-w-5xl sm:max-w-6xl border border-transparent px-1 md:px-2"
+              ? "mx-auto mt-3 h-12 sm:h-14 w-full max-w-3xl sm:max-w-4xl border border-border/50 px-3 md:px-4"
+              : "mt-0 h-16 sm:h-18 md:h-20 w-full max-w-none border border-transparent px-0"
           }`}
           style={scrolled ? {
             boxShadow: `
@@ -77,7 +77,7 @@ export function Header() {
               priority
               className="rounded-sm"
             />
-            <span>HideMyBrowser</span>
+            <span className="bg-linear-to-b from-sky-800 dark:from-sky-100 to-foreground dark:to-foreground bg-clip-text text-transparent tracking-tighter">HideMyBrowser</span>
           </Link>
 
           <nav className="relative z-10 hidden md:flex flex-1 items-center justify-center gap-1 min-w-0">
@@ -87,7 +87,7 @@ export function Header() {
             <NavLink href="#pricing" scrolled={scrolled}>
               Pricing
             </NavLink>
-            <NavLink href="#faq" scrolled={scrolled}>
+            <NavLink href="/feedback" scrolled={scrolled}>
               Feedback
             </NavLink>
           </nav>

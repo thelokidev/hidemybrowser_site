@@ -146,7 +146,6 @@ export function FeatureDemo() {
                 <BrowserWindow subtle stealthOn={false} />
               </motion.div>
               {/* Caption: clarify right view */}
-              
             </div>
           </div>
 

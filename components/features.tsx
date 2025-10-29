@@ -4,10 +4,8 @@ import { motion } from "framer-motion"
 import { useInView } from "framer-motion"
 import { useReducedMotion } from "framer-motion"
 import { useRef, useState } from "react"
-import type { SVGProps } from "react"
+import type { SVGProps, ReactNode } from "react"
 import { HmbBolt, HmbEyeOff, HmbGhost, HmbMic, HmbKeyboard, HmbShield } from "./icons"
-import { InvisibilityAnimation } from "@/components/animations/invisibility-animation"
-import { WorkflowAnimation } from "@/components/animations/workflow-animation"
 import { MiniInterviews, MiniPresentations, MiniMeetings } from "@/components/animations/mini-card-animations"
 import { Check } from "lucide-react"
 
@@ -110,7 +108,7 @@ type CardProps = {
   badge?: string
   size?: "lg" | "sm"
   image?: string
-  icon?: (props: SVGProps<SVGSVGElement>) => JSX.Element
+  icon?: (props: SVGProps<SVGSVGElement>) => ReactNode
   accent?: string
   bullets?: string[]
 }
@@ -237,36 +235,47 @@ export function Features() {
 
   return (
     <section id="features" ref={ref} className="relative py-20 md:py-28 px-4 sm:px-6 lg:px-8 overflow-hidden bg-white dark:bg-background">
+      {/* Background glow aligned with hero aesthetics */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 -top-40 -z-10 opacity-60 blur-3xl [mask-image:radial-gradient(closest-side,white,transparent)]"
+      >
+        <div className="mx-auto h-72 w-[70%] rounded-full bg-gradient-to-b from-sky-400/30 via-cyan-400/20 to-indigo-500/10 dark:from-sky-500/20 dark:via-cyan-400/15 dark:to-indigo-500/10" />
+      </div>
+
       <div className="relative max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          animate={ isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 } }
           transition={{ duration: 0.6 }}
-          className="text-center mb-12 sm:mb-16"
+          className="text-center mb-10 sm:mb-14"
         >
-          <div className="text-xs tracking-widest uppercase text-muted-foreground mb-3">The future of privacy</div>
-          <h2 className="text-4xl md:text-5xl font-medium tracking-tighter mx-auto text-pretty bg-linear-to-b from-sky-800 dark:from-sky-100 to-foreground dark:to-foreground bg-clip-text text-transparent">
+          <div className="text-[11px] tracking-[0.2em] uppercase text-muted-foreground mb-3">The future of privacy</div>
+          <h2 className="text-[34px] md:text-5xl font-medium tracking-tighter mx-auto text-pretty bg-linear-to-b from-sky-800 dark:from-sky-100 to-foreground dark:to-foreground bg-clip-text text-transparent">
             Hide Your Browser helps with anything you need to hide.
           </h2>
+          <p className="mt-3 text-sm md:text-base text-muted-foreground max-w-2xl mx-auto">
+            A private, invisible browsing layer that works anywhere and stays off-camera. Fast, elegant, undetectable.
+          </p>
         </motion.div>
 
         {/* Top grid: 2 frosted feature cards + quick highlights */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 mb-10">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:gap-7 mb-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.5, delay: 0.05 }}
-            className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6"
+            className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-5"
           >
-            <div className="rounded-2xl border border-white/10 bg-white/60 dark:bg-white/5 backdrop-blur-xl p-7">
+            <div className="rounded-2xl border border-white/10 bg-white/60 dark:bg-white/5 backdrop-blur-xl p-7 shadow-sm hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between mb-2 text-xs font-semibold text-foreground/60">
                 <span>Sees what others can’t</span>
               </div>
               <h3 className="text-xl font-semibold text-foreground mb-2">Browser-only visibility</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">Create a completely invisible browsing layer that only you can see during sharing, recording, or monitoring tools.</p>
             </div>
-            <div className="rounded-2xl border border-white/10 bg-white/60 dark:bg-white/5 backdrop-blur-xl p-7">
+            <div className="rounded-2xl border border-white/10 bg-white/60 dark:bg-white/5 backdrop-blur-xl p-7 shadow-sm hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between mb-2 text-xs font-semibold text-foreground/60">
                 <span>Works on everything</span>
               </div>
@@ -279,13 +288,15 @@ export function Features() {
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.5, delay: 0.12 }}
-            className="rounded-2xl border border-white/10 bg-white/60 dark:bg-white/5 backdrop-blur-xl p-7"
+            className="rounded-2xl border border-white/10 bg-white/60 dark:bg-white/5 backdrop-blur-xl p-7 shadow-sm hover:shadow-md transition-all"
           >
             <div className="text-xs font-semibold text-foreground/60 mb-3">Quick controls</div>
-            <ul className="space-y-3">
+            <ul className="space-y-2.5">
               {["Instant toggle with Alt\\", "Drag anywhere on screen", "Adjustable opacity"].map((item) => (
-                <li key={item} className="flex items-start gap-3">
-                  <Check className="w-4 h-4 mt-[2px] text-sky-600 dark:text-sky-400" />
+                <li key={item} className="flex items-center gap-2.5">
+                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-sky-500/15 text-sky-600 dark:text-sky-300">
+                    <Check className="w-3.5 h-3.5" />
+                  </span>
                   <span className="text-sm text-muted-foreground">{item}</span>
                 </li>
               ))}
@@ -298,8 +309,11 @@ export function Features() {
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.6, delay: 0.15 }}
-          className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-slate-900 to-slate-950 p-8 md:p-10 mb-10 shadow-2xl"
+          className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-slate-900 to-slate-950 p-8 md:p-10 mb-12 shadow-2xl"
         >
+          {/* Gradient ring & glow */}
+          <div aria-hidden className="pointer-events-none absolute inset-0 rounded-[18px] ring-1 ring-white/10" />
+          <div aria-hidden className="pointer-events-none absolute -inset-24 bg-gradient-to-br from-sky-500/10 via-cyan-400/10 to-indigo-500/10 blur-3xl" />
           <div className="text-center">
             <h3 className="text-white text-xl md:text-2xl font-semibold mb-2">Undetectable by design.</h3>
             <p className="text-white/70 text-sm md:text-base mb-5">No bots in the room. No Zoom guests. No screenshare trails. Works on everything.</p>
@@ -312,60 +326,6 @@ export function Features() {
           </div>
         </motion.div>
 
-        {/* Two benefit rows */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-8">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
-            transition={{ duration: 0.5, delay: 0.05 }}
-            className="rounded-2xl border border-white/10 bg-white/60 dark:bg-white/5 backdrop-blur-xl p-6 order-1"
-          >
-            <h3 className="text-2xl font-semibold mb-3 text-foreground">Invisible to screen-share</h3>
-            <p className="text-sm text-muted-foreground mb-3">Never shows up in shared screens, recordings, or internal meeting tools. It’s fully hidden from everyone but you.</p>
-            <ul className="space-y-2">
-              {["System-level invisibility layer","Undetectable by recording software","No traces in system logs"].map((b) => (
-                <li key={b} className="flex items-start gap-3 text-sm">
-                  <Check className="w-4 h-4 mt-[2px] text-emerald-600 dark:text-emerald-500" />
-                  <span className="text-muted-foreground">{b}</span>
-                </li>
-              ))}
-            </ul>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="rounded-2xl border border-white/10 bg-white/50 dark:bg-white/5 backdrop-blur-xl aspect-[4/3] w-full overflow-hidden order-2"
-          >
-            <InvisibilityAnimation />
-          </motion.div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-10">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="rounded-2xl border border-white/10 bg-white/50 dark:bg-white/5 backdrop-blur-xl aspect-[4/3] w-full overflow-hidden order-1 lg:order-none"
-          >
-            <WorkflowAnimation />
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
-            transition={{ duration: 0.5, delay: 0.05 }}
-            className="rounded-2xl border border-white/10 bg-white/60 dark:bg-white/5 backdrop-blur-xl p-6"
-          >
-            <h3 className="text-2xl font-semibold mb-3 text-foreground">Follow your workflow</h3>
-            <p className="text-sm text-muted-foreground mb-3">The window is fully moveable so you can position it exactly where you need it — without ever breaking concentration.</p>
-            <div className="text-xs font-semibold text-foreground/60 mb-2">Keyboard shortcuts</div>
-            <div className="flex flex-wrap gap-2">
-              {['Toggle (Alt+\\)', 'Snap/Drag', 'Opacity'].map((x) => (
-                <span key={x} className="px-3 py-1 rounded-full text-xs font-medium border border-foreground/15 text-foreground/80">{x}</span>
-              ))}
-            </div>
-          </motion.div>
-        </div>
 
         {/* Bottom: three use-cases */}
         <motion.div
@@ -377,7 +337,7 @@ export function Features() {
           <h3 className="text-3xl md:text-4xl font-medium tracking-tight bg-linear-to-b from-sky-800 dark:from-sky-100 to-foreground dark:to-foreground bg-clip-text text-transparent">Three ways Hide Your Browser changes how you work.</h3>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-7">
           {[
             { title: 'Interviews', desc: 'Reference your prep notes, ask Otter for timestamps, and capture next steps — without anyone noticing.', anim: <MiniInterviews /> },
             { title: 'Presentations', desc: 'Keep your speaker notes, backup slides, and reference links open. Present confidently with instant access.', anim: <MiniPresentations /> },

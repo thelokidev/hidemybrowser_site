@@ -1,96 +1,86 @@
-<!-- b4099801-2208-415d-b967-862eece211ef 28596079-8ad0-491a-b845-b30d540de088 -->
-# Non-Breaking Desktop Auth + Subscription Plan (Refined with References)
+# HideMyBrowser Landing Page Redesign Plan
 
-### Goals
+## Context
 
-- Preserve existing deep-link Supabase PKCE flow for desktop auth; no regressions.
-- Add a clean renewal/paywall loop when a subscription expires.
-- Optionally introduce device tokens behind a feature flag, without changing defaults.
+- Framework: Next.js (App Router) with TypeScript (`app/`, `layout.tsx`, `page.tsx` present)
+- Styling: Tailwind CSS (`styles/globals.css`)
+- Components already exist for major sections: `components/hero.tsx`, `components/trust.tsx`, `components/features.tsx`, `components/pricing.tsx`, `components/faq.tsx`, `components/footer.tsx`
+- We will enhance existing sections and add reusable UI primitives.
 
-### Current Flow (kept as default)
+## Dependencies
 
-- Desktop opens `/auth?desktop=1&return=hidemybrowser://auth` in system browser; web callback redirects back with `access_token`.
-- Electron saves token (encrypted) and polls `GET/POST /api/desktop/subscription` with `Authorization: Bearer <token>`.
-- If `allow === true` → unlock; if false → show login layer/paywall and route user to login + pricing.
+- Add: `framer-motion`, `lucide-react`, `react-countup`, `clsx`, `tailwind-merge`
+- Use `pnpm` for installs (pnpm-lock.yaml present)
 
-### Adjustments (additive, safe)
+## Phase 1: Setup & Architecture
 
-- Electron
-- Continue storing the token via `safeStorage`. Treat `allow` as the single source of truth for unlock.
-- Expose poll interval via env: `DESKTOP_SUBSCRIPTION_POLL_MS` (default 300000). Do not change default behavior.
-- When `allow === false` (expired or unauthorized), show login layer and open web to `/auth?desktop=1&return=hidemybrowser://auth`, then pricing if still no active sub.
-- Server
-- Keep `app/api/desktop/subscription/route.ts` request/response stable: `{ allow, status, inGrace?, graceEnd? }`.
-- Optionally mirror `graceEnd` as headers (ignored by existing clients).
-- Web UX
-- Keep DodoPayments checkout; after success, webhooks update Supabase and desktop unlocks on next poll automatically.
+- Create `utils/animations.ts`: motion variants (fade-in, slide-up, scale), presets (fast/normal/slow), stagger helpers, `useInView` wrapper
+- Create or update `tailwind.config.ts`: gradient backgrounds, keyframes (pulse-glow, float, gradient-shift), extended shadows (glow-sm/md/lg), timing functions, z-index
+- Create UI primitives in `components/ui/`: `animated-section.tsx`, `gradient-button.tsx`, `feature-card.tsx`, `section-header.tsx`
 
-### Renewal/Expiry Behavior (precise)
+## Phase 2: Hero Section Overhaul
 
-- While subscription is active (or within grace), `allow === true` → desktop unlocked.
-- On expiry (and no grace), `allow === false` → desktop shows login layer and opens web to login + pricing.
-- After payment succeeds and webhooks sync, next poll flips `allow === true` and desktop auto-unlocks; re-auth not required unless user signed out.
-- If strict re-auth desired, set server to invalidate desktop tokens on expiry (applies to device tokens in Phase 2).
+- Edit `components/hero.tsx`: animated gradient bg, larger gradient headline, revised subheadline, CTAs with `GradientButton`, social proof line, subtle pulse on primary
+- Wrap hero visual in `AnimatedSection`; reduce mockup height, add parallax/floating effect, glow/shadow, before/after badges
 
-### Optional Device Tokens (behind flag `DESKTOP_DEVICE_TOKENS=1`)
+## Phase 3: Trust & Social Proof
 
-- Why: Avoid storing raw Supabase JWT on desktop; enable per-device revocation/limits; smoother renewals (Cursor/Windsurf-like experience).
-- DB (additive): `desktop_devices(id, user_id, device_name, created_at, last_seen_at, revoked_at, token_hash, expires_at)` with indexes on `user_id`, `revoked_at`.
-- API (additive; RFC 8628 aligned fields)
-- `POST /api/desktop/register` → `{ device_code, user_code, verification_uri, verification_uri_complete, expires_in, interval }`.
-- `POST /api/desktop/token` → exchanges `{ device_code }` for opaque device token; on pending auth return RFC 8628 errors (`authorization_pending`, `slow_down`).
-- `POST /api/desktop/introspect` → validates device token, returns `{ user_id }` and optionally rotates token (return new token via header `x-device-token`).
-- `POST /api/desktop/revoke` → revoke device token by id.
-- Electron (flagged)
-- Show device-code pairing UI; display `user_code` + `verification_uri_complete` (or QR).
-- Store opaque token via `safeStorage`; use it for `introspect`/`subscription`. If flag off, use current JWT flow.
-- Dashboard (flagged)
-- Devices list and per-device revoke; optional device limits per user.
+- Edit or add `components/trust.tsx`: light gray container, title, logo grid (grayscale→color on hover), live counter (ReactCountUp), three stat cards, fade-in on scroll
 
-### Platform Protocol Registration (required for deep links)
+## Phase 4: Features Enhancements
 
-- Windows: Register URL protocol during installation (Registry `HKEY_CLASSES_ROOT\<scheme>` with `URL Protocol`); runtime `app.setAsDefaultProtocolClient('<scheme>')` is helpful but not sufficient for fresh installs.
-- macOS: Add `CFBundleURLTypes` to `Info.plist` for the custom scheme and handle `open-url`.
+- Edit `components/features.tsx`:
+- Convert text cards to `FeatureCard` with `lucide-react` icons
+- Stagger animations on scroll, hover lift/glow
+- Enhance "Undetectable by Design" with gradient border, particles (lazy via dynamic import), larger platform icons
+- Add before/after slider or animated toggle demo for screen-share invisibility
+- Replace empty browser mock with realistic UI or video overlay
+- Update "Three Ways" cards with GIF/video or CSS illustration; add hover-to-play and "Learn more →"
 
-### Supabase Auth Token Notes
+## Phase 5: Pricing Upgrade
 
-- Access tokens are short-lived; refresh/session lifetimes are configurable in Supabase Auth settings. The desktop flow does not rely on refresh tokens; it validates access server-side. Expect occasional re-auth prompts in Phase 1 when JWT expires or is invalid. Phase 2 avoids this by using device tokens.
+- Edit `components/pricing.tsx` and/or `components/pricing-table.tsx`:
+- Prominent "Most Popular" badge, annual "Save 40%" badge
+- Larger price tyj078y7ypography with currency
+- Tier differences via colored checkmarks
+- Hover lift/glow and larger gradient CTAs
+- Add comparison table (responsive, highlight recommended tier) and guarantee note
 
-### Security and Resilience
+## Phase 6: FAQ & Final CTA
 
-- Never log tokens; keep Electron storage encrypted.
-- Handle network failures as temporary lock; retry with backoff to avoid flapping.
-- Webhook latency can be seconds to minutes; keep a visible “processing” state.
-- Rate-limit device-code polling; short device-code TTL (5–10 minutes), single-use; store only `token_hash` at rest.
+- Edit `components/faq.tsx`:
+- Smooth expand/collapse, search filter, cyan accent for active, icons per question, grouped dividers
+- Add `components/final-cta.tsx`:
+- Dark gradient bg with particles (lazy), strong heading/subheading, prominent download button, "No credit card required"
 
-### Rollout
+## Phase 7: Footer & Engagement
 
-- Ship Adjustments + Renewal behavior first (no schema changes). Zero behavior change expected.
-- Merge device-token feature behind `DESKTOP_DEVICE_TOKENS`. Keep default OFF. Toggle ON per environment when ready.
+- Edit `components/footer.tsx`:
+- Security badges, trust indicators, reorganized links, newsletter form, social icons with hover
+- Add exit-intent modal and floating chat button (once per session) with brand styling
 
-### References
+## Phase 8: Mobile & Polish
 
-- OAuth 2.0 Device Authorization Grant (RFC 8628): `https://datatracker.ietf.org/doc/html/rfc8628`
-- OAuth device flow overview: `https://oauth.net/2/device-flow/`
-- Electron protocol/deep linking (default protocol client, open-url handling): Electron documentation on custom protocols
-- Windows URL protocol registration: Microsoft documentation on URL protocol handlers (`HKEY_CLASSES_ROOT`, `URL Protocol`)
-- macOS custom URL schemes: Apple documentation for `CFBundleURLTypes`
-- Supabase Auth token/session TTLs: Supabase Auth documentation (JWT lifetime, refresh behavior)
+- Ensure responsive typography and layout: larger mobile hero headline, vertical mockups, horizontal scroll carousel for pricing on mobile
+- Performance: lazy load images/videos, transform/opacity-only animations, loading states, code-splitting with `next/dynamic`
+- SEO/Accessibility: OG/Twitter tags, reduced motion support, smooth scroll, skeletons, micro-interactions, touch-safe hovers, focus states
 
-### Work Items (ordered, non-breaking)
+## Files to Change / Add (key ones)
 
-1. Electron: ensure UI lock toggles on `allow` with no other conditions; read poll interval from `DESKTOP_SUBSCRIPTION_POLL_MS`.
-2. Server: keep `/api/desktop/subscription` contract; optionally add grace headers (ignored by clients).
-3. Web UX: confirm `/auth/callback` maintains `desktop=1` deep-link redirect.
-4. Optional (flagged): DB migration for `desktop_devices`; add `register/token/introspect/revoke` routes (RFC 8628 aligned); implement device-code UI; add Dashboard Devices page.
+- Add: `utils/animations.ts`
+- Add/Update: `tailwind.config.ts`
+- Add: `components/ui/animated-section.tsx`, `components/ui/gradient-button.tsx`, `components/ui/feature-card.tsx`, `components/ui/section-header.tsx`
+- Edit: `components/hero.tsx`, `components/trust.tsx`, `components/features.tsx`, `components/pricing.tsx`, `components/pricing-table.tsx`, `components/faq.tsx`, `components/footer.tsx`
+- Add: `components/final-cta.tsx`
+- Add: `PROGRESS.md`
 
-### To-dos
+## Testing & Performance
 
-- [ ] Gate desktop unlock strictly on allow from subscription API
-- [ ] Add DESKTOP_SUBSCRIPTION_POLL_MS env support in desktop poller
-- [ ] Keep desktop subscription API response stable; add optional grace headers
-- [ ] Verify desktop deep-link redirect remains intact in auth callback
-- [ ] Add desktop_devices table and indexes (flagged)
-- [ ] Implement register/token/introspect/revoke endpoints (flagged)
-- [ ] Add device-code pairing UI and token storage (flagged)
-- [ ] Add devices management UI in dashboard (flagged)
+- After each phase, test at 375/768/1024/1440 widths
+- Use `next dev` locally; check Lighthouse for LCP/CLS/TBT after Phase 2 and Phase 8
+- Respect `prefers-reduced-motion`; gate heavy effects behind intersection
+
+## Git Workflow
+
+- Commit after each phase with descriptive messages
+- Feature branch: `feat/landing-redesign`

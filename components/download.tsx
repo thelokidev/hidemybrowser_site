@@ -35,20 +35,23 @@ export function Download() {
 
   return (
     <section id="download" ref={ref} className="relative py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 bg-background overflow-hidden">
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 -top-24 -z-10 opacity-60 blur-3xl [mask-image:radial-gradient(closest-side,white,transparent)]">
+        <div className="mx-auto h-60 w-[70%] rounded-full bg-gradient-to-b from-sky-400/30 via-cyan-400/20 to-indigo-500/10" />
+      </div>
       <div className="max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-10 sm:mb-12 md:mb-16"
+          className="text-center mb-10 sm:mb-12 md:mb-14"
         >
-          <h2 className="text-3xl sm:text-4xl md:text-4xl lg:text-5xl font-medium tracking-tighter mx-auto text-pretty bg-linear-to-b from-sky-800 dark:from-sky-100 to-foreground dark:to-foreground bg-clip-text text-transparent mb-3 sm:mb-4">Download HideMyBrowser</h2>
-          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+          <h2 className="text-[34px] sm:text-4xl md:text-5xl font-medium tracking-tighter mx-auto text-pretty bg-linear-to-b from-sky-800 dark:from-sky-100 to-foreground dark:to-foreground bg-clip-text text-transparent mb-3 sm:mb-4">Download HideMyBrowser</h2>
+          <p className="text-base sm:text-lg text-muted-foreground max-w-3xl mx-auto">
             Get the truly undetectable browser for your platform. Start your stealth browsing experience today.
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-8 mb-12">
+        <div className="grid md:grid-cols-2 gap-6 sm:gap-7 mb-10">
           {platforms.map((platform, index) => {
             const Icon = platform.icon
             return (
@@ -57,27 +60,25 @@ export function Download() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                whileHover={{ y: -4 }}
+                whileHover={{ y: -6 }}
                 className="h-full"
               >
-                <div className={`relative h-full p-8 rounded-2xl bg-gradient-to-br ${platform.gradient} border-2 border-border hover:border-foreground/30 transition-all duration-300 hover:shadow-xl overflow-hidden group`}>
-                  {/* Background icon decoration */}
+                <div className={`relative h-full p-8 rounded-2xl border border-white/10 bg-white/60 dark:bg-white/5 backdrop-blur-xl ring-0 hover:ring-1 hover:ring-foreground/15 transition-all duration-300 hover:shadow-2xl overflow-hidden group`}>
                   <div className="absolute -right-8 -top-8 opacity-5 group-hover:opacity-10 transition-opacity duration-300">
                     <Icon className="w-40 h-40" />
                   </div>
 
-                  {/* Icon badge */}
-                  <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-background border-2 border-border mb-6 ${platform.iconColor} group-hover:scale-110 transition-transform duration-300`}>
+                  <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/70 dark:bg-white/10 backdrop-blur border border-white/20 mb-6 ${platform.iconColor} group-hover:scale-110 transition-transform duration-300`}>
                     <Icon className="w-8 h-8" strokeWidth={2} />
                   </div>
 
                   <h3 className="text-2xl font-bold mb-2">{platform.name}</h3>
                   <p className="text-muted-foreground mb-6">{platform.subtitle}</p>
 
-                  <ul className="space-y-3 mb-8">
+                  <ul className="space-y-2.5 mb-8">
                     {platform.requirements.map((req) => (
-                      <li key={req} className="flex items-start gap-3 text-sm">
-                        <Check className="w-4 h-4 text-green-600 dark:text-green-500 flex-shrink-0 mt-0.5" />
+                      <li key={req} className="flex items-center gap-2.5 text-sm">
+                        <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-300"><Check className="w-3.5 h-3.5" /></span>
                         <span className="text-muted-foreground">{req}</span>
                       </li>
                     ))}
@@ -99,7 +100,6 @@ export function Download() {
           })}
         </div>
 
-        {/* Removed 'What You Get' section */}
       </div>
     </section>
   )

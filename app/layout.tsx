@@ -5,6 +5,7 @@ import "./globals.css"
 import { Suspense } from "react"
 import { AuthProviderWrapper } from "@/components/auth-provider-wrapper"
 import { Geist } from "next/font/google"
+import { Toaster } from "@/components/ui/toaster"
 
 const geist = Geist({ subsets: ["latin"] })
 
@@ -31,6 +32,7 @@ export default function RootLayout({
           <Suspense fallback={null}>{children}</Suspense>
         </AuthProviderWrapper>
         <Analytics />
+        <Toaster />
       </body>
     </html>
   )

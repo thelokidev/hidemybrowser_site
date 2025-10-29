@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { motion, AnimatePresence } from "framer-motion"
-import { FeatureDemo } from "@/components/feature-demo"
+import { FeatureShowcase } from "@/components/feature-showcase"
 import { useEffect, useState } from "react"
 
 export function Hero() {
@@ -40,47 +40,41 @@ export function Hero() {
 
   return (
     <div className="relative justify-center items-center">
-      <section className="max-w-(--breakpoint-xl) mx-auto px-4 py-28 gap-12 md:px-8 flex flex-col justify-center items-center">
+      <section className="max-w-7xl mx-auto px-4 py-40 gap-12 flex flex-col justify-center items-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, type: "spring", bounce: 0 }}
-          className="flex flex-col justify-center items-center space-y-5 max-w-4xl mx-auto text-center"
+          className="flex flex-col justify-center items-start space-y-5 w-full text-left"
         >
-          <h1 className="text-4xl md:text-6xl font-medium tracking-tighter mx-auto text-pretty">
+          <h1 className="text-[32px] md:text-[32px] font-medium tracking-tighter text-pretty">
             <span className="block bg-linear-to-b from-sky-800 dark:from-sky-100 to-foreground dark:to-foreground bg-clip-text text-transparent">The Truly Undetectable Browser To Hide</span>
-            <span className="flex items-center justify-center gap-3 my-2">
-              <span className="inline-flex w-[14ch] justify-center">
-                <AnimatePresence mode="wait">
-                  <motion.span
-                    key={currentWordIndex}
-                    initial={{ opacity: 0, y: 6, filter: "blur(4px)" }}
-                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                    exit={{ opacity: 0, y: -6, filter: "blur(4px)" }}
-                    transition={{ duration: 0.35, ease: "easeInOut" }}
-                    className="whitespace-nowrap font-medium inline-block bg-gradient-to-r from-sky-500 via-cyan-400 to-indigo-500 dark:from-sky-300 dark:via-cyan-300 dark:to-indigo-400 bg-clip-text text-transparent drop-shadow"
-                  >
-                    {rotatingWords[currentWordIndex].text}
-                  </motion.span>
-                </AnimatePresence>
-              </span>
+            <span className="flex items-center my-0">
+              <AnimatePresence mode="wait">
+                <motion.span
+                  key={currentWordIndex}
+                  initial={{ opacity: 0, y: 6, filter: "blur(4px)" }}
+                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                  exit={{ opacity: 0, y: -6, filter: "blur(4px)" }}
+                  transition={{ duration: 0.35, ease: "easeInOut" }}
+                  className="whitespace-nowrap font-medium inline-block bg-gradient-to-r from-sky-500 via-cyan-400 to-indigo-500 dark:from-sky-300 dark:via-cyan-300 dark:to-indigo-400 bg-clip-text text-transparent drop-shadow mr-3"
+                >
+                  {rotatingWords[currentWordIndex].text}
+                </motion.span>
+              </AnimatePresence>
+              <span className="bg-linear-to-b from-sky-800 dark:from-sky-100 to-foreground dark:to-foreground bg-clip-text text-transparent">From Screenshare.</span>
             </span>
-            <span className="block bg-linear-to-b from-sky-800 dark:from-sky-100 to-foreground dark:to-foreground bg-clip-text text-transparent">From Screenshare.</span>
           </h1>
-          <p className="max-w-2xl text-lg mx-auto text-muted-foreground text-balance">
-            Share your screen, not your secrets.
-          </p>
-          <p className="text-sm sm:text-base text-muted-foreground/80">Perfect for Interviews - Presentations - Demos</p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="items-center justify-center gap-x-3 space-y-3 sm:flex sm:space-y-0"
+            className="items-start gap-x-3 space-y-3 sm:flex sm:space-y-0"
           >
-            <Button size="lg" className="text-[15px] px-8 h-12 shadow-lg" onClick={scrollToDownload}>
+            <Button size="lg" className="text-[15px] px-8 h-12 rounded-full shadow-[0_6px_0_rgba(0,0,0,0.35)] hover:shadow-[0_4px_0_rgba(0,0,0,0.35)] active:translate-y-[2px] active:shadow-[0_2px_0_rgba(0,0,0,0.35)] ring-1 ring-white/10" onClick={scrollToDownload}>
               Download Now
             </Button>
-            <Button size="lg" variant="outline" className="text-[15px] px-8 h-12 bg-transparent" onClick={scrollToFeatures}>
+            <Button size="lg" variant="outline" className="text-[15px] px-8 h-12 rounded-full border-2 border-foreground/20 bg-transparent hover:bg-foreground/5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]" onClick={scrollToFeatures}>
               Learn More
             </Button>
           </motion.div>
@@ -93,7 +87,7 @@ export function Hero() {
           transition={{ duration: 0.8, delay: 0.4 }}
           className="relative w-full max-w-7xl mx-auto"
         >
-          <FeatureDemo />
+          <FeatureShowcase />
         </motion.div>
       </section>
 
