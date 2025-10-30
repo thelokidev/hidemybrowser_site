@@ -18,6 +18,12 @@ interface PaymentWithExpiry {
 
 // Map product IDs to plan details
 const PRODUCT_PLANS: Record<string, { name: string; duration_days: number }> = {
+  // New product IDs
+  [process.env.NEXT_PUBLIC_DODO_PRODUCT_WEEKLY || 'pdt_5ypSpqAzpNPQIBIw2Y66S']: { name: 'Weekly', duration_days: 7 },
+  [process.env.NEXT_PUBLIC_DODO_PRODUCT_MONTHLY || 'pdt_EUozfisbUTWeqXfagMOlc']: { name: 'Monthly', duration_days: 30 },
+  [process.env.NEXT_PUBLIC_DODO_PRODUCT_3_MONTH || 'pdt_tmsm2z2gKcT5azrdecgyD']: { name: '3 Months', duration_days: 90 },
+  [process.env.NEXT_PUBLIC_DODO_PRODUCT_6_MONTH || 'pdt_lq0xS7T3B921STb4Ys6D0']: { name: '6 Months', duration_days: 180 },
+  // Legacy product IDs for backward compatibility
   'pdt_v0slst9k4JI0Q2qUDkIAW': { name: 'Weekly', duration_days: 7 },
   'pdt_ugqyKXMT219386BcoejVN': { name: 'Monthly', duration_days: 30 },
   'pdt_W4YuF093U2MSpABbJ7miA': { name: '3 Months', duration_days: 90 },

@@ -49,13 +49,13 @@ export function generateCheckoutUrl(params: CheckoutParams): string {
 
 /**
  * Product IDs for different subscription tiers
- * Update these with your actual DodoPayments product IDs
+ * These can be overridden by environment variables
  */
 export const SUBSCRIPTION_PRODUCTS = {
-  WEEKLY: process.env.NEXT_PUBLIC_DODO_PRODUCT_WEEKLY || 'pdt_v0slst9k4JI0Q2qUDkIAW',
-  MONTHLY: process.env.NEXT_PUBLIC_DODO_PRODUCT_MONTHLY || 'pdt_ugqyKXMT219386BcoejVN',
-  THREE_MONTHS: process.env.NEXT_PUBLIC_DODO_PRODUCT_3_MONTHS || 'pdt_W4YuF093U2MSpABbJ7miA',
-  SIX_MONTHS: process.env.NEXT_PUBLIC_DODO_PRODUCT_6_MONTHS || 'pdt_Ah7DRDitJbvGcaFMrqrOf',
+  WEEKLY: process.env.NEXT_PUBLIC_DODO_PRODUCT_WEEKLY || 'pdt_5ypSpqAzpNPQIBIw2Y66S',
+  MONTHLY: process.env.NEXT_PUBLIC_DODO_PRODUCT_MONTHLY || 'pdt_EUozfisbUTWeqXfagMOlc',
+  THREE_MONTHS: process.env.NEXT_PUBLIC_DODO_PRODUCT_3_MONTH || 'pdt_tmsm2z2gKcT5azrdecgyD',
+  SIX_MONTHS: process.env.NEXT_PUBLIC_DODO_PRODUCT_6_MONTH || 'pdt_lq0xS7T3B921STb4Ys6D0',
 } as const
 
 /**

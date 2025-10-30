@@ -25,8 +25,8 @@ const plans = [
     highlighted: false,
     badge: null,
     savings: null,
-    dodoProductId: "pdt_v0slst9k4JI0Q2qUDkIAW",
-    checkoutUrl: "https://test.checkout.dodopayments.com/buy/pdt_v0slst9k4JI0Q2qUDkIAW?quantity=1",
+    dodoProductId: process.env.NEXT_PUBLIC_DODO_PRODUCT_WEEKLY || "pdt_5ypSpqAzpNPQIBIw2Y66S",
+    checkoutUrl: `https://test.checkout.dodopayments.com/buy/${process.env.NEXT_PUBLIC_DODO_PRODUCT_WEEKLY || "pdt_5ypSpqAzpNPQIBIw2Y66S"}?quantity=1`,
   },
   {
     name: "Monthly",
@@ -37,8 +37,8 @@ const plans = [
     highlighted: true,
     badge: "Most Popular",
     savings: null,
-    dodoProductId: "pdt_ugqyKXMT219386BcoejVN",
-    checkoutUrl: "https://test.checkout.dodopayments.com/buy/pdt_ugqyKXMT219386BcoejVN?quantity=1",
+    dodoProductId: process.env.NEXT_PUBLIC_DODO_PRODUCT_MONTHLY || "pdt_EUozfisbUTWeqXfagMOlc",
+    checkoutUrl: `https://test.checkout.dodopayments.com/buy/${process.env.NEXT_PUBLIC_DODO_PRODUCT_MONTHLY || "pdt_EUozfisbUTWeqXfagMOlc"}?quantity=1`,
   },
   {
     name: "3 Months",
@@ -49,8 +49,8 @@ const plans = [
     highlighted: false,
     badge: null,
     savings: "Save 33%",
-    dodoProductId: "pdt_W4YuF093U2MSpABbJ7miA",
-    checkoutUrl: "https://test.checkout.dodopayments.com/buy/pdt_W4YuF093U2MSpABbJ7miA?quantity=1",
+    dodoProductId: process.env.NEXT_PUBLIC_DODO_PRODUCT_3_MONTH || "pdt_tmsm2z2gKcT5azrdecgyD",
+    checkoutUrl: `https://test.checkout.dodopayments.com/buy/${process.env.NEXT_PUBLIC_DODO_PRODUCT_3_MONTH || "pdt_tmsm2z2gKcT5azrdecgyD"}?quantity=1`,
   },
   {
     name: "6 Months",
@@ -61,8 +61,8 @@ const plans = [
     highlighted: false,
     badge: "Best Value",
     savings: "Save 44%",
-    dodoProductId: "pdt_Ah7DRDitJbvGcaFMrqrOf",
-    checkoutUrl: "https://test.checkout.dodopayments.com/buy/pdt_Ah7DRDitJbvGcaFMrqrOf?quantity=1",
+    dodoProductId: process.env.NEXT_PUBLIC_DODO_PRODUCT_6_MONTH || "pdt_lq0xS7T3B921STb4Ys6D0",
+    checkoutUrl: `https://test.checkout.dodopayments.com/buy/${process.env.NEXT_PUBLIC_DODO_PRODUCT_6_MONTH || "pdt_lq0xS7T3B921STb4Ys6D0"}?quantity=1`,
   },
 ]
 

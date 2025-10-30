@@ -87,12 +87,21 @@ export const POST = async (req: NextRequest) => {
     return guardResponse
   }
 
+  // Log configuration for debugging
+  const apiKey = process.env.DODO_PAYMENTS_API_KEY!
+  const environment = process.env.DODO_PAYMENTS_ENVIRONMENT as DodoPaymentsEnvironment
+  console.log('[Checkout] Configuration:', {
+    hasApiKey: !!apiKey,
+    apiKeyPrefix: apiKey?.substring(0, 10) + '...',
+    environment,
+    environmentSource: process.env.DODO_PAYMENTS_ENVIRONMENT
+  })
+
   const { origin } = new URL(req.url);
   const handler = Checkout({
-    bearerToken: process.env.DODO_PAYMENTS_API_KEY!,
+    bearerToken: apiKey,
     returnUrl: `${origin}/dashboard`,
-    environment: process.env
-      .DODO_PAYMENTS_ENVIRONMENT as DodoPaymentsEnvironment,
+    environment: environment,
     type: "session",
   });
 

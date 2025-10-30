@@ -97,6 +97,12 @@ export default function SubscriptionStatus() {
     // Map product IDs to plan names
     const getPlanName = (productId?: string) => {
       const planMap: Record<string, string> = {
+        // New product IDs
+        [process.env.NEXT_PUBLIC_DODO_PRODUCT_WEEKLY || 'pdt_5ypSpqAzpNPQIBIw2Y66S']: 'Weekly Plan',
+        [process.env.NEXT_PUBLIC_DODO_PRODUCT_MONTHLY || 'pdt_EUozfisbUTWeqXfagMOlc']: 'Monthly Plan',
+        [process.env.NEXT_PUBLIC_DODO_PRODUCT_3_MONTH || 'pdt_tmsm2z2gKcT5azrdecgyD']: '3 Months Plan',
+        [process.env.NEXT_PUBLIC_DODO_PRODUCT_6_MONTH || 'pdt_lq0xS7T3B921STb4Ys6D0']: '6 Months Plan',
+        // Legacy product IDs for backward compatibility
         'pdt_v0slst9k4JI0Q2qUDkIAW': 'Weekly Plan',
         'pdt_ugqyKXMT219386BcoejVN': 'Monthly Plan',
         'pdt_W4YuF093U2MSpABbJ7miA': '3 Months Plan',

@@ -7,8 +7,17 @@
 
 /**
  * Product ID mapping for subscription tiers
+ * Supports both old and new product IDs for backward compatibility
  */
 export const SUBSCRIPTION_TIERS = {
+  WEEKLY: process.env.NEXT_PUBLIC_DODO_PRODUCT_WEEKLY || 'pdt_5ypSpqAzpNPQIBIw2Y66S',
+  MONTHLY: process.env.NEXT_PUBLIC_DODO_PRODUCT_MONTHLY || 'pdt_EUozfisbUTWeqXfagMOlc',
+  THREE_MONTHS: process.env.NEXT_PUBLIC_DODO_PRODUCT_3_MONTH || 'pdt_tmsm2z2gKcT5azrdecgyD',
+  SIX_MONTHS: process.env.NEXT_PUBLIC_DODO_PRODUCT_6_MONTH || 'pdt_lq0xS7T3B921STb4Ys6D0',
+} as const
+
+// Legacy product IDs mapping for backward compatibility
+export const LEGACY_SUBSCRIPTION_TIERS = {
   WEEKLY: 'pdt_v0slst9k4JI0Q2qUDkIAW',
   MONTHLY: 'pdt_ugqyKXMT219386BcoejVN',
   THREE_MONTHS: 'pdt_W4YuF093U2MSpABbJ7miA',
@@ -19,20 +28,32 @@ export const SUBSCRIPTION_TIERS = {
  * Tier levels for comparison (higher = better tier)
  */
 const TIER_LEVELS: Record<string, number> = {
+  // New product IDs
   [SUBSCRIPTION_TIERS.WEEKLY]: 1,
   [SUBSCRIPTION_TIERS.MONTHLY]: 2,
   [SUBSCRIPTION_TIERS.THREE_MONTHS]: 3,
   [SUBSCRIPTION_TIERS.SIX_MONTHS]: 4,
+  // Legacy product IDs for backward compatibility
+  [LEGACY_SUBSCRIPTION_TIERS.WEEKLY]: 1,
+  [LEGACY_SUBSCRIPTION_TIERS.MONTHLY]: 2,
+  [LEGACY_SUBSCRIPTION_TIERS.THREE_MONTHS]: 3,
+  [LEGACY_SUBSCRIPTION_TIERS.SIX_MONTHS]: 4,
 }
 
 /**
  * Human-readable tier names
  */
 export const TIER_NAMES: Record<string, string> = {
+  // New product IDs
   [SUBSCRIPTION_TIERS.WEEKLY]: 'Weekly Plan',
   [SUBSCRIPTION_TIERS.MONTHLY]: 'Monthly Plan',
   [SUBSCRIPTION_TIERS.THREE_MONTHS]: '3 Months Plan',
   [SUBSCRIPTION_TIERS.SIX_MONTHS]: '6 Months Plan',
+  // Legacy product IDs for backward compatibility
+  [LEGACY_SUBSCRIPTION_TIERS.WEEKLY]: 'Weekly Plan',
+  [LEGACY_SUBSCRIPTION_TIERS.MONTHLY]: 'Monthly Plan',
+  [LEGACY_SUBSCRIPTION_TIERS.THREE_MONTHS]: '3 Months Plan',
+  [LEGACY_SUBSCRIPTION_TIERS.SIX_MONTHS]: '6 Months Plan',
 }
 
 /**

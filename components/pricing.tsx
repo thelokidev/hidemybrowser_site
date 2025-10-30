@@ -10,10 +10,10 @@ import { useSubscription } from '@/hooks/use-subscription'
 
 // Product ID mapping for checkout
 const checkoutUrls: Record<string, string> = {
-  "Weekly": "https://test.checkout.dodopayments.com/buy/pdt_v0slst9k4JI0Q2qUDkIAW?quantity=1",
-  "Monthly": "https://test.checkout.dodopayments.com/buy/pdt_ugqyKXMT219386BcoejVN?quantity=1",
-  "3 Months": "https://test.checkout.dodopayments.com/buy/pdt_W4YuF093U2MSpABbJ7miA?quantity=1",
-  "6 Months": "https://test.checkout.dodopayments.com/buy/pdt_Ah7DRDitJbvGcaFMrqrOf?quantity=1",
+  "Weekly": `https://test.checkout.dodopayments.com/buy/${process.env.NEXT_PUBLIC_DODO_PRODUCT_WEEKLY || "pdt_5ypSpqAzpNPQIBIw2Y66S"}?quantity=1`,
+  "Monthly": `https://test.checkout.dodopayments.com/buy/${process.env.NEXT_PUBLIC_DODO_PRODUCT_MONTHLY || "pdt_EUozfisbUTWeqXfagMOlc"}?quantity=1`,
+  "3 Months": `https://test.checkout.dodopayments.com/buy/${process.env.NEXT_PUBLIC_DODO_PRODUCT_3_MONTH || "pdt_tmsm2z2gKcT5azrdecgyD"}?quantity=1`,
+  "6 Months": `https://test.checkout.dodopayments.com/buy/${process.env.NEXT_PUBLIC_DODO_PRODUCT_6_MONTH || "pdt_lq0xS7T3B921STb4Ys6D0"}?quantity=1`,
 }
 
 // Extract product IDs from URLs for reverse lookup against subscriptions
