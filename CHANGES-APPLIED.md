@@ -90,3 +90,6 @@ The product IDs were hardcoded in the source code with the old values. When you 
 
 Now the code dynamically reads from environment variables, so future product ID changes only need to be updated in Vercel, not in the code.
 
+
+
+

@@ -70,3 +70,6 @@ The product IDs were **hardcoded in the source code**. When you updated environm
 
 Now the code is dynamic and will automatically use the environment variables from Vercel.
 
+
+
+

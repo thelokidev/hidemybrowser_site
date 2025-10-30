@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 
 function Keycap({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center justify-center rounded-md border border-white/20 bg-white/70 px-2 py-1 text-[11px] font-medium text-gray-900 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/10 dark:text-white/90">
+    <span className="inline-flex items-center justify-center rounded-md border border-white/10 bg-white/10 px-2 py-1 text-[11px] font-medium text-white/90 shadow-sm backdrop-blur">
       {children}
     </span>
   )

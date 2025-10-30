@@ -77,7 +77,7 @@ export function Header() {
               priority
               className="rounded-sm"
             />
-            <span className="bg-linear-to-b from-sky-800 dark:from-sky-100 to-foreground dark:to-foreground bg-clip-text text-transparent tracking-tighter">HideMyBrowser</span>
+            <span className="bg-gradient-to-b from-sky-100 to-foreground bg-clip-text text-transparent tracking-tighter">HideMyBrowser</span>
           </Link>
 
           <nav className="relative z-10 hidden md:flex flex-1 items-center justify-center gap-1 min-w-0">

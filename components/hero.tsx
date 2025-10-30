@@ -48,8 +48,8 @@ export function Hero() {
           className="flex flex-col justify-center items-start space-y-5 w-full text-left"
         >
           <h1 className="text-[32px] md:text-[32px] font-medium tracking-tighter text-pretty">
-            <span className="block bg-linear-to-b from-sky-800 dark:from-sky-100 to-foreground dark:to-foreground bg-clip-text text-transparent">The Truly Undetectable Browser To Hide</span>
-            <span className="flex items-center my-0">
+            <span className="block bg-gradient-to-b from-sky-100 to-foreground bg-clip-text text-transparent">The Truly Undetectable Browser To Hide</span>
+            <span className="flex items-baseline my-0">
               <AnimatePresence mode="wait">
                 <motion.span
                   key={currentWordIndex}
@@ -57,12 +57,12 @@ export function Hero() {
                   animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                   exit={{ opacity: 0, y: -6, filter: "blur(4px)" }}
                   transition={{ duration: 0.35, ease: "easeInOut" }}
-                  className="whitespace-nowrap font-medium inline-block bg-gradient-to-r from-sky-500 via-cyan-400 to-indigo-500 dark:from-sky-300 dark:via-cyan-300 dark:to-indigo-400 bg-clip-text text-transparent drop-shadow mr-3"
+                  className="whitespace-nowrap font-medium inline-block bg-gradient-to-r from-sky-300 via-cyan-300 to-indigo-400 bg-clip-text text-transparent drop-shadow mr-2"
                 >
                   {rotatingWords[currentWordIndex].text}
                 </motion.span>
               </AnimatePresence>
-              <span className="bg-linear-to-b from-sky-800 dark:from-sky-100 to-foreground dark:to-foreground bg-clip-text text-transparent">From Screenshare.</span>
+              <span className="bg-gradient-to-b from-sky-100 to-foreground bg-clip-text text-transparent">From Screenshare.</span>
             </span>
           </h1>
           <motion.div

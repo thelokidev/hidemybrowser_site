@@ -10,8 +10,7 @@ export function LicensePill() {
 
   const base =
     "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium " +
-    "border-white/20 bg-white/60 text-foreground/80 shadow-sm backdrop-blur " +
-    "dark:border-white/10 dark:bg-white/10 dark:text-white/80"
+    "border-white/10 bg-white/10 text-white/80 shadow-sm backdrop-blur"
 
   if (access.loading) {
     return (
@@ -41,7 +40,7 @@ export function LicensePill() {
     })()
 
     return (
-      <span className={base + " border-green-500/20 bg-green-500/10 text-green-700 dark:text-green-400"} title="Active license">
+      <span className={base + " border-green-500/20 bg-green-500/10 text-green-400"} title="Active license">
         <CheckCircle2 className="h-3.5 w-3.5" />
         Active{typeof daysRemaining === "number" ? ` • ${daysRemaining}d left` : ""}
       </span>

@@ -161,7 +161,7 @@ function BentoCard({ title, description, badge, size = "sm", image, icon: Icon, 
           "linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.06))",
       }}
     >
-      <div className="relative h-full rounded-2xl border border-white/10 dark:border-white/10 bg-white/60 dark:bg-white/5 backdrop-blur-xl overflow-hidden">
+      <div className="relative h-full rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl overflow-hidden">
         {/* Accent glow */}
         <div className={`pointer-events-none absolute -inset-24 opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100 ${accent ? `bg-gradient-to-br ${accent}` : "bg-gradient-to-br from-white/10 to-transparent"}`} />
 
@@ -176,7 +176,7 @@ function BentoCard({ title, description, badge, size = "sm", image, icon: Icon, 
             animate={{ opacity: 0, scale: 3 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
             onAnimationComplete={() => setRipples((prev) => prev.filter((x) => x.id !== r.id))}
-            className="pointer-events-none absolute rounded-full bg-white/30 dark:bg-white/20"
+            className="pointer-events-none absolute rounded-full bg-white/20"
             style={{ left: r.x - 40, top: r.y - 40, width: 80, height: 80 }}
           />
         ))}
@@ -184,21 +184,21 @@ function BentoCard({ title, description, badge, size = "sm", image, icon: Icon, 
         <div className={size === "lg" ? "p-8" : "p-6"}>
           {Icon ? (
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="rounded-xl bg-white/20 dark:bg-white/10 p-4 backdrop-blur-sm border border-white/20">
+              <div className="rounded-xl bg-white/10 p-4 backdrop-blur-sm border border-white/20">
                 <Icon className="h-8 w-8 text-white" />
               </div>
             </div>
           ) : null}
 
           <div className="flex items-start justify-between gap-4 mb-2">
-            <h3 className={`${size === "lg" ? "text-2xl" : "text-xl"} font-bold text-gray-900 dark:text-white`}>{title}</h3>
+            <h3 className={`${size === "lg" ? "text-2xl" : "text-xl"} font-bold text-white`}>{title}</h3>
             {badge ? (
-              <span className="shrink-0 rounded-full px-3 py-1 text-xs font-semibold bg-white/20 dark:bg-white/10 border border-white/20 text-gray-900 dark:text-white">
+              <span className="shrink-0 rounded-full px-3 py-1 text-xs font-semibold bg-white/10 border border-white/20 text-white">
                 {badge}
               </span>
             ) : null}
           </div>
-          <p className="text-sm sm:text-[15px] text-gray-700 dark:text-gray-300 leading-relaxed">{description}</p>
+          <p className="text-sm sm:text-[15px] text-gray-300 leading-relaxed">{description}</p>
         </div>
       </div>
     </div>
@@ -208,12 +208,12 @@ function BentoCard({ title, description, badge, size = "sm", image, icon: Icon, 
 function FeatureItem({ title, description, icon: Icon, bullets }: Pick<CardProps, "title" | "description" | "icon" | "bullets">) {
   return (
     <div className="flex flex-col gap-3 items-center text-center">
-      <div className="h-10 w-10 rounded-full bg-gray-100 text-gray-900 dark:bg-white/10 dark:text-white flex items-center justify-center">
+      <div className="h-10 w-10 rounded-full bg-white/10 text-white flex items-center justify-center">
         {Icon ? <Icon className="h-5 w-5" /> : null}
       </div>
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
+      <h3 className="text-lg font-semibold text-white">{title}</h3>
       {bullets && bullets.length ? (
-        <ul className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed space-y-1">
+        <ul className="text-sm text-gray-400 leading-relaxed space-y-1">
           {bullets.map((b) => (
             <li key={b} className="flex items-start justify-center gap-2">
               <span className="mt-[6px] h-1.5 w-1.5 rounded-full bg-current/60" />
@@ -222,7 +222,7 @@ function FeatureItem({ title, description, icon: Icon, bullets }: Pick<CardProps
           ))}
         </ul>
       ) : (
-        <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{description}</p>
+        <p className="text-sm text-gray-400 leading-relaxed">{description}</p>
       )}
     </div>
   )
@@ -234,13 +234,13 @@ export function Features() {
   const features = [...topCards, ...bottomCards]
 
   return (
-    <section id="features" ref={ref} className="relative py-20 md:py-28 px-4 sm:px-6 lg:px-8 overflow-hidden bg-white dark:bg-background">
+    <section id="features" ref={ref} className="relative py-20 md:py-28 px-4 sm:px-6 lg:px-8 overflow-hidden bg-background">
       {/* Background glow aligned with hero aesthetics */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 -top-40 -z-10 opacity-60 blur-3xl [mask-image:radial-gradient(closest-side,white,transparent)]"
       >
-        <div className="mx-auto h-72 w-[70%] rounded-full bg-gradient-to-b from-sky-400/30 via-cyan-400/20 to-indigo-500/10 dark:from-sky-500/20 dark:via-cyan-400/15 dark:to-indigo-500/10" />
+        <div className="mx-auto h-72 w-[70%] rounded-full bg-gradient-to-b from-sky-500/20 via-cyan-400/15 to-indigo-500/10" />
       </div>
 
       <div className="relative max-w-7xl mx-auto">
@@ -252,7 +252,7 @@ export function Features() {
           className="text-center mb-10 sm:mb-14"
         >
           <div className="text-[11px] tracking-[0.2em] uppercase text-muted-foreground mb-3">The future of privacy</div>
-          <h2 className="text-[34px] md:text-5xl font-medium tracking-tighter mx-auto text-pretty bg-linear-to-b from-sky-800 dark:from-sky-100 to-foreground dark:to-foreground bg-clip-text text-transparent">
+          <h2 className="text-[34px] md:text-5xl font-medium tracking-tighter mx-auto text-pretty bg-gradient-to-b from-sky-100 to-foreground bg-clip-text text-transparent">
             Hide Your Browser helps with anything you need to hide.
           </h2>
           <p className="mt-3 text-sm md:text-base text-muted-foreground max-w-2xl mx-auto">
@@ -268,14 +268,14 @@ export function Features() {
             transition={{ duration: 0.5, delay: 0.05 }}
             className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-5"
           >
-            <div className="rounded-2xl border border-white/10 bg-white/60 dark:bg-white/5 backdrop-blur-xl p-7 shadow-sm hover:shadow-md transition-shadow">
+            <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-7 shadow-sm hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between mb-2 text-xs font-semibold text-foreground/60">
-                <span>Sees what others can’t</span>
+                <span>Sees what others can't</span>
               </div>
               <h3 className="text-xl font-semibold text-foreground mb-2">Browser-only visibility</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">Create a completely invisible browsing layer that only you can see during sharing, recording, or monitoring tools.</p>
             </div>
-            <div className="rounded-2xl border border-white/10 bg-white/60 dark:bg-white/5 backdrop-blur-xl p-7 shadow-sm hover:shadow-md transition-shadow">
+            <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-7 shadow-sm hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between mb-2 text-xs font-semibold text-foreground/60">
                 <span>Works on everything</span>
               </div>
@@ -288,13 +288,13 @@ export function Features() {
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.5, delay: 0.12 }}
-            className="rounded-2xl border border-white/10 bg-white/60 dark:bg-white/5 backdrop-blur-xl p-7 shadow-sm hover:shadow-md transition-all"
+            className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-7 shadow-sm hover:shadow-md transition-all"
           >
             <div className="text-xs font-semibold text-foreground/60 mb-3">Quick controls</div>
             <ul className="space-y-2.5">
               {["Instant toggle with Alt\\", "Drag anywhere on screen", "Adjustable opacity"].map((item) => (
                 <li key={item} className="flex items-center gap-2.5">
-                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-sky-500/15 text-sky-600 dark:text-sky-300">
+                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-sky-500/15 text-sky-300">
                     <Check className="w-3.5 h-3.5" />
                   </span>
                   <span className="text-sm text-muted-foreground">{item}</span>
@@ -334,7 +334,7 @@ export function Features() {
           transition={{ duration: 0.6 }}
           className="text-center mb-6"
         >
-          <h3 className="text-3xl md:text-4xl font-medium tracking-tight bg-linear-to-b from-sky-800 dark:from-sky-100 to-foreground dark:to-foreground bg-clip-text text-transparent">Three ways Hide Your Browser changes how you work.</h3>
+          <h3 className="text-3xl md:text-4xl font-medium tracking-tight bg-gradient-to-b from-sky-100 to-foreground bg-clip-text text-transparent">Three ways Hide Your Browser changes how you work.</h3>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-7">
@@ -348,7 +348,7 @@ export function Features() {
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               transition={{ duration: 0.5, delay: 0.05 + i * 0.06 }}
-              className="group rounded-2xl border border-white/10 bg-white/60 dark:bg-white/5 backdrop-blur-xl p-6 md:p-7 transition-all hover:shadow-xl hover:-translate-y-0.5 hover:ring-1 hover:ring-foreground/15 flex flex-col h-full"
+              className="group rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-6 md:p-7 transition-all hover:shadow-xl hover:-translate-y-0.5 hover:ring-1 hover:ring-foreground/15 flex flex-col h-full"
             >
               <div className="mb-4 rounded-xl overflow-hidden">{c.anim}</div>
               <h4 className="text-xl font-semibold text-foreground mb-1">{c.title}</h4>

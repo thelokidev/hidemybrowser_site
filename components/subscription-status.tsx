@@ -158,7 +158,7 @@ export default function SubscriptionStatus() {
 
           {subscription.cancel_at_period_end && (
             <div className="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
-              <p className="text-sm text-yellow-700 dark:text-yellow-600">
+              <p className="text-sm text-yellow-600">
                 Your subscription will cancel at the end of the current period.
               </p>
             </div>

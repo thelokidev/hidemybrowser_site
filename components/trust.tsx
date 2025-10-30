@@ -48,7 +48,7 @@ export function Trust() {
           transition={{ duration: 0.5 }}
           className="text-center mb-10 sm:mb-12"
         >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-medium tracking-tighter mx-auto text-pretty bg-linear-to-b from-sky-800 dark:from-sky-100 to-foreground dark:to-foreground bg-clip-text text-transparent mb-3">Trusted by professionals</h2>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-medium tracking-tighter mx-auto text-pretty bg-gradient-to-b from-sky-100 to-foreground bg-clip-text text-transparent mb-3">Trusted by professionals</h2>
           <p className="text-sm sm:text-base text-muted-foreground">Featured in and used across leading teams</p>
         </motion.div>
 

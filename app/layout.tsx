@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 import { Suspense } from "react"
 import { AuthProviderWrapper } from "@/components/auth-provider-wrapper"
+import { ThemeProvider } from "@/components/theme-provider"
 import { Geist } from "next/font/google"
 import { Toaster } from "@/components/ui/toaster"
 
@@ -26,13 +27,15 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${geist.className} font-sans antialiased`}>
-        <AuthProviderWrapper>
-          <Suspense fallback={null}>{children}</Suspense>
-        </AuthProviderWrapper>
-        <Analytics />
-        <Toaster />
+        <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark">
+          <AuthProviderWrapper>
+            <Suspense fallback={null}>{children}</Suspense>
+          </AuthProviderWrapper>
+          <Analytics />
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   )

@@ -5,12 +5,18 @@ import { Mic, Presentation, Users, NotebookPen, Play, Layout } from "lucide-reac
 
 function MiniWindow({ children, title, icon }: { children: React.ReactNode; title: string; icon: React.ReactNode }) {
   return (
-    <div className="relative w-full h-60 md:h-64 rounded-2xl border border-slate-700/40 bg-slate-900/70 overflow-hidden shadow-xl transition-transform duration-300 group-hover:scale-[1.02]">
-      <div className="flex items-center gap-2 h-9 px-3 border-b border-slate-700/40 bg-slate-800/80">
-        <span className="inline-flex items-center justify-center w-4 h-4 text-slate-200">{icon}</span>
-        <span className="text-[12px] font-medium text-slate-200 truncate">{title}</span>
+    <div className="relative w-full h-60 md:h-64 rounded-2xl border border-slate-700/40 bg-gradient-to-br from-slate-900/90 via-slate-900/70 to-slate-800/70 overflow-hidden shadow-xl transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-2xl group-hover:border-slate-600/50">
+      {/* Subtle gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-slate-800/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      
+      {/* Header */}
+      <div className="relative flex items-center gap-2 h-10 px-4 border-b border-slate-700/40 bg-gradient-to-b from-slate-800/90 to-slate-800/70 backdrop-blur-sm">
+        <span className="inline-flex items-center justify-center w-5 h-5 text-slate-300 group-hover:text-slate-200 transition-colors">{icon}</span>
+        <span className="text-[13px] font-medium text-slate-200 truncate">{title}</span>
       </div>
-      <div className="relative h-[calc(15rem-2.25rem)] md:h-[calc(16rem-2.25rem)] p-3">
+      
+      {/* Content area with improved spacing and visual hierarchy */}
+      <div className="relative h-[calc(15rem-2.5rem)] md:h-[calc(16rem-2.5rem)] p-4 bg-gradient-to-b from-slate-900/30 to-transparent">
         {children}
       </div>
     </div>

@@ -157,7 +157,7 @@ export function Pricing() {
           transition={{ duration: 0.6 }}
           className="text-center mb-10 sm:mb-12 md:mb-14"
         >
-          <h2 className="text-[34px] sm:text-4xl md:text-5xl font-medium tracking-tighter mx-auto text-pretty bg-linear-to-b from-sky-800 dark:from-sky-100 to-foreground dark:to-foreground bg-clip-text text-transparent mb-3 sm:mb-4">Simple, transparent pricing</h2>
+          <h2 className="text-[34px] sm:text-4xl md:text-5xl font-medium tracking-tighter mx-auto text-pretty bg-gradient-to-b from-sky-100 to-foreground bg-clip-text text-transparent mb-3 sm:mb-4">Simple, transparent pricing</h2>
           <p className="text-base sm:text-lg text-muted-foreground">Choose the perfect plan for your needs</p>
         </motion.div>
 
@@ -182,8 +182,8 @@ export function Pricing() {
               <div
                 className={`h-full p-6 rounded-2xl border transition-all duration-300 flex flex-col backdrop-blur-xl ${
                   plan.highlighted
-                    ? "border-white/10 bg-white/70 dark:bg-white/5 ring-1 ring-sky-400/30 shadow-2xl"
-                    : "border-white/10 bg-white/60 dark:bg-white/5 hover:ring-1 hover:ring-foreground/15"
+                    ? "border-white/10 bg-white/5 ring-1 ring-sky-400/30 shadow-2xl"
+                    : "border-white/10 bg-white/5 hover:ring-1 hover:ring-foreground/15"
                 } hover:shadow-xl`}
               >
                 <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
@@ -194,7 +194,7 @@ export function Pricing() {
 
                 {plan.savings && (
                   <div className="mb-4">
-                    <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 ring-1 ring-emerald-500/20">
+                    <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/20">
                       {plan.savings}
                     </span>
                   </div>
@@ -203,7 +203,7 @@ export function Pricing() {
                 <ul className="space-y-3 mb-6 mt-6 flex-1">
                   {plan.features.map((feature) => (
                     <li key={feature} className="flex items-center gap-2.5 text-sm">
-                      <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-300"><Check className="w-3.5 h-3.5" /></span>
+                      <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-300"><Check className="w-3.5 h-3.5" /></span>
                       <span className="text-muted-foreground">{feature}</span>
                     </li>
                   ))}

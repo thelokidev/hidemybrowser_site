@@ -326,8 +326,8 @@ export default function AuthPage() {
             {message && (
               <div className={`mt-4 p-3 rounded-lg flex items-start gap-2 text-sm ${
                 message.type === 'success' 
-                  ? 'bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800' 
-                  : 'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800'
+                  ? 'bg-green-950/30 text-green-400 border border-green-800' 
+                  : 'bg-red-950/30 text-red-400 border border-red-800'
               }`}>
                 {message.type === 'success' ? (
                   <CheckCircle2 className="h-5 w-5 shrink-0 mt-0.5" />

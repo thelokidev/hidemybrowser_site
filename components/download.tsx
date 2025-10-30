@@ -15,7 +15,7 @@ const platforms = [
     downloads: "6 downloads",
     version: "vrelease",
     gradient: "from-blue-500/10 to-cyan-500/10",
-    iconColor: "text-blue-600 dark:text-blue-400",
+    iconColor: "text-blue-400",
   },
   {
     name: "macOS",
@@ -25,7 +25,7 @@ const platforms = [
     downloads: "6 downloads",
     version: "vrelease",
     gradient: "from-gray-500/10 to-slate-500/10",
-    iconColor: "text-gray-700 dark:text-gray-300",
+    iconColor: "text-gray-300",
   },
 ]
 
@@ -45,7 +45,7 @@ export function Download() {
           transition={{ duration: 0.6 }}
           className="text-center mb-10 sm:mb-12 md:mb-14"
         >
-          <h2 className="text-[34px] sm:text-4xl md:text-5xl font-medium tracking-tighter mx-auto text-pretty bg-linear-to-b from-sky-800 dark:from-sky-100 to-foreground dark:to-foreground bg-clip-text text-transparent mb-3 sm:mb-4">Download HideMyBrowser</h2>
+          <h2 className="text-[34px] sm:text-4xl md:text-5xl font-medium tracking-tighter mx-auto text-pretty bg-gradient-to-b from-sky-100 to-foreground bg-clip-text text-transparent mb-3 sm:mb-4">Download HideMyBrowser</h2>
           <p className="text-base sm:text-lg text-muted-foreground max-w-3xl mx-auto">
             Get the truly undetectable browser for your platform. Start your stealth browsing experience today.
           </p>
@@ -63,12 +63,12 @@ export function Download() {
                 whileHover={{ y: -6 }}
                 className="h-full"
               >
-                <div className={`relative h-full p-8 rounded-2xl border border-white/10 bg-white/60 dark:bg-white/5 backdrop-blur-xl ring-0 hover:ring-1 hover:ring-foreground/15 transition-all duration-300 hover:shadow-2xl overflow-hidden group`}>
+                <div className={`relative h-full p-8 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl ring-0 hover:ring-1 hover:ring-foreground/15 transition-all duration-300 hover:shadow-2xl overflow-hidden group`}>
                   <div className="absolute -right-8 -top-8 opacity-5 group-hover:opacity-10 transition-opacity duration-300">
                     <Icon className="w-40 h-40" />
                   </div>
 
-                  <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/70 dark:bg-white/10 backdrop-blur border border-white/20 mb-6 ${platform.iconColor} group-hover:scale-110 transition-transform duration-300`}>
+                  <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/10 backdrop-blur border border-white/20 mb-6 ${platform.iconColor} group-hover:scale-110 transition-transform duration-300`}>
                     <Icon className="w-8 h-8" strokeWidth={2} />
                   </div>
 
@@ -78,7 +78,7 @@ export function Download() {
                   <ul className="space-y-2.5 mb-8">
                     {platform.requirements.map((req) => (
                       <li key={req} className="flex items-center gap-2.5 text-sm">
-                        <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-300"><Check className="w-3.5 h-3.5" /></span>
+                        <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-300"><Check className="w-3.5 h-3.5" /></span>
                         <span className="text-muted-foreground">{req}</span>
                       </li>
                     ))}

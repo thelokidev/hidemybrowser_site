@@ -34,7 +34,7 @@ function BrowserWindow({ onClose, constraintsRef }: { onClose?: () => void, cons
   const containerClasses = `relative rounded-xl border shadow-2xl overflow-hidden transition-all duration-300 ${
     stealthOn
       ? "bg-white/10 border-white/20 backdrop-blur-xl saturate-125"
-      : "bg-[#1e1e1e] border-gray-800"
+      : "bg-[var(--background)] border-gray-800"
   }`
 
   const syncSizeFromDom = () => {
@@ -58,31 +58,17 @@ function BrowserWindow({ onClose, constraintsRef }: { onClose?: () => void, cons
 
   function NewTabContent({ stealth }: { stealth: boolean }) {
     return (
-      <div className={`relative w-full h-full rounded-xl ${stealth ? "bg-white/5" : "bg-[#161616]"} border border-white/10 overflow-hidden`}> 
+      <div className={`relative w-full h-full rounded-xl ${stealth ? "bg-white/5" : "bg-[var(--background)]"} border border-white/10 overflow-hidden`}>
         <div className="absolute inset-0 opacity-[0.07] pointer-events-none" style={{backgroundImage: "radial-gradient(transparent 1px, rgba(255,255,255,.3) 1px)", backgroundSize: "24px 24px"}} />
-        <div className="relative p-4 sm:p-5 md:p-6 h-full flex flex-col gap-5">
-          <div className="flex-1 rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-5">
-            <div className="text-xs text-white/80 mb-4 flex items-center gap-2"><FileText className="h-4 w-4" /> Interview Notes</div>
-            <div className="space-y-3">
-              <div className="h-2 rounded-full bg-white/10 overflow-hidden">
-                <div className="h-full w-2/3 bg-gradient-to-r from-sky-400/60 to-cyan-400/60 animate-pulse" />
-              </div>
-              <div className="h-2 rounded-full bg-white/10 overflow-hidden">
-                <div className="h-full w-1/2 bg-gradient-to-r from-sky-400/60 to-cyan-400/60 animate-pulse" />
-              </div>
-              <div className="h-2 rounded-full bg-white/10 overflow-hidden">
-                <div className="h-full w-3/4 bg-gradient-to-r from-sky-400/60 to-cyan-400/60 animate-pulse" />
-              </div>
+        <div className="relative p-4 sm:p-5 md:p-6 h-full flex items-center justify-center">
+          <div className="text-center space-y-4">
+            <div className="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br from-sky-500/20 to-cyan-500/20 border border-sky-500/30 flex items-center justify-center">
+              <FileText className="h-8 w-8 text-sky-400" />
             </div>
-          </div>
-
-          <div className="mt-auto grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {[{icon: FileText, label: "Open Notes"}, {icon: PlayCircle, label: "Open Slides"}, {icon: Mic, label: "Start Otter"}, {icon: GridIcon, label: "Open Boards"}].map((a) => (
-              <button key={a.label} className="group inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/80 hover:bg-white/10 hover:shadow-md transition-all">
-                <a.icon className="h-4 w-4 opacity-80 group-hover:opacity-100" />
-                <span>{a.label}</span>
-              </button>
-            ))}
+            <div>
+              <h3 className="text-lg font-semibold text-white mb-1">Interview Notes</h3>
+              <p className="text-sm text-white/60">Your preparation materials</p>
+            </div>
           </div>
         </div>
       </div>
@@ -270,7 +256,7 @@ export function FeatureShowcase() {
   return (
     <div className="relative mx-auto w-full max-w-7xl">
       {/* Background layer with demo.webp */}
-      <div className="relative overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-800 shadow-2xl">
+      <div className="relative overflow-hidden rounded-2xl border border-gray-800 shadow-2xl">
         <img 
           src="/demo.webp" 
           alt="Background" 
@@ -278,7 +264,7 @@ export function FeatureShowcase() {
         />
         
         {/* Content overlay */}
-        <div ref={constraintsRef} className="absolute inset-0 bg-white/80 dark:bg-gray-900/80 p-8 md:p-12 flex items-center justify-center">
+        <div ref={constraintsRef} className="absolute inset-0 bg-gray-900/80 p-8 md:p-12 flex items-center justify-center">
           {/* Browser container */}
           <div className="max-w-4xl w-full relative">
             <AnimatePresence initial={false} mode="wait">

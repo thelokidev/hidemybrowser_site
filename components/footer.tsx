@@ -3,7 +3,7 @@ import Image from "next/image"
 
 export function Footer() {
   return (
-    <footer className="relative border-t border-white/10 bg-white/60 dark:bg-white/5 backdrop-blur-xl overflow-hidden">
+    <footer className="relative border-t border-white/10 bg-white/5 backdrop-blur-xl overflow-hidden">
       <div aria-hidden className="pointer-events-none absolute inset-x-0 -top-20 opacity-60 blur-3xl [mask-image:linear-gradient(to_bottom,white,transparent)]">
         <div className="mx-auto h-24 w-[70%] rounded-full bg-gradient-to-b from-sky-400/25 via-cyan-400/15 to-indigo-500/10" />
       </div>
@@ -11,7 +11,7 @@ export function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <Link href="/" className="flex items-center gap-2 text-xl font-semibold hover:opacity-80 transition-opacity">
             <Image src="/favicon.ico" alt="HideMyBrowser logo" width={22} height={22} className="rounded-sm" />
-            <span className="bg-linear-to-b from-sky-800 dark:from-sky-100 to-foreground dark:to-foreground bg-clip-text text-transparent tracking-tight">HideMyBrowser</span>
+            <span className="bg-gradient-to-b from-sky-100 to-foreground bg-clip-text text-transparent tracking-tight">HideMyBrowser</span>
           </Link>
 
           <nav className="flex items-center gap-6">

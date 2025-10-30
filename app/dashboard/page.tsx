@@ -28,8 +28,8 @@ export default async function DashboardPage() {
   return (
     <div className="relative min-h-screen bg-background overflow-hidden">
       <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute -top-24 -right-24 w-[560px] h-[420px] bg-light/60 dark:bg-light/40 blur-[140px] rounded-[48rem]" />
-        <div className="absolute bottom-[-10%] -left-24 w-[520px] h-[420px] bg-light/40 dark:bg-light/25 blur-[130px] rounded-[48rem]" />
+        <div className="absolute -top-24 -right-24 w-[560px] h-[420px] bg-light/40 blur-[140px] rounded-[48rem]" />
+        <div className="absolute bottom-[-10%] -left-24 w-[520px] h-[420px] bg-light/25 blur-[130px] rounded-[48rem]" />
       </div>
       {/* Back to home (matches auth page UX) */}
       <Link
@@ -86,7 +86,7 @@ export default async function DashboardPage() {
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
             <div className="flex flex-wrap items-center gap-3">
-              <h1 className="text-4xl md:text-5xl font-medium tracking-tighter bg-linear-to-b from-sky-800 dark:from-sky-100 to-foreground dark:to-foreground bg-clip-text text-transparent">Welcome to your Dashboard</h1>
+              <h1 className="text-4xl md:text-5xl font-medium tracking-tighter bg-gradient-to-b from-sky-100 to-foreground bg-clip-text text-transparent">Welcome to your Dashboard</h1>
               <LicensePill />
             </div>
             <p className="text-muted-foreground mt-1">
@@ -95,7 +95,7 @@ export default async function DashboardPage() {
           </div>
 
           <div className="grid gap-6 md:grid-cols-2">
-            <Card className="border border-white/10 bg-white/60 dark:bg-white/5 backdrop-blur-xl">
+            <Card className="border border-white/10 bg-white/5 backdrop-blur-xl">
               <CardHeader>
                 <CardTitle>Account Information</CardTitle>
                 <CardDescription>Your account details</CardDescription>
@@ -126,7 +126,7 @@ export default async function DashboardPage() {
 
             <SubscriptionStatus />
 
-            <Card className="md:col-span-2 border border-white/10 bg-white/60 dark:bg-white/5 backdrop-blur-xl">
+            <Card className="md:col-span-2 border border-white/10 bg-white/5 backdrop-blur-xl">
               <CardHeader>
                 <CardTitle>Quick Actions</CardTitle>
                 <CardDescription>Get started with HideMyBrowser</CardDescription>
@@ -158,7 +158,7 @@ export default async function DashboardPage() {
             </Card>
 
             {/* Resources */}
-            <Card className="md:col-span-2 border border-white/10 bg-white/60 dark:bg-white/5 backdrop-blur-xl">
+            <Card className="md:col-span-2 border border-white/10 bg-white/5 backdrop-blur-xl">
               <CardHeader>
                 <CardTitle>Resources</CardTitle>
                 <CardDescription>Helpful links and support</CardDescription>

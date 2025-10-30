@@ -64,7 +64,7 @@ export function FAQ() {
           transition={{ duration: 0.6 }}
           className="text-center mb-10 sm:mb-12 md:mb-14"
         >
-          <h2 className="text-[34px] sm:text-4xl md:text-5xl font-medium tracking-tighter mx-auto text-pretty bg-linear-to-b from-sky-800 dark:from-sky-100 to-foreground dark:to-foreground bg-clip-text text-transparent mb-3 sm:mb-4">Frequently Asked Questions</h2>
+          <h2 className="text-[34px] sm:text-4xl md:text-5xl font-medium tracking-tighter mx-auto text-pretty bg-gradient-to-b from-sky-100 to-foreground bg-clip-text text-transparent mb-3 sm:mb-4">Frequently Asked Questions</h2>
           <p className="text-base sm:text-lg text-muted-foreground">Have questions? We've got answers.</p>
         </motion.div>
 
@@ -73,7 +73,7 @@ export function FAQ() {
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          <div className="rounded-2xl border border-white/10 bg-white/60 dark:bg-white/5 backdrop-blur-xl p-2 sm:p-3">
+          <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-2 sm:p-3">
             <Accordion type="single" collapsible className="w-full">
               {faqs.map((faq, index) => (
                 <AccordionItem key={index} value={`item-${index}`}>
