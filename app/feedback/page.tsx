@@ -69,7 +69,7 @@ export default function FeedbackPage() {
           initial={{ opacity: 0, y: -40 }}
           animate={{ opacity: 0.6, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="absolute -top-24 left-1/2 h-[420px] w-[820px] -translate-x-1/2 rounded-full bg-gradient-to-r from-purple-500/30 via-indigo-500/30 to-cyan-500/30 blur-3xl"
+          className="absolute -top-24 left-1/2 h-[420px] w-[820px] -translate-x-1/2 rounded-full bg-gradient-to-r from-indigo-500/30 via-indigo-500/30 to-cyan-500/30 blur-3xl"
         />
         <motion.div
           initial={{ opacity: 0, y: 40 }}

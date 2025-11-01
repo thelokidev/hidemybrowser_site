@@ -4,7 +4,7 @@ import { useEffect, useState, useRef, type RefObject, type MutableRefObject } fr
 import { motion, AnimatePresence, useDragControls } from "framer-motion"
 import { Eye, EyeOff, Plus, X, Minus, Maximize2, MoreVertical, FileText, Mic, PlayCircle, Grid as GridIcon, RefreshCw } from "lucide-react"
 
-function BrowserWindow({ onClose, constraintsRef }: { onClose?: () => void, constraintsRef?: RefObject<HTMLDivElement | null> | MutableRefObject<HTMLDivElement | null> }) {
+function BrowserWindow({ onClose, constraintsRef, isAnimating, currentStep, stealthMode, browserSize, onInteraction }: { onClose?: () => void, constraintsRef?: RefObject<HTMLDivElement | null> | MutableRefObject<HTMLDivElement | null>, isAnimating?: boolean, currentStep?: number, stealthMode?: boolean, browserSize?: { width: number; height: number }, onInteraction?: () => void }) {
   const [tabs, setTabs] = useState<{ id: number; title: string }[]>([
     { id: 1, title: "New Tab" },
   ])
@@ -14,10 +14,31 @@ function BrowserWindow({ onClose, constraintsRef }: { onClose?: () => void, cons
   const [maximized, setMaximized] = useState(false)
   const [size, setSize] = useState<{ width: number; height: number }>({ width: 960, height: 500 })
   const [prevSize, setPrevSize] = useState<{ width: number; height: number } | null>(null)
+  const [position, setPosition] = useState({ x: 0, y: 0 })
   const winRef = useRef<HTMLDivElement>(null)
   const dragControls = useDragControls()
 
+  // Sync animation props
+  useEffect(() => {
+    if (isAnimating && stealthMode !== undefined) {
+      setStealthOn(stealthMode)
+    }
+  }, [isAnimating, stealthMode])
+
+  useEffect(() => {
+    if (isAnimating && browserSize) {
+      setSize(browserSize)
+    }
+  }, [isAnimating, browserSize])
+
+  const handleInteraction = () => {
+    if (onInteraction) {
+      onInteraction()
+    }
+  }
+
   const addTab = () => {
+    handleInteraction()
     const id = (tabs.at(-1)?.id ?? 0) + 1
     const next = [...tabs, { id, title: "New Tab" }]
     setTabs(next)
@@ -25,6 +46,7 @@ function BrowserWindow({ onClose, constraintsRef }: { onClose?: () => void, cons
   }
 
   const closeTab = (id: number) => {
+    handleInteraction()
     const remaining = tabs.filter((t) => t.id !== id)
     const next = remaining.length ? remaining : [{ id: 1, title: "New Tab" }]
     setTabs(next)
@@ -38,6 +60,7 @@ function BrowserWindow({ onClose, constraintsRef }: { onClose?: () => void, cons
   }`
 
   const syncSizeFromDom = () => {
+    handleInteraction()
     const node = winRef.current
     if (!node) return
     const rect = node.getBoundingClientRect()
@@ -79,21 +102,25 @@ function BrowserWindow({ onClose, constraintsRef }: { onClose?: () => void, cons
     <motion.div
       ref={winRef}
       className={containerClasses}
+      animate={{
+        width: size.width,
+        height: size.height,
+      }}
       style={{ 
-        width: size.width, 
-        height: size.height, 
         resize: "both" as any, 
         minWidth: 560, 
         minHeight: 360,
         maxWidth: Math.max(560, Math.min(((constraintsRef as any)?.current?.clientWidth ?? 1024) - 48, 896)),
         maxHeight: Math.max(360, Math.min(((constraintsRef as any)?.current?.clientHeight ?? 700) - 48, 600)),
       }}
-      drag
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      drag={!isAnimating}
       dragControls={dragControls}
       dragListener={false}
       dragMomentum={false}
       dragElastic={0.1}
       dragConstraints={constraintsRef as any}
+      onDragStart={handleInteraction}
       onPointerUp={syncSizeFromDom}
     >
       {/* Browser chrome */}
@@ -101,11 +128,14 @@ function BrowserWindow({ onClose, constraintsRef }: { onClose?: () => void, cons
         className={`flex items-center gap-3 px-3 py-2 border-b transition-colors ${
           stealthOn ? "bg-white/10 border-white/20" : "bg-[#2d2d2d] border-gray-800"
         }`}
-        onPointerDown={(e) => dragControls.start(e)}
+        onPointerDown={(e) => {
+          dragControls.start(e)
+          handleInteraction()
+        }}
       >
         <div className="flex items-center gap-2">
           <MoreVertical className="h-4 w-4 text-gray-300" />
-          <div className="h-6 w-6 rounded-full bg-violet-500 text-white grid place-items-center text-xs font-semibold">H</div>
+          <div className="h-6 w-6 rounded-full bg-indigo-500 text-white grid place-items-center text-xs font-semibold">H</div>
         </div>
 
         <div className="flex-1 flex items-center gap-2 min-w-0">
@@ -113,7 +143,10 @@ function BrowserWindow({ onClose, constraintsRef }: { onClose?: () => void, cons
             {tabs.map((t) => (
               <button
                 key={t.id}
-                onClick={() => setActiveId(t.id)}
+                onClick={() => {
+                  handleInteraction()
+                  setActiveId(t.id)
+                }}
                 className={`group flex items-center gap-2 px-3 py-1 rounded-md text-xs transition-colors min-w-[88px] ${
                   t.id === activeId ? "bg-neutral-700/70 text-white" : "bg-neutral-800/70 text-gray-300 hover:bg-neutral-700/60"
                 }`}
@@ -140,7 +173,10 @@ function BrowserWindow({ onClose, constraintsRef }: { onClose?: () => void, cons
           </button>
 
           <button
-            onClick={() => setStealthOn((v) => !v)}
+            onClick={() => {
+              handleInteraction()
+              setStealthOn((v) => !v)
+            }}
             className={`inline-flex items-center gap-2 rounded-md px-2 h-7 text-xs font-medium transition active:scale-95 ${
               stealthOn
                 ? "bg-rose-500/20 text-rose-200 hover:bg-rose-500/25"
@@ -155,7 +191,10 @@ function BrowserWindow({ onClose, constraintsRef }: { onClose?: () => void, cons
 
         <div className="ml-auto flex items-center gap-1">
           <button
-            onClick={() => onClose?.()}
+            onClick={() => {
+              handleInteraction()
+              onClose?.()
+            }}
             className="h-7 w-7 grid place-items-center rounded-md bg-neutral-800/70 text-gray-200 hover:bg-neutral-700/60 active:scale-95"
             title="Minimize"
           >
@@ -163,6 +202,7 @@ function BrowserWindow({ onClose, constraintsRef }: { onClose?: () => void, cons
           </button>
           <button
             onClick={() => {
+              handleInteraction()
               const bounds = (constraintsRef as any)?.current as HTMLDivElement | null
               const maxW = Math.max(560, Math.min((bounds?.clientWidth ?? 1024) - 48, 896))
               const maxH = Math.max(360, Math.min((bounds?.clientHeight ?? 700) - 48, 600))
@@ -183,7 +223,10 @@ function BrowserWindow({ onClose, constraintsRef }: { onClose?: () => void, cons
             <Maximize2 className="h-4 w-4" />
           </button>
           <button
-            onClick={() => onClose?.()}
+            onClick={() => {
+              handleInteraction()
+              onClose?.()
+            }}
             className="h-7 w-7 grid place-items-center rounded-md bg-neutral-800/70 text-gray-200 hover:bg-red-600/70 hover:text-white active:scale-95"
             title="Close"
           >
@@ -242,6 +285,55 @@ export function FeatureShowcase() {
   const [browserVisible, setBrowserVisible] = useState(true)
   const constraintsRef = useRef<HTMLDivElement>(null)
   const [demoVersion, setDemoVersion] = useState(0)
+  const [currentStep, setCurrentStep] = useState(0)
+  const [featureMessage, setFeatureMessage] = useState("")
+  const [browserPosition, setBrowserPosition] = useState({ x: 0, y: 0 })
+  const [browserSize, setBrowserSize] = useState({ width: 960, height: 500 })
+  const [stealthMode, setStealthMode] = useState(false)
+  const [windowVisible, setWindowVisible] = useState(true)
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true)
+  const [userHasInteracted, setUserHasInteracted] = useState(false)
+
+  // Auto-animation sequence (15 seconds total: 5 seconds per step)
+  useEffect(() => {
+    if (!isAutoPlaying) return
+    
+    const timers: ReturnType<typeof setTimeout>[] = []
+    
+    // Step 1: Visibility Toggle (0-5s)
+    if (currentStep === 0) {
+      timers.push(setTimeout(() => setStealthMode(true), 500))
+      timers.push(setTimeout(() => setFeatureMessage("Invisible Mode: Toggle visibility for discreet note-taking"), 500))
+      timers.push(setTimeout(() => setStealthMode(false), 3000))
+      timers.push(setTimeout(() => setFeatureMessage(""), 4500))
+      timers.push(setTimeout(() => setCurrentStep(1), 5000))
+    }
+    // Step 2: Quick Hide/Unhide (5-10s)
+    else if (currentStep === 1) {
+      timers.push(setTimeout(() => setWindowVisible(false), 500))
+      timers.push(setTimeout(() => setFeatureMessage("Alt + \\ : Instant Hide/Unhide"), 500))
+      timers.push(setTimeout(() => setWindowVisible(true), 3000))
+      timers.push(setTimeout(() => setFeatureMessage(""), 4500))
+      timers.push(setTimeout(() => setCurrentStep(2), 5000))
+    }
+    // Step 3: Drag & Resize (10-15s)
+    else if (currentStep === 2) {
+      timers.push(setTimeout(() => {
+        setBrowserPosition({ x: 50, y: 50 })
+        setFeatureMessage("Drag & Resize: Fully customizable")
+      }, 500))
+      timers.push(setTimeout(() => setBrowserSize({ width: 800, height: 450 }), 3000))
+      timers.push(setTimeout(() => setFeatureMessage(""), 4500))
+      timers.push(setTimeout(() => {
+        setCurrentStep(0)
+        setBrowserPosition({ x: 0, y: 0 })
+        setBrowserSize({ width: 960, height: 500 })
+        setIsAutoPlaying(true) // Loop back
+      }, 5000))
+    }
+
+    return () => timers.forEach(clearTimeout)
+  }, [currentStep, isAutoPlaying])
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -265,25 +357,59 @@ export function FeatureShowcase() {
         
         {/* Content overlay */}
         <div ref={constraintsRef} className="absolute inset-0 bg-gray-900/80 p-8 md:p-12 flex items-center justify-center">
+          {/* Feature message banner */}
+          <AnimatePresence>
+            {featureMessage && (
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="absolute top-8 left-1/2 -translate-x-1/2 z-50 px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-full text-sm font-medium shadow-lg"
+              >
+                {featureMessage}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* Browser container */}
           <div className="max-w-4xl w-full relative">
             <AnimatePresence initial={false} mode="wait">
-              {browserVisible && (
+              {browserVisible && windowVisible && (
                 <motion.div
                   key={`browser-${demoVersion}`}
-                  initial={{ opacity: 0, y: 40, scale: 0.98 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 20, scale: 0.98 }}
-                  transition={{ duration: 0.28, ease: "easeOut" }}
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{ 
+                    opacity: 1, 
+                    scale: 1, 
+                    x: browserPosition.x,
+                    y: browserPosition.y
+                  }}
+                  exit={{ opacity: 0, scale: 0.98 }}
+                  transition={{ duration: 0.4, ease: "easeOut" }}
                 >
-                  <BrowserWindow constraintsRef={constraintsRef} onClose={() => setBrowserVisible(false)} />
+                  <BrowserWindow 
+                    constraintsRef={constraintsRef} 
+                    onClose={() => setBrowserVisible(false)}
+                    isAnimating={isAutoPlaying}
+                    currentStep={currentStep}
+                    stealthMode={stealthMode}
+                    browserSize={browserSize}
+                    onInteraction={() => {
+                      setIsAutoPlaying(false)
+                      setUserHasInteracted(true)
+                    }}
+                  />
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
           {/* Move the Alt+\ hint to the bottom-left of the entire background area */}
           <button
-            onClick={() => setBrowserVisible((v) => !v)}
+            onClick={() => {
+              setIsAutoPlaying(false)
+              setUserHasInteracted(true)
+              setBrowserVisible((v) => !v)
+            }}
             className="absolute left-4 bottom-4 rounded-md border border-white/20 bg-black/70 text-white px-2 py-1 text-xs font-medium shadow hover:bg-black/80 active:scale-95 transition"
             title="Toggle demo (Alt + \\)"
           >
@@ -293,7 +419,18 @@ export function FeatureShowcase() {
           </button>
           {/* Refresh button bottom-right */}
           <button
-            onClick={() => { setBrowserVisible(true); setDemoVersion((v) => v + 1) }}
+            onClick={() => {
+              setCurrentStep(0)
+              setBrowserVisible(true)
+              setWindowVisible(true)
+              setStealthMode(false)
+              setFeatureMessage("")
+              setBrowserPosition({ x: 0, y: 0 })
+              setBrowserSize({ width: 960, height: 500 })
+              setIsAutoPlaying(true)
+              setUserHasInteracted(false)
+              setDemoVersion((v) => v + 1)
+            }}
             className="absolute right-4 bottom-4 rounded-md border border-white/20 bg-black/70 text-white p-1.5 text-xs font-medium shadow hover:bg-black/80 active:scale-95 transition"
             title="Reset demo"
             aria-label="Reset demo"

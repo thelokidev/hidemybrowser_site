@@ -14,9 +14,9 @@ export function ProfileDropdown() {
     <div className="relative">
       <button
         onClick={() => router.push("/dashboard")}
-        className="transition-all duration-200 hover:opacity-80"
+        className="transition-all duration-200 hover:opacity-80 flex items-center"
       >
-        <UserAvatar size={36} className="ring-1 ring-border/60" />
+        <UserAvatar size={36} className="ring-1 ring-border/60 flex-shrink-0" />
       </button>
     </div>
   )

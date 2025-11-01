@@ -62,9 +62,12 @@ export function FAQ() {
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-10 sm:mb-12 md:mb-14"
+          className="text-center mb-12 sm:mb-16"
         >
-          <h2 className="text-[34px] sm:text-4xl md:text-5xl font-medium tracking-tighter mx-auto text-pretty bg-gradient-to-b from-sky-100 to-foreground bg-clip-text text-transparent mb-3 sm:mb-4">Frequently Asked Questions</h2>
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm mb-4">
+            <span className="text-[11px] tracking-[0.2em] uppercase text-muted-foreground">FAQ</span>
+          </div>
+          <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tighter mx-auto text-pretty bg-gradient-to-b from-white via-sky-100 to-sky-300 bg-clip-text text-transparent mb-4">Frequently Asked Questions</h2>
           <p className="text-base sm:text-lg text-muted-foreground">Have questions? We've got answers.</p>
         </motion.div>
 

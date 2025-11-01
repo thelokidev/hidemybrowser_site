@@ -43,10 +43,13 @@ export function Download() {
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-10 sm:mb-12 md:mb-14"
+          className="text-center mb-12 sm:mb-16"
         >
-          <h2 className="text-[34px] sm:text-4xl md:text-5xl font-medium tracking-tighter mx-auto text-pretty bg-gradient-to-b from-sky-100 to-foreground bg-clip-text text-transparent mb-3 sm:mb-4">Download HideMyBrowser</h2>
-          <p className="text-base sm:text-lg text-muted-foreground max-w-3xl mx-auto">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm mb-4">
+            <span className="text-[11px] tracking-[0.2em] uppercase text-muted-foreground">Download</span>
+          </div>
+          <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tighter mx-auto text-pretty bg-gradient-to-b from-white via-sky-100 to-sky-300 bg-clip-text text-transparent mb-4">Download HideMyBrowser</h2>
+          <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Get the truly undetectable browser for your platform. Start your stealth browsing experience today.
           </p>
         </motion.div>
@@ -63,33 +66,36 @@ export function Download() {
                 whileHover={{ y: -6 }}
                 className="h-full"
               >
-                <div className={`relative h-full p-8 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl ring-0 hover:ring-1 hover:ring-foreground/15 transition-all duration-300 hover:shadow-2xl overflow-hidden group`}>
+                <div className={`relative h-full p-10 rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl ring-0 hover:ring-2 hover:ring-sky-400/30 transition-all duration-300 hover:shadow-2xl overflow-hidden group`}>
                   <div className="absolute -right-8 -top-8 opacity-5 group-hover:opacity-10 transition-opacity duration-300">
                     <Icon className="w-40 h-40" />
                   </div>
+                  
+                  {/* Gradient overlay on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-sky-500/10 via-transparent to-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-                  <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/10 backdrop-blur border border-white/20 mb-6 ${platform.iconColor} group-hover:scale-110 transition-transform duration-300`}>
-                    <Icon className="w-8 h-8" strokeWidth={2} />
+                  <div className={`inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-white/10 backdrop-blur border border-white/20 mb-6 ${platform.iconColor} group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300 relative z-10`}>
+                    <Icon className="w-10 h-10" strokeWidth={2} />
                   </div>
 
-                  <h3 className="text-2xl font-bold mb-2">{platform.name}</h3>
-                  <p className="text-muted-foreground mb-6">{platform.subtitle}</p>
+                  <h3 className="text-2xl font-bold mb-2 relative z-10">{platform.name}</h3>
+                  <p className="text-muted-foreground mb-6 relative z-10">{platform.subtitle}</p>
 
-                  <ul className="space-y-2.5 mb-8">
+                  <ul className="space-y-3 mb-8 relative z-10">
                     {platform.requirements.map((req) => (
                       <li key={req} className="flex items-center gap-2.5 text-sm">
-                        <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-300"><Check className="w-3.5 h-3.5" /></span>
+                        <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-300 shrink-0"><Check className="w-3.5 h-3.5" /></span>
                         <span className="text-muted-foreground">{req}</span>
                       </li>
                     ))}
                   </ul>
 
-                  <Button className="w-full mb-4 group-hover:shadow-lg transition-shadow" size="lg">
+                  <Button className="w-full mb-4 group-hover:shadow-lg transition-shadow relative z-10 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500" size="lg">
                     <DownloadIcon className="w-4 h-4 mr-2" />
                     Download for {platform.name}
                   </Button>
 
-                  <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                  <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground relative z-10">
                     <span>{platform.downloads}</span>
                     <span>-</span>
                     <span>{platform.version}</span>

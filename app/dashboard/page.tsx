@@ -57,7 +57,7 @@ export default async function DashboardPage() {
           <div className="mx-auto flex items-center justify-between mt-4 h-16 w-full max-w-6xl px-3 md:px-4 rounded-2xl border border-border/60 bg-background/70 backdrop-blur-md">
             <Link 
               href="/" 
-              className="flex items-center gap-2 font-bold transition-all duration-300 hover:opacity-80 text-lg"
+              className="flex items-center gap-2 font-bold transition-all duration-300 hover:opacity-80 text-lg leading-none"
             >
               <Image
                 src="/favicon.ico"
@@ -67,13 +67,13 @@ export default async function DashboardPage() {
                 priority
                 className="rounded-sm"
               />
-              <span>HideMyBrowser</span>
+              <span className="leading-none">HideMyBrowser</span>
             </Link>
 
             <div className="flex items-center gap-2">
-              <UserAvatar size={36} className="ring-1 ring-border/60" withLink={false} />
+              <UserAvatar size={36} className="ring-1 ring-border/60 flex-shrink-0" withLink={false} />
               <form action={handleSignOut}>
-                <Button size="sm" className="transition-all duration-300 hover:scale-105 hover:shadow-lg" type="submit">
+                <Button size="sm" className="transition-all duration-300 hover:scale-105 hover:shadow-lg leading-none" type="submit">
                   Sign Out
                 </Button>
               </form>

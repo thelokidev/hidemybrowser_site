@@ -33,7 +33,7 @@ const topCards = [
     badge: "Undetectable",
     image: undefined,
     icon: HmbEyeOff,
-    accent: "from-violet-400/30 to-fuchsia-500/10",
+    accent: "from-indigo-400/30 to-indigo-500/10",
     bullets: [
       "Hidden in screen shares",
       "Invisible in recordings",
@@ -249,13 +249,15 @@ export function Features() {
           initial={{ opacity: 0, y: 20 }}
           animate={ isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 } }
           transition={{ duration: 0.6 }}
-          className="text-center mb-10 sm:mb-14"
+          className="text-center mb-12 sm:mb-16"
         >
-          <div className="text-[11px] tracking-[0.2em] uppercase text-muted-foreground mb-3">The future of privacy</div>
-          <h2 className="text-[34px] md:text-5xl font-medium tracking-tighter mx-auto text-pretty bg-gradient-to-b from-sky-100 to-foreground bg-clip-text text-transparent">
-            Hide Your Browser helps with anything you need to hide.
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm mb-4">
+            <span className="text-[11px] tracking-[0.2em] uppercase text-muted-foreground">Features</span>
+          </div>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tighter mx-auto text-pretty bg-gradient-to-b from-white via-sky-100 to-sky-300 bg-clip-text text-transparent mb-4">
+            Everything you need to browse invisibly
           </h2>
-          <p className="mt-3 text-sm md:text-base text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             A private, invisible browsing layer that works anywhere and stays off-camera. Fast, elegant, undetectable.
           </p>
         </motion.div>
@@ -309,20 +311,28 @@ export function Features() {
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.6, delay: 0.15 }}
-          className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-slate-900 to-slate-950 p-8 md:p-10 mb-12 shadow-2xl"
+          className="relative overflow-hidden rounded-3xl border border-white/20 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 p-10 md:p-12 mb-12 shadow-2xl group"
         >
           {/* Gradient ring & glow */}
-          <div aria-hidden className="pointer-events-none absolute inset-0 rounded-[18px] ring-1 ring-white/10" />
-          <div aria-hidden className="pointer-events-none absolute -inset-24 bg-gradient-to-br from-sky-500/10 via-cyan-400/10 to-indigo-500/10 blur-3xl" />
-          <div className="text-center">
-            <h3 className="text-white text-xl md:text-2xl font-semibold mb-2">Undetectable by design.</h3>
-            <p className="text-white/70 text-sm md:text-base mb-5">No bots in the room. No Zoom guests. No screenshare trails. Works on everything.</p>
-            <div className="flex flex-wrap items-center justify-center gap-3">
-  <img alt="Slack" src="https://api.iconify.design/logos/slack-icon.svg" className="w-6 h-6" />
-  <img alt="Google Meet" src="https://api.iconify.design/logos/google-meet.svg" className="w-6 h-6" />
-  <img alt="Zoom" src="https://api.iconify.design/logos/zoom-icon.svg" className="w-6 h-6" />
-  <img alt="Microsoft Teams" src="https://api.iconify.design/logos/microsoft-teams.svg" className="w-6 h-6" />
-</div>
+          <div aria-hidden className="pointer-events-none absolute inset-0 rounded-[24px] ring-1 ring-white/20" />
+          <div aria-hidden className="pointer-events-none absolute -inset-32 bg-gradient-to-br from-sky-500/20 via-cyan-400/15 to-indigo-500/20 blur-3xl group-hover:opacity-100 opacity-60 transition-opacity duration-500" />
+          <div className="text-center relative z-10">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-sky-500/10 border border-sky-400/20 mb-4">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
+              </span>
+              <span className="text-xs font-medium text-sky-200">Works Everywhere</span>
+            </div>
+            <h3 className="text-white text-2xl md:text-3xl font-bold mb-3">Undetectable by design</h3>
+            <p className="text-white/80 text-base md:text-lg mb-6">No bots in the room. No Zoom guests. No screenshare trails. Works on everything.</p>
+            <div className="flex flex-wrap items-center justify-center gap-6 opacity-80 group-hover:opacity-100 transition-opacity duration-300">
+              <img alt="Slack" src="https://api.iconify.design/logos/slack-icon.svg" className="w-8 h-8 grayscale group-hover:grayscale-0 transition-all duration-300" />
+              <img alt="Google Meet" src="https://api.iconify.design/logos/google-meet.svg" className="w-8 h-8 grayscale group-hover:grayscale-0 transition-all duration-300" />
+              <img alt="Zoom" src="https://api.iconify.design/logos/zoom-icon.svg" className="w-8 h-8 grayscale group-hover:grayscale-0 transition-all duration-300" />
+              <img alt="Microsoft Teams" src="https://api.iconify.design/logos/microsoft-teams.svg" className="w-8 h-8 grayscale group-hover:grayscale-0 transition-all duration-300" />
+              <img alt="Discord" src="https://api.iconify.design/logos/discord-icon.svg" className="w-8 h-8 grayscale group-hover:grayscale-0 transition-all duration-300" />
+            </div>
           </div>
         </motion.div>
 
@@ -332,9 +342,10 @@ export function Features() {
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-6"
+          className="text-center mb-10"
         >
-          <h3 className="text-3xl md:text-4xl font-medium tracking-tight bg-gradient-to-b from-sky-100 to-foreground bg-clip-text text-transparent">Three ways Hide Your Browser changes how you work.</h3>
+          <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight bg-gradient-to-b from-white via-sky-100 to-sky-300 bg-clip-text text-transparent mb-3">Three ways HideMyBrowser changes how you work</h3>
+          <p className="text-base text-muted-foreground">Use it wherever you need privacy during screen shares</p>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-7">

@@ -17,7 +17,7 @@ export function VideoDemo() {
         transition={{ duration: 0.8 }}
         className="max-w-6xl mx-auto"
       >
-        <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-pink-200 via-purple-200 to-blue-300 p-1">
+        <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-pink-200 via-indigo-200 to-blue-300 p-1">
           <div className="relative rounded-xl overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900 aspect-video">
             {/* Mock browser interface */}
             <div className="absolute inset-0 flex items-center justify-center">

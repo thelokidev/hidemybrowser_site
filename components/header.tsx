@@ -65,7 +65,7 @@ export function Header() {
           />
           <Link 
             href="/" 
-            className={`relative z-10 shrink-0 flex items-center gap-2 font-bold transition-all duration-300 hover:opacity-80 ${
+            className={`relative z-10 shrink-0 flex items-center gap-2 font-bold transition-all duration-300 hover:opacity-80 leading-none ${
               scrolled ? "text-base sm:text-lg" : "text-lg sm:text-xl"
             }`}
           >
@@ -77,7 +77,7 @@ export function Header() {
               priority
               className="rounded-sm"
             />
-            <span className="bg-gradient-to-b from-sky-100 to-foreground bg-clip-text text-transparent tracking-tighter">HideMyBrowser</span>
+            <span className="bg-gradient-to-b from-sky-100 to-foreground bg-clip-text text-transparent tracking-tighter leading-none">HideMyBrowser</span>
           </Link>
 
           <nav className="relative z-10 hidden md:flex flex-1 items-center justify-center gap-1 min-w-0">
@@ -103,7 +103,7 @@ export function Header() {
                 <Button 
                   variant="ghost"
                   size="sm"
-                  className="transition-all duration-300 hover:bg-accent/50"
+                  className="transition-all duration-300 hover:bg-accent/50 leading-none"
                 >
                   Get a Demo
                 </Button>
@@ -111,7 +111,7 @@ export function Header() {
                   <Button 
                     /* primary (black) */
                     size="sm"
-                    className="transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                    className="transition-all duration-300 hover:scale-105 hover:shadow-lg leading-none"
                   >
                     Login
                   </Button>

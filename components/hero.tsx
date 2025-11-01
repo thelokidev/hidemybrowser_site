@@ -47,9 +47,23 @@ export function Hero() {
           transition={{ duration: 0.6, type: "spring", bounce: 0 }}
           className="flex flex-col justify-center items-start space-y-5 w-full text-left"
         >
-          <h1 className="text-[32px] md:text-[32px] font-medium tracking-tighter text-pretty">
-            <span className="block bg-gradient-to-b from-sky-100 to-foreground bg-clip-text text-transparent">The Truly Undetectable Browser To Hide</span>
-            <span className="flex items-baseline my-0">
+          {/* Badge */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm"
+          >
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span className="text-xs font-medium text-muted-foreground">100% Undetectable</span>
+          </motion.div>
+
+          <h1 className="text-[32px] md:text-[32px] font-medium tracking-tighter text-pretty leading-none">
+            <span className="flex items-baseline my-0 gap-x-2">
+              <span className="bg-gradient-to-b from-sky-100 to-foreground bg-clip-text text-transparent">The Truly Undetectable Browser To Hide</span>
               <AnimatePresence mode="wait">
                 <motion.span
                   key={currentWordIndex}
@@ -57,14 +71,19 @@ export function Hero() {
                   animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                   exit={{ opacity: 0, y: -6, filter: "blur(4px)" }}
                   transition={{ duration: 0.35, ease: "easeInOut" }}
-                  className="whitespace-nowrap font-medium inline-block bg-gradient-to-r from-sky-300 via-cyan-300 to-indigo-400 bg-clip-text text-transparent drop-shadow mr-2"
+                  className="whitespace-nowrap font-medium inline-block bg-gradient-to-r from-sky-300 via-cyan-300 to-indigo-400 bg-clip-text text-transparent drop-shadow"
                 >
                   {rotatingWords[currentWordIndex].text}
                 </motion.span>
               </AnimatePresence>
-              <span className="bg-gradient-to-b from-sky-100 to-foreground bg-clip-text text-transparent">From Screenshare.</span>
             </span>
+            <span className="block bg-gradient-to-b from-sky-100 to-foreground bg-clip-text text-transparent leading-none">From Screenshare.</span>
           </h1>
+
+          <p className="text-sm md:text-base text-muted-foreground leading-relaxed max-w-2xl">
+            Browse privately during screen shares, video calls, and recordings. Instantly toggle with Alt+\
+          </p>
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
