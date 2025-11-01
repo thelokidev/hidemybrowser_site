@@ -16,6 +16,8 @@ const platforms = [
     version: "vrelease",
     gradient: "from-blue-500/10 to-cyan-500/10",
     iconColor: "text-blue-400",
+    downloadUrl: "/hidemybrowser-setup.exe",
+    available: true,
   },
   {
     name: "macOS",
@@ -26,12 +28,28 @@ const platforms = [
     version: "vrelease",
     gradient: "from-gray-500/10 to-slate-500/10",
     iconColor: "text-gray-300",
+    downloadUrl: null,
+    available: false,
   },
 ]
 
 export function Download() {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
+
+  const handleDownload = (platform: typeof platforms[0]) => {
+    if (!platform.available || !platform.downloadUrl) {
+      return
+    }
+
+    // Create a temporary anchor element to trigger download
+    const link = document.createElement('a')
+    link.href = platform.downloadUrl
+    link.download = `hidemybrowser-setup-${platform.name.toLowerCase()}.exe`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
 
   return (
     <section id="download" ref={ref} className="relative py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 bg-background overflow-hidden">
@@ -90,16 +108,15 @@ export function Download() {
                     ))}
                   </ul>
 
-                  <Button className="w-full mb-4 group-hover:shadow-lg transition-shadow relative z-10 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500" size="lg">
+                  <Button 
+                    className={`w-full group-hover:shadow-lg transition-shadow relative z-10 ${platform.available ? 'bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500' : 'bg-gray-600/50 cursor-not-allowed opacity-60'}`}
+                    size="lg"
+                    onClick={() => handleDownload(platform)}
+                    disabled={!platform.available}
+                  >
                     <DownloadIcon className="w-4 h-4 mr-2" />
-                    Download for {platform.name}
+                    {platform.available ? `Download for ${platform.name}` : `Coming Soon for ${platform.name}`}
                   </Button>
-
-                  <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground relative z-10">
-                    <span>{platform.downloads}</span>
-                    <span>-</span>
-                    <span>{platform.version}</span>
-                  </div>
                 </div>
               </motion.div>
             )
