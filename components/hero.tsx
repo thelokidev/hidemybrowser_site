@@ -39,8 +39,14 @@ export function Hero() {
   }
 
   return (
-    <div className="relative justify-center items-center">
-      <section className="max-w-7xl mx-auto px-4 py-40 gap-12 flex flex-col justify-center items-center">
+    <div className="relative justify-center items-center overflow-hidden">
+      {/* Enhanced background gradients */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-gradient-to-b from-sky-500/20 via-transparent to-transparent rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-gradient-to-t from-indigo-500/15 via-transparent to-transparent rounded-full blur-3xl" />
+      </div>
+
+      <section className="relative max-w-7xl mx-auto px-4 py-40 gap-12 flex flex-col justify-center items-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -106,6 +112,7 @@ export function Hero() {
           transition={{ duration: 0.8, delay: 0.4 }}
           className="relative w-full max-w-7xl mx-auto"
         >
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-sky-500/10 to-transparent blur-3xl" />
           <FeatureShowcase />
         </motion.div>
       </section>
