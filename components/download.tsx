@@ -13,10 +13,10 @@ const platforms = [
     icon: Monitor,
     requirements: ["Windows 10 or later", "4GB RAM minimum", "500MB free space"],
     downloads: "6 downloads",
-    version: "vrelease",
+    version: "v1.35.1",
     gradient: "from-blue-500/10 to-cyan-500/10",
     iconColor: "text-blue-400",
-    downloadUrl: "/hidemybrowser-setup.exe",
+    downloadUrl: "https://github.com/thelokidev/hidemybrowser_site/releases/download/v1.35.1/hidemybrowser-1.35.1-setup.exe",
     available: true,
   },
   {
@@ -42,10 +42,12 @@ export function Download() {
       return
     }
 
-    // Create a temporary anchor element to trigger download
+    // For GitHub releases, create a temporary link to trigger download
+    // GitHub releases send proper Content-Disposition headers for downloads
     const link = document.createElement('a')
     link.href = platform.downloadUrl
-    link.download = `hidemybrowser-setup-${platform.name.toLowerCase()}.exe`
+    link.target = '_blank'
+    link.rel = 'noopener noreferrer'
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
