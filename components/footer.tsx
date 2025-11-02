@@ -1,5 +1,6 @@
 import Link from "next/link"
 import Image from "next/image"
+import { SocialSection } from "./social-section"
 
 export function Footer() {
   return (
@@ -25,6 +26,11 @@ export function Footer() {
               Privacy Policy
             </Link>
           </nav>
+        </div>
+
+        {/* Social Section */}
+        <div className="mt-12">
+          <SocialSection />
         </div>
 
         <div className="mt-8 pt-8 border-t border-white/10 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
