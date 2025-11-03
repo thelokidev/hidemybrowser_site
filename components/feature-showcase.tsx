@@ -12,7 +12,7 @@ function BrowserWindow({ onClose, constraintsRef, isAnimating, currentStep, stea
   const [stealthOn, setStealthOn] = useState(false)
   const [minimized, setMinimized] = useState(false)
   const [maximized, setMaximized] = useState(false)
-  const [size, setSize] = useState<{ width: number; height: number }>({ width: 960, height: 500 })
+  const [size, setSize] = useState<{ width: number; height: number }>({ width: 800, height: 450 })
   const [prevSize, setPrevSize] = useState<{ width: number; height: number } | null>(null)
   const [position, setPosition] = useState({ x: 0, y: 0 })
   const winRef = useRef<HTMLDivElement>(null)
@@ -85,12 +85,12 @@ function BrowserWindow({ onClose, constraintsRef, isAnimating, currentStep, stea
         <div className="absolute inset-0 opacity-[0.07] pointer-events-none" style={{backgroundImage: "radial-gradient(transparent 1px, rgba(255,255,255,.3) 1px)", backgroundSize: "24px 24px"}} />
         <div className="relative p-4 sm:p-5 md:p-6 h-full flex items-center justify-center">
           <div className="text-center space-y-4">
-            <div className="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br from-sky-500/20 to-cyan-500/20 border border-sky-500/30 flex items-center justify-center">
-              <FileText className="h-8 w-8 text-sky-400" />
+            <div className="mx-auto w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-sky-500/20 to-cyan-500/20 border border-sky-500/30 flex items-center justify-center">
+              <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-sky-400" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-white mb-1">Interview Notes</h3>
-              <p className="text-sm text-white/60">Your preparation materials</p>
+              <h3 className="text-base sm:text-lg font-semibold text-white mb-1">Interview Notes</h3>
+              <p className="text-xs sm:text-sm text-white/60">Your preparation materials</p>
             </div>
           </div>
         </div>
@@ -108,10 +108,10 @@ function BrowserWindow({ onClose, constraintsRef, isAnimating, currentStep, stea
       }}
       style={{ 
         resize: "both" as any, 
-        minWidth: 560, 
-        minHeight: 360,
-        maxWidth: Math.max(560, Math.min(((constraintsRef as any)?.current?.clientWidth ?? 1024) - 48, 896)),
-        maxHeight: Math.max(360, Math.min(((constraintsRef as any)?.current?.clientHeight ?? 700) - 48, 600)),
+        minWidth: 320, 
+        minHeight: 240,
+        maxWidth: Math.max(320, Math.min(((constraintsRef as any)?.current?.clientWidth ?? 1024) - 32, 896)),
+        maxHeight: Math.max(240, Math.min(((constraintsRef as any)?.current?.clientHeight ?? 700) - 32, 600)),
       }}
       transition={{ duration: 0.5, ease: "easeOut" }}
       drag={!isAnimating}
@@ -125,7 +125,7 @@ function BrowserWindow({ onClose, constraintsRef, isAnimating, currentStep, stea
     >
       {/* Browser chrome */}
       <div
-        className={`flex items-center gap-3 px-3 py-2 border-b transition-colors ${
+        className={`flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-1.5 sm:py-2 border-b transition-colors ${
           stealthOn ? "bg-white/10 border-white/20" : "bg-[#2d2d2d] border-gray-800"
         }`}
         onPointerDown={(e) => {
@@ -133,9 +133,9 @@ function BrowserWindow({ onClose, constraintsRef, isAnimating, currentStep, stea
           handleInteraction()
         }}
       >
-        <div className="flex items-center gap-2">
-          <MoreVertical className="h-4 w-4 text-gray-300" />
-          <div className="h-6 w-6 rounded-full bg-indigo-500 text-white grid place-items-center text-xs font-semibold">H</div>
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <MoreVertical className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-300" />
+          <div className="h-5 w-5 sm:h-6 sm:w-6 rounded-full bg-indigo-500 text-white grid place-items-center text-[10px] sm:text-xs font-semibold">H</div>
         </div>
 
         <div className="flex-1 flex items-center gap-2 min-w-0">
@@ -166,10 +166,10 @@ function BrowserWindow({ onClose, constraintsRef, isAnimating, currentStep, stea
 
           <button
             onClick={addTab}
-            className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-neutral-800/70 text-gray-200 hover:bg-neutral-700/60 active:scale-95 transition"
+            className="hidden sm:inline-flex h-7 w-7 items-center justify-center rounded-md bg-neutral-800/70 text-gray-200 hover:bg-neutral-700/60 active:scale-95 transition"
             title="New tab"
           >
-            <Plus className="h-4 w-4" />
+            <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </button>
 
           <button
@@ -177,35 +177,35 @@ function BrowserWindow({ onClose, constraintsRef, isAnimating, currentStep, stea
               handleInteraction()
               setStealthOn((v) => !v)
             }}
-            className={`inline-flex items-center gap-2 rounded-md px-2 h-7 text-xs font-medium transition active:scale-95 ${
+            className={`inline-flex items-center gap-1 sm:gap-2 rounded-md px-1.5 sm:px-2 h-6 sm:h-7 text-[10px] sm:text-xs font-medium transition active:scale-95 ${
               stealthOn
                 ? "bg-rose-500/20 text-rose-200 hover:bg-rose-500/25"
                 : "bg-emerald-500/20 text-emerald-200 hover:bg-emerald-500/25"
             }`}
             title={stealthOn ? "Invisible" : "Visible"}
           >
-            {stealthOn ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-            <span className="hidden sm:inline">{stealthOn ? "Invisible" : "Visible"}</span>
+            {stealthOn ? <EyeOff className="h-3 w-3 sm:h-4 sm:w-4" /> : <Eye className="h-3 w-3 sm:h-4 sm:w-4" />}
+            <span className="hidden md:inline">{stealthOn ? "Invisible" : "Visible"}</span>
           </button>
         </div>
 
-        <div className="ml-auto flex items-center gap-1">
+        <div className="ml-auto flex items-center gap-0.5 sm:gap-1">
           <button
             onClick={() => {
               handleInteraction()
               onClose?.()
             }}
-            className="h-7 w-7 grid place-items-center rounded-md bg-neutral-800/70 text-gray-200 hover:bg-neutral-700/60 active:scale-95"
+            className="hidden sm:grid h-6 w-6 sm:h-7 sm:w-7 place-items-center rounded-md bg-neutral-800/70 text-gray-200 hover:bg-neutral-700/60 active:scale-95"
             title="Minimize"
           >
-            <Minus className="h-4 w-4" />
+            <Minus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </button>
           <button
             onClick={() => {
               handleInteraction()
               const bounds = (constraintsRef as any)?.current as HTMLDivElement | null
-              const maxW = Math.max(560, Math.min((bounds?.clientWidth ?? 1024) - 48, 896))
-              const maxH = Math.max(360, Math.min((bounds?.clientHeight ?? 700) - 48, 600))
+              const maxW = Math.max(320, Math.min((bounds?.clientWidth ?? 1024) - 32, 896))
+              const maxH = Math.max(240, Math.min((bounds?.clientHeight ?? 700) - 32, 600))
               if (!maximized) {
                 setPrevSize(size)
                 const targetW = maxW
@@ -213,31 +213,31 @@ function BrowserWindow({ onClose, constraintsRef, isAnimating, currentStep, stea
                 setSize({ width: targetW, height: targetH })
                 setMaximized(true)
               } else {
-                setSize(prevSize ?? { width: 960, height: 500 })
+                setSize(prevSize ?? { width: 800, height: 450 })
                 setMaximized(false)
               }
             }}
-            className="h-7 w-7 grid place-items-center rounded-md bg-neutral-800/70 text-gray-200 hover:bg-neutral-700/60 active:scale-95"
+            className="hidden sm:grid h-6 w-6 sm:h-7 sm:w-7 place-items-center rounded-md bg-neutral-800/70 text-gray-200 hover:bg-neutral-700/60 active:scale-95"
             title={maximized ? "Restore" : "Maximize"}
           >
-            <Maximize2 className="h-4 w-4" />
+            <Maximize2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </button>
           <button
             onClick={() => {
               handleInteraction()
               onClose?.()
             }}
-            className="h-7 w-7 grid place-items-center rounded-md bg-neutral-800/70 text-gray-200 hover:bg-red-600/70 hover:text-white active:scale-95"
+            className="h-6 w-6 sm:h-7 sm:w-7 grid place-items-center rounded-md bg-neutral-800/70 text-gray-200 hover:bg-red-600/70 hover:text-white active:scale-95"
             title="Close"
           >
-            <X className="h-4 w-4" />
+            <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </button>
         </div>
       </div>
 
       {/* Browser content */}
       {!minimized && (
-        <div className="p-6 h-[calc(100%-44px)] overflow-hidden">
+        <div className="p-3 sm:p-4 md:p-6 h-[calc(100%-36px)] sm:h-[calc(100%-44px)] overflow-hidden">
           {tabs.find((t) => t.id === activeId)?.title === "New Tab" ? (
             <NewTabContent stealth={stealthOn} />
           ) : (
@@ -327,7 +327,7 @@ export function FeatureShowcase() {
       timers.push(setTimeout(() => {
         setCurrentStep(0)
         setBrowserPosition({ x: 0, y: 0 })
-        setBrowserSize({ width: 960, height: 500 })
+        setBrowserSize({ width: 800, height: 450 })
         setIsAutoPlaying(true) // Loop back
       }, 5000))
     }
@@ -356,7 +356,7 @@ export function FeatureShowcase() {
         />
         
         {/* Content overlay */}
-        <div ref={constraintsRef} className="absolute inset-0 bg-gray-900/80 p-8 md:p-12 flex items-center justify-center">
+        <div ref={constraintsRef} className="absolute inset-0 bg-gray-900/80 p-4 sm:p-6 md:p-8 lg:p-12 flex items-center justify-center">
           {/* Feature message banner */}
           <AnimatePresence>
             {featureMessage && (
@@ -364,7 +364,7 @@ export function FeatureShowcase() {
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="absolute top-8 left-1/2 -translate-x-1/2 z-50 px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-full text-sm font-medium shadow-lg"
+                className="absolute top-4 sm:top-8 left-1/2 -translate-x-1/2 z-50 px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-full text-xs sm:text-sm font-medium shadow-lg"
               >
                 {featureMessage}
               </motion.div>
@@ -410,12 +410,12 @@ export function FeatureShowcase() {
               setUserHasInteracted(true)
               setBrowserVisible((v) => !v)
             }}
-            className="absolute left-4 bottom-4 rounded-md border border-white/20 bg-black/70 text-white px-2 py-1 text-xs font-medium shadow hover:bg-black/80 active:scale-95 transition"
+            className="absolute left-2 sm:left-4 bottom-2 sm:bottom-4 rounded-md border border-white/20 bg-black/70 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs font-medium shadow hover:bg-black/80 active:scale-95 transition"
             title="Toggle demo (Alt + \\)"
           >
-            <span className="font-mono">Alt</span>
-            <span className="mx-1">+</span>
-            <span className="font-mono">\</span>
+            <span className="font-mono text-[10px] sm:text-xs">Alt</span>
+            <span className="mx-0.5 sm:mx-1">+</span>
+            <span className="font-mono text-[10px] sm:text-xs">\</span>
           </button>
           {/* Refresh button bottom-right */}
           <button
@@ -426,16 +426,16 @@ export function FeatureShowcase() {
               setStealthMode(false)
               setFeatureMessage("")
               setBrowserPosition({ x: 0, y: 0 })
-              setBrowserSize({ width: 960, height: 500 })
+              setBrowserSize({ width: 800, height: 450 })
               setIsAutoPlaying(true)
               setUserHasInteracted(false)
               setDemoVersion((v) => v + 1)
             }}
-            className="absolute right-4 bottom-4 rounded-md border border-white/20 bg-black/70 text-white p-1.5 text-xs font-medium shadow hover:bg-black/80 active:scale-95 transition"
+            className="absolute right-2 sm:right-4 bottom-2 sm:bottom-4 rounded-md border border-white/20 bg-black/70 text-white p-1 sm:p-1.5 text-xs font-medium shadow hover:bg-black/80 active:scale-95 transition"
             title="Reset demo"
             aria-label="Reset demo"
           >
-            <RefreshCw className="h-3.5 w-3.5" />
+            <RefreshCw className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
           </button>
         </div>
       </div>

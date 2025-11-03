@@ -46,29 +46,29 @@ export function Hero() {
         <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-gradient-to-t from-indigo-500/15 via-transparent to-transparent rounded-full blur-3xl" />
       </div>
 
-      <section className="relative max-w-7xl mx-auto px-4 py-40 gap-12 flex flex-col justify-center items-center">
+      <section className="relative max-w-7xl mx-auto px-4 sm:px-6 py-24 sm:py-32 md:py-40 gap-8 sm:gap-12 flex flex-col justify-center items-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, type: "spring", bounce: 0 }}
-          className="flex flex-col justify-center items-start space-y-5 w-full text-left"
+          className="flex flex-col justify-center items-start space-y-4 sm:space-y-5 w-full text-left"
         >
           {/* Badge */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm"
+            className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm"
           >
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
-            <span className="text-xs font-medium text-muted-foreground">100% Undetectable</span>
+            <span className="text-[10px] sm:text-xs font-medium text-muted-foreground">100% Undetectable</span>
           </motion.div>
 
-          <h1 className="text-[32px] md:text-[32px] font-medium tracking-tighter text-pretty leading-none">
-            <span className="flex items-baseline my-0 gap-x-2">
+          <h1 className="text-[28px] sm:text-[36px] md:text-[42px] lg:text-[48px] font-medium tracking-tighter text-pretty leading-tight sm:leading-none">
+            <span className="flex flex-col sm:flex-row sm:items-baseline my-0 gap-x-2 gap-y-1">
               <span className="bg-gradient-to-b from-sky-100 to-foreground bg-clip-text text-transparent">The Truly Undetectable Browser To Hide</span>
               <AnimatePresence mode="wait">
                 <motion.span
@@ -83,10 +83,10 @@ export function Hero() {
                 </motion.span>
               </AnimatePresence>
             </span>
-            <span className="block bg-gradient-to-b from-sky-100 to-foreground bg-clip-text text-transparent leading-none">From Screenshare.</span>
+            <span className="block bg-gradient-to-b from-sky-100 to-foreground bg-clip-text text-transparent leading-tight sm:leading-none mt-1">From Screenshare.</span>
           </h1>
 
-          <p className="text-sm md:text-base text-muted-foreground leading-relaxed max-w-2xl">
+          <p className="text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed max-w-2xl">
             Browse privately during screen shares, video calls, and recordings. Instantly toggle with Alt+\
           </p>
 
@@ -94,12 +94,12 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="items-start gap-x-3 space-y-3 sm:flex sm:space-y-0"
+            className="flex flex-col sm:flex-row items-stretch sm:items-start gap-3 w-full sm:w-auto"
           >
-            <Button size="lg" className="text-[15px] px-8 h-12 rounded-full shadow-[0_6px_0_rgba(0,0,0,0.35)] hover:shadow-[0_4px_0_rgba(0,0,0,0.35)] active:translate-y-[2px] active:shadow-[0_2px_0_rgba(0,0,0,0.35)] ring-1 ring-white/10" onClick={scrollToDownload}>
+            <Button size="lg" className="text-sm sm:text-[15px] px-6 sm:px-8 h-11 sm:h-12 rounded-full shadow-[0_6px_0_rgba(0,0,0,0.35)] hover:shadow-[0_4px_0_rgba(0,0,0,0.35)] active:translate-y-[2px] active:shadow-[0_2px_0_rgba(0,0,0,0.35)] ring-1 ring-white/10 w-full sm:w-auto" onClick={scrollToDownload}>
               Download Now
             </Button>
-            <Button size="lg" variant="outline" className="text-[15px] px-8 h-12 rounded-full border-2 border-foreground/20 bg-transparent hover:bg-foreground/5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]" onClick={scrollToFeatures}>
+            <Button size="lg" variant="outline" className="text-sm sm:text-[15px] px-6 sm:px-8 h-11 sm:h-12 rounded-full border-2 border-foreground/20 bg-transparent hover:bg-foreground/5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] w-full sm:w-auto" onClick={scrollToFeatures}>
               Learn More
             </Button>
           </motion.div>

@@ -67,8 +67,8 @@ export function FAQ() {
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm mb-4">
             <span className="text-[11px] tracking-[0.2em] uppercase text-muted-foreground">FAQ</span>
           </div>
-          <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tighter mx-auto text-pretty bg-gradient-to-b from-white via-sky-100 to-sky-300 bg-clip-text text-transparent mb-4">Frequently Asked Questions</h2>
-          <p className="text-base sm:text-lg text-muted-foreground">Have questions? We've got answers.</p>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tighter mx-auto text-pretty bg-gradient-to-b from-white via-sky-100 to-sky-300 bg-clip-text text-transparent mb-3 sm:mb-4">Frequently Asked Questions</h2>
+          <p className="text-sm sm:text-base md:text-lg text-muted-foreground">Have questions? We've got answers.</p>
         </motion.div>
 
         <motion.div

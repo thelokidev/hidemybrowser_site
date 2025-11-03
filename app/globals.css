@@ -178,6 +178,20 @@
   /* Responsive base font size for better scaling */
   html {
     font-size: 16px; /* Base for mobile */
+    overflow-x: hidden;
+  }
+  
+  body {
+    overflow-x: hidden;
+    width: 100%;
+  }
+  
+  /* Improve touch targets on mobile */
+  @media (max-width: 767px) {
+    button, a {
+      min-height: 44px;
+      min-width: 44px;
+    }
   }
   
   @media (min-width: 768px) {
@@ -196,6 +210,22 @@
     html {
       font-size: 16px; /* Back to normal for 1440p+ */
     }
+  }
+  
+  /* Prevent horizontal scroll on mobile */
+  * {
+    max-width: 100%;
+  }
+  
+  /* Smooth scrolling for all devices */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Better image handling on mobile */
+  img {
+    max-width: 100%;
+    height: auto;
   }
 }
 

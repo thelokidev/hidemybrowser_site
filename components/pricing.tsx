@@ -160,11 +160,11 @@ export function Pricing() {
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm mb-4">
             <span className="text-[11px] tracking-[0.2em] uppercase text-muted-foreground">Pricing</span>
           </div>
-          <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tighter mx-auto text-pretty bg-gradient-to-b from-white via-sky-100 to-sky-300 bg-clip-text text-transparent mb-4">Simple, transparent pricing</h2>
-          <p className="text-base sm:text-lg text-muted-foreground">Choose the perfect plan for your needs</p>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tighter mx-auto text-pretty bg-gradient-to-b from-white via-sky-100 to-sky-300 bg-clip-text text-transparent mb-3 sm:mb-4">Simple, transparent pricing</h2>
+          <p className="text-sm sm:text-base md:text-lg text-muted-foreground">Choose the perfect plan for your needs</p>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6 max-w-[1100px] mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6 max-w-[1100px] mx-auto">
           {plans.map((plan, index) => (
             <motion.div
               key={plan.name}
@@ -183,16 +183,16 @@ export function Pricing() {
               )}
 
               <div
-                className={`h-full p-6 rounded-2xl border transition-all duration-300 flex flex-col backdrop-blur-xl ${
+                className={`h-full p-5 sm:p-6 rounded-2xl border transition-all duration-300 flex flex-col backdrop-blur-xl ${
                   plan.highlighted
                     ? "border-white/10 bg-white/5 ring-1 ring-sky-400/30 shadow-2xl"
                     : "border-white/10 bg-white/5 hover:ring-1 hover:ring-foreground/15"
                 } hover:shadow-xl`}
               >
-                <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
+                <h3 className="text-lg sm:text-xl font-bold mb-2">{plan.name}</h3>
                 <div className="mb-1">
-                  <span className="text-4xl md:text-5xl font-bold">{plan.price}</span>
-                  <span className="text-muted-foreground text-sm">{plan.period}</span>
+                  <span className="text-3xl sm:text-4xl md:text-5xl font-bold">{plan.price}</span>
+                  <span className="text-muted-foreground text-xs sm:text-sm">{plan.period}</span>
                 </div>
 
                 {plan.savings && (
@@ -203,10 +203,10 @@ export function Pricing() {
                   </div>
                 )}
 
-                <ul className="space-y-3 mb-6 mt-6 flex-1">
+                <ul className="space-y-2.5 sm:space-y-3 mb-5 sm:mb-6 mt-4 sm:mt-6 flex-1">
                   {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-center gap-2.5 text-sm">
-                      <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-300"><Check className="w-3.5 h-3.5" /></span>
+                    <li key={feature} className="flex items-center gap-2 sm:gap-2.5 text-xs sm:text-sm">
+                      <span className="inline-flex h-4 w-4 sm:h-5 sm:w-5 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-300 shrink-0"><Check className="w-3 h-3 sm:w-3.5 sm:h-3.5" /></span>
                       <span className="text-muted-foreground">{feature}</span>
                     </li>
                   ))}
@@ -218,7 +218,7 @@ export function Pricing() {
                     window.location.href = `/pricing?plan=${encodeURIComponent(slug)}`
                   }}
                   disabled={subLoading || loading === plan.name || (currentPlan !== null && currentPlan !== plan.name)}
-                  className={`w-full mt-auto transition-transform duration-200 hover:-translate-y-0.5 active:translate-y-0 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary/60 
+                  className={`w-full mt-auto transition-transform duration-200 hover:-translate-y-0.5 active:translate-y-0 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary/60 text-sm sm:text-base
             ${currentPlan === plan.name ? 'bg-muted text-foreground cursor-default' : currentPlan ? 'bg-muted text-muted-foreground cursor-not-allowed' : 'bg-foreground text-background hover:bg-foreground/90'} hover:shadow-lg`}
                   size="lg"
                 >
@@ -231,7 +231,7 @@ export function Pricing() {
                         : (loading === plan.name ? 'Processing...' : plan.cta)}
                 </Button>
                 {currentPlan && currentPlan !== plan.name && (
-                  <p className="text-[12px] text-muted-foreground mt-2 text-center">
+                  <p className="text-[11px] sm:text-[12px] text-muted-foreground mt-2 text-center">
                     Plan changes are blocked until your current plan expires.
                   </p>
                 )}

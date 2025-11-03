@@ -16,7 +16,7 @@ const platforms = [
     version: "v1.35.1",
     gradient: "from-blue-500/10 to-cyan-500/10",
     iconColor: "text-blue-400",
-    downloadUrl: "https://github.com/thelokidev/hidemybrowser_site/releases/download/v1.35.1/hidemybrowser-1.35.1-setup.exe",
+    downloadUrl: "https://github.com/thelokidev/hidemybrowser_site/releases/tag/v1.35.1",
     available: true,
   },
   {
@@ -37,13 +37,44 @@ export function Download() {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
 
-  const handleDownload = (platform: typeof platforms[0]) => {
+  const handleDownload = async (platform: typeof platforms[0]) => {
     if (!platform.available || !platform.downloadUrl) {
       return
     }
 
-    // For GitHub releases, create a temporary link to trigger download
-    // GitHub releases send proper Content-Disposition headers for downloads
+    // Fetch the actual download URL from GitHub API
+    if (platform.downloadUrl.includes('/releases/tag/')) {
+      try {
+        const tag = platform.version
+        const apiUrl = `https://api.github.com/repos/thelokidev/hidemybrowser_site/releases/tags/${tag}`
+        const response = await fetch(apiUrl)
+        
+        if (response.ok) {
+          const data = await response.json()
+          // Find the Windows executable in assets
+          const windowsAsset = data.assets?.find((asset: any) => 
+            asset.name.includes('.exe') || asset.name.toLowerCase().includes('windows')
+          )
+          
+          if (windowsAsset?.browser_download_url) {
+            // Direct download the file
+            const link = document.createElement('a')
+            link.href = windowsAsset.browser_download_url
+            link.target = '_blank'
+            link.rel = 'noopener noreferrer'
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+            return
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch download URL:', error)
+      }
+      return
+    }
+
+    // For direct download URLs, create a temporary link to trigger download
     const link = document.createElement('a')
     link.href = platform.downloadUrl
     link.target = '_blank'
@@ -68,13 +99,13 @@ export function Download() {
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm mb-4">
             <span className="text-[11px] tracking-[0.2em] uppercase text-muted-foreground">Download</span>
           </div>
-          <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tighter mx-auto text-pretty bg-gradient-to-b from-white via-sky-100 to-sky-300 bg-clip-text text-transparent mb-4">Download HideMyBrowser</h2>
-          <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tighter mx-auto text-pretty bg-gradient-to-b from-white via-sky-100 to-sky-300 bg-clip-text text-transparent mb-3 sm:mb-4">Download HideMyBrowser</h2>
+          <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Get the truly undetectable browser for your platform. Start your stealth browsing experience today.
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-6 sm:gap-7 mb-10">
+        <div className="grid md:grid-cols-2 gap-5 sm:gap-6 md:gap-7 mb-10">
           {platforms.map((platform, index) => {
             const Icon = platform.icon
             return (
@@ -86,38 +117,39 @@ export function Download() {
                 whileHover={{ y: -6 }}
                 className="h-full"
               >
-                <div className={`relative h-full p-10 rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl ring-0 hover:ring-2 hover:ring-sky-400/30 transition-all duration-300 hover:shadow-2xl overflow-hidden group`}>
+                <div className={`relative h-full p-6 sm:p-8 md:p-10 rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl ring-0 hover:ring-2 hover:ring-sky-400/30 transition-all duration-300 hover:shadow-2xl overflow-hidden group`}>
                   <div className="absolute -right-8 -top-8 opacity-5 group-hover:opacity-10 transition-opacity duration-300">
-                    <Icon className="w-40 h-40" />
+                    <Icon className="w-32 h-32 sm:w-40 sm:h-40" />
                   </div>
                   
                   {/* Gradient overlay on hover */}
                   <div className="absolute inset-0 bg-gradient-to-br from-sky-500/10 via-transparent to-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-                  <div className={`inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-white/10 backdrop-blur border border-white/20 mb-6 ${platform.iconColor} group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300 relative z-10`}>
-                    <Icon className="w-10 h-10" strokeWidth={2} />
+                  <div className={`inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-white/10 backdrop-blur border border-white/20 mb-4 sm:mb-6 ${platform.iconColor} group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300 relative z-10`}>
+                    <Icon className="w-8 h-8 sm:w-10 sm:h-10" strokeWidth={2} />
                   </div>
 
-                  <h3 className="text-2xl font-bold mb-2 relative z-10">{platform.name}</h3>
-                  <p className="text-muted-foreground mb-6 relative z-10">{platform.subtitle}</p>
+                  <h3 className="text-xl sm:text-2xl font-bold mb-1.5 sm:mb-2 relative z-10">{platform.name}</h3>
+                  <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6 relative z-10">{platform.subtitle}</p>
 
-                  <ul className="space-y-3 mb-8 relative z-10">
+                  <ul className="space-y-2.5 sm:space-y-3 mb-6 sm:mb-8 relative z-10">
                     {platform.requirements.map((req) => (
-                      <li key={req} className="flex items-center gap-2.5 text-sm">
-                        <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-300 shrink-0"><Check className="w-3.5 h-3.5" /></span>
+                      <li key={req} className="flex items-center gap-2 sm:gap-2.5 text-xs sm:text-sm">
+                        <span className="inline-flex h-4 w-4 sm:h-5 sm:w-5 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-300 shrink-0"><Check className="w-3 h-3 sm:w-3.5 sm:h-3.5" /></span>
                         <span className="text-muted-foreground">{req}</span>
                       </li>
                     ))}
                   </ul>
 
                   <Button 
-                    className={`w-full group-hover:shadow-lg transition-shadow relative z-10 ${platform.available ? 'bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500' : 'bg-gray-600/50 cursor-not-allowed opacity-60'}`}
+                    className={`w-full group-hover:shadow-lg transition-shadow relative z-10 text-sm sm:text-base ${platform.available ? 'bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500' : 'bg-gray-600/50 cursor-not-allowed opacity-60'}`}
                     size="lg"
                     onClick={() => handleDownload(platform)}
                     disabled={!platform.available}
                   >
                     <DownloadIcon className="w-4 h-4 mr-2" />
-                    {platform.available ? `Download for ${platform.name}` : `Coming Soon for ${platform.name}`}
+                    <span className="hidden sm:inline">{platform.available ? `Download for ${platform.name}` : `Coming Soon for ${platform.name}`}</span>
+                    <span className="sm:hidden">{platform.available ? `Download ${platform.name}` : `Coming Soon`}</span>
                   </Button>
                 </div>
               </motion.div>

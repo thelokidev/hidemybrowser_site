@@ -92,10 +92,10 @@ export function Header() {
             </NavLink>
           </nav>
 
-          <div className="relative z-10 shrink-0 flex items-center gap-2">
+          <div className="relative z-10 shrink-0 flex items-center gap-1.5 sm:gap-2">
             {/* Keep server and first client render identical to avoid hydration mismatch */}
             {!mounted ? (
-              <div className="h-9 w-[180px]" />
+              <div className="h-9 w-[120px] sm:w-[180px]" />
             ) : user ? (
               <ProfileDropdown />
             ) : (
@@ -103,7 +103,7 @@ export function Header() {
                 <Button 
                   variant="ghost"
                   size="sm"
-                  className="transition-all duration-300 hover:bg-accent/50 leading-none"
+                  className="hidden sm:inline-flex transition-all duration-300 hover:bg-accent/50 leading-none"
                 >
                   Get a Demo
                 </Button>
@@ -111,7 +111,7 @@ export function Header() {
                   <Button 
                     /* primary (black) */
                     size="sm"
-                    className="transition-all duration-300 hover:scale-105 hover:shadow-lg leading-none"
+                    className="transition-all duration-300 hover:scale-105 hover:shadow-lg leading-none text-xs sm:text-sm px-3 sm:px-4"
                   >
                     Login
                   </Button>

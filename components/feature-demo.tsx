@@ -17,29 +17,29 @@ function BrowserWindow({ className = "", subtle = false, stealthOn = false }: { 
   return (
     <div
       className={
-        "pointer-events-none relative w-[260px] sm:w-[320px] md:w-[360px] lg:w-[380px] rounded-xl border " +
+        "pointer-events-none relative w-full max-w-[200px] xs:max-w-[240px] sm:max-w-[280px] md:max-w-[320px] lg:max-w-[360px] xl:max-w-[380px] rounded-xl border " +
         (subtle ? "border-white/10 bg-white/5" : "border-slate-700 bg-slate-900/95") +
         " shadow-2xl overflow-hidden " +
         className
       }
     >
-      <div className={(subtle ? "bg-white/10 border-white/10" : "bg-slate-800/90 border-slate-700") + " flex items-center justify-between border-b px-3 py-2"}>
-        <div className="flex items-center gap-2">
-          <span className="h-2.5 w-2.5 rounded-full bg-red-500" />
-          <span className="h-2.5 w-2.5 rounded-full bg-yellow-500" />
-          <span className="h-2.5 w-2.5 rounded-full bg-green-500" />
-          <span className={(subtle ? "bg-white/20 text-white" : "bg-slate-700 text-slate-200") + " ml-3 rounded px-2 py-0.5 text-[10px] font-medium"}>
+      <div className={(subtle ? "bg-white/10 border-white/10" : "bg-slate-800/90 border-slate-700") + " flex items-center justify-between border-b px-2 sm:px-3 py-1.5 sm:py-2"}>
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-1 min-w-0">
+          <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-red-500 shrink-0" />
+          <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-yellow-500 shrink-0" />
+          <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-green-500 shrink-0" />
+          <span className={(subtle ? "bg-white/20 text-white" : "bg-slate-700 text-slate-200") + " ml-2 sm:ml-3 rounded px-1.5 sm:px-2 py-0.5 text-[9px] xs:text-[10px] sm:text-[10px] font-medium truncate"}>
             hidemybrowser.com
           </span>
         </div>
-        <div className={"flex items-center gap-1 text-[10px] " + (subtle ? "text-white/80" : stealthOn ? "text-rose-400/90" : "text-emerald-400/90") }>
-          {stealthOn ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
-          <span className="font-medium">{stealthOn ? "Invisible layer (only you)" : "Visible on your screen"}</span>
+        <div className={"flex items-center gap-1 text-[9px] xs:text-[10px] sm:text-[10px] shrink-0 ml-1 " + (subtle ? "text-white/80" : stealthOn ? "text-rose-400/90" : "text-emerald-400/90") }>
+          {stealthOn ? <EyeOff className="h-2.5 w-2.5 sm:h-3 sm:w-3" /> : <Eye className="h-2.5 w-2.5 sm:h-3 sm:w-3" />}
+          <span className="font-medium hidden xs:inline">{stealthOn ? "Invisible" : "Visible"}</span>
         </div>
       </div>
-      <div className="p-4">
-        <div className={(subtle ? "bg-white/20" : "bg-slate-700/40") + " mb-2 h-2.5 w-3/4 rounded"} />
-        <div className={(subtle ? "bg-white/10" : "bg-slate-700/30") + " h-2.5 w-1/2 rounded"} />
+      <div className="p-3 sm:p-4">
+        <div className={(subtle ? "bg-white/20" : "bg-slate-700/40") + " mb-2 h-2 sm:h-2.5 w-3/4 rounded"} />
+        <div className={(subtle ? "bg-white/10" : "bg-slate-700/30") + " h-2 sm:h-2.5 w-1/2 rounded"} />
       </div>
     </div>
   )

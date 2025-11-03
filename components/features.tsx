@@ -234,7 +234,7 @@ export function Features() {
   const features = [...topCards, ...bottomCards]
 
   return (
-    <section id="features" ref={ref} className="relative py-20 md:py-28 px-4 sm:px-6 lg:px-8 overflow-hidden bg-background">
+    <section id="features" ref={ref} className="relative py-12 sm:py-16 md:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 overflow-hidden bg-background">
       {/* Background glow aligned with hero aesthetics */}
       <div
         aria-hidden
@@ -254,35 +254,35 @@ export function Features() {
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm mb-4">
             <span className="text-[11px] tracking-[0.2em] uppercase text-muted-foreground">Features</span>
           </div>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tighter mx-auto text-pretty bg-gradient-to-b from-white via-sky-100 to-sky-300 bg-clip-text text-transparent mb-4">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tighter mx-auto text-pretty bg-gradient-to-b from-white via-sky-100 to-sky-300 bg-clip-text text-transparent mb-3 sm:mb-4">
             Everything you need to browse invisibly
           </h2>
-          <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             A private, invisible browsing layer that works anywhere and stays off-camera. Fast, elegant, undetectable.
           </p>
         </motion.div>
 
         {/* Top grid: 2 frosted feature cards + quick highlights */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:gap-7 mb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-7 mb-8 sm:mb-10 md:mb-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.5, delay: 0.05 }}
             className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-5"
           >
-            <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-7 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between mb-2 text-xs font-semibold text-foreground/60">
+            <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-5 sm:p-6 md:p-7 shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex items-center justify-between mb-2 text-[10px] sm:text-xs font-semibold text-foreground/60">
                 <span>Sees what others can't</span>
               </div>
-              <h3 className="text-xl font-semibold text-foreground mb-2">Browser-only visibility</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">Create a completely invisible browsing layer that only you can see during sharing, recording, or monitoring tools.</p>
+              <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2">Browser-only visibility</h3>
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">Create a completely invisible browsing layer that only you can see during sharing, recording, or monitoring tools.</p>
             </div>
-            <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-7 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between mb-2 text-xs font-semibold text-foreground/60">
+            <div className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-5 sm:p-6 md:p-7 shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex items-center justify-between mb-2 text-[10px] sm:text-xs font-semibold text-foreground/60">
                 <span>Works on everything</span>
               </div>
-              <h3 className="text-xl font-semibold text-foreground mb-2">Compatible anywhere</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">Zoom, Teams, Meet, Slack, Discord. Any software that screenshares. Our system technology operates at the OS level.</p>
+              <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2">Compatible anywhere</h3>
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">Zoom, Teams, Meet, Slack, Discord. Any software that screenshares. Our system technology operates at the OS level.</p>
             </div>
           </motion.div>
 
@@ -290,16 +290,16 @@ export function Features() {
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.5, delay: 0.12 }}
-            className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-7 shadow-sm hover:shadow-md transition-all"
+            className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-5 sm:p-6 md:p-7 shadow-sm hover:shadow-md transition-all"
           >
-            <div className="text-xs font-semibold text-foreground/60 mb-3">Quick controls</div>
+            <div className="text-[10px] sm:text-xs font-semibold text-foreground/60 mb-3">Quick controls</div>
             <ul className="space-y-2.5">
               {["Instant toggle with Alt\\", "Drag anywhere on screen", "Adjustable opacity"].map((item) => (
                 <li key={item} className="flex items-center gap-2.5">
                   <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-sky-500/15 text-sky-300">
                     <Check className="w-3.5 h-3.5" />
                   </span>
-                  <span className="text-sm text-muted-foreground">{item}</span>
+                  <span className="text-xs sm:text-sm text-muted-foreground">{item}</span>
                 </li>
               ))}
             </ul>
@@ -311,7 +311,7 @@ export function Features() {
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.6, delay: 0.15 }}
-          className="relative overflow-hidden rounded-3xl border border-white/20 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 p-10 md:p-12 mb-12 shadow-2xl group"
+          className="relative overflow-hidden rounded-3xl border border-white/20 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 p-6 sm:p-8 md:p-10 lg:p-12 mb-8 sm:mb-10 md:mb-12 shadow-2xl group"
         >
           {/* Gradient ring & glow */}
           <div aria-hidden className="pointer-events-none absolute inset-0 rounded-[24px] ring-1 ring-white/20" />
@@ -324,14 +324,14 @@ export function Features() {
               </span>
               <span className="text-xs font-medium text-sky-200">Works Everywhere</span>
             </div>
-            <h3 className="text-white text-2xl md:text-3xl font-bold mb-3">Undetectable by design</h3>
-            <p className="text-white/80 text-base md:text-lg mb-6">No bots in the room. No Zoom guests. No screenshare trails. Works on everything.</p>
-            <div className="flex flex-wrap items-center justify-center gap-6 opacity-80 group-hover:opacity-100 transition-opacity duration-300">
-              <img alt="Slack" src="https://api.iconify.design/logos/slack-icon.svg" className="w-8 h-8 grayscale group-hover:grayscale-0 transition-all duration-300" />
-              <img alt="Google Meet" src="https://api.iconify.design/logos/google-meet.svg" className="w-8 h-8 grayscale group-hover:grayscale-0 transition-all duration-300" />
-              <img alt="Zoom" src="https://api.iconify.design/logos/zoom-icon.svg" className="w-8 h-8 grayscale group-hover:grayscale-0 transition-all duration-300" />
-              <img alt="Microsoft Teams" src="https://api.iconify.design/logos/microsoft-teams.svg" className="w-8 h-8 grayscale group-hover:grayscale-0 transition-all duration-300" />
-              <img alt="Discord" src="https://api.iconify.design/logos/discord-icon.svg" className="w-8 h-8 grayscale group-hover:grayscale-0 transition-all duration-300" />
+            <h3 className="text-white text-xl sm:text-2xl md:text-3xl font-bold mb-2 sm:mb-3">Undetectable by design</h3>
+            <p className="text-white/80 text-sm sm:text-base md:text-lg mb-4 sm:mb-6">No bots in the room. No Zoom guests. No screenshare trails. Works on everything.</p>
+            <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 opacity-80 group-hover:opacity-100 transition-opacity duration-300">
+              <img alt="Slack" src="https://api.iconify.design/logos/slack-icon.svg" className="w-6 h-6 sm:w-8 sm:h-8 grayscale group-hover:grayscale-0 transition-all duration-300" />
+              <img alt="Google Meet" src="https://api.iconify.design/logos/google-meet.svg" className="w-6 h-6 sm:w-8 sm:h-8 grayscale group-hover:grayscale-0 transition-all duration-300" />
+              <img alt="Zoom" src="https://api.iconify.design/logos/zoom-icon.svg" className="w-6 h-6 sm:w-8 sm:h-8 grayscale group-hover:grayscale-0 transition-all duration-300" />
+              <img alt="Microsoft Teams" src="https://api.iconify.design/logos/microsoft-teams.svg" className="w-6 h-6 sm:w-8 sm:h-8 grayscale group-hover:grayscale-0 transition-all duration-300" />
+              <img alt="Discord" src="https://api.iconify.design/logos/discord-icon.svg" className="w-6 h-6 sm:w-8 sm:h-8 grayscale group-hover:grayscale-0 transition-all duration-300" />
             </div>
           </div>
         </motion.div>
@@ -344,11 +344,11 @@ export function Features() {
           transition={{ duration: 0.6 }}
           className="text-center mb-10"
         >
-          <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight bg-gradient-to-b from-white via-sky-100 to-sky-300 bg-clip-text text-transparent mb-3">Three ways HideMyBrowser changes how you work</h3>
-          <p className="text-base text-muted-foreground">Use it wherever you need privacy during screen shares</p>
+          <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight bg-gradient-to-b from-white via-sky-100 to-sky-300 bg-clip-text text-transparent mb-2 sm:mb-3">Three ways HideMyBrowser changes how you work</h3>
+          <p className="text-sm sm:text-base text-muted-foreground">Use it wherever you need privacy during screen shares</p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-7">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 lg:gap-7">
           {[
             { title: 'Interviews', desc: 'Reference your prep notes, ask Otter for timestamps, and capture next steps — without anyone noticing.', anim: <MiniInterviews /> },
             { title: 'Presentations', desc: 'Keep your speaker notes, backup slides, and reference links open. Present confidently with instant access.', anim: <MiniPresentations /> },
@@ -359,11 +359,11 @@ export function Features() {
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               transition={{ duration: 0.5, delay: 0.05 + i * 0.06 }}
-              className="group rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-6 md:p-7 transition-all hover:shadow-xl hover:-translate-y-0.5 hover:ring-1 hover:ring-foreground/15 flex flex-col h-full"
+              className="group rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-5 sm:p-6 md:p-7 transition-all hover:shadow-xl hover:-translate-y-0.5 hover:ring-1 hover:ring-foreground/15 flex flex-col h-full"
             >
-              <div className="mb-4 rounded-xl overflow-hidden">{c.anim}</div>
-              <h4 className="text-xl font-semibold text-foreground mb-1">{c.title}</h4>
-              <p className="text-[15px] text-muted-foreground leading-relaxed">{c.desc}</p>
+              <div className="mb-3 sm:mb-4 rounded-xl overflow-hidden">{c.anim}</div>
+              <h4 className="text-lg sm:text-xl font-semibold text-foreground mb-1">{c.title}</h4>
+              <p className="text-sm sm:text-[15px] text-muted-foreground leading-relaxed">{c.desc}</p>
             </motion.div>
           ))}
         </div>

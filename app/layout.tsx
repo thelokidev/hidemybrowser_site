@@ -14,6 +14,12 @@ export const metadata: Metadata = {
   title: "HideMyBrowser - The Truly Undetectable Browser",
   description: "Share your screen, not your secrets. Perfect for Interviews, Presentations, and Demos.",
   generator: "v0.app",
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+  },
   icons: {
     icon: [
       { url: "/favicon.ico", type: "image/x-icon" },
