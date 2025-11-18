@@ -88,7 +88,15 @@ export function useAccessStatus() {
         const subscription = data as SubscriptionRow | null
         console.log('[useAccessStatus] Subscription:', subscription)
         
-        const isSubscribed = !!subscription && (subscription.status === 'active' || subscription.status === 'trialing' || subscription.status === 'renewed')
+        const now = new Date()
+        const currentPeriodEnd = subscription?.current_period_end ? new Date(subscription.current_period_end) : null
+        const isExpired = currentPeriodEnd ? currentPeriodEnd < now : false
+
+        // Check if subscription is active AND not expired
+        const isSubscribed = !!subscription && 
+          ['active', 'trialing', 'renewed'].includes(subscription.status) && 
+          !isExpired
+
         if (isSubscribed) {
           setStatus({
             hasAccess: true,
@@ -99,6 +107,9 @@ export function useAccessStatus() {
             loading: false
           })
         } else {
+          if (subscription && isExpired) {
+            console.log('[useAccessStatus] Subscription expired on:', currentPeriodEnd)
+          }
           setStatus({
             hasAccess: false,
             accessType: 'none',

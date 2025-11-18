@@ -57,12 +57,23 @@ export function useSubscription() {
 
         const subscriptionData = data as DodoSubscription | null
 
-        // Use Supabase as source of truth - webhooks keep it up-to-date
-        // No need to fetch from DodoPayments API client-side
-        console.log('[useSubscription] Subscription data from database:', subscriptionData)
-        console.log('[useSubscription] Subscription status:', subscriptionData?.status)
-        console.log('[useSubscription] Product ID:', subscriptionData?.dodo_product_id)
-        setSubscription(subscriptionData)
+        // Check for expiration - ensure we don't show expired subscriptions as active
+        const now = new Date()
+        const currentPeriodEnd = subscriptionData?.current_period_end ? new Date(subscriptionData.current_period_end) : null
+        const isExpired = currentPeriodEnd ? currentPeriodEnd < now : false
+
+        if (isExpired && subscriptionData) {
+           console.log('[useSubscription] Subscription found but expired on:', currentPeriodEnd)
+           // Treat as no subscription
+           setSubscription(null)
+        } else {
+           // Use Supabase as source of truth - webhooks keep it up-to-date
+           // No need to fetch from DodoPayments API client-side
+           console.log('[useSubscription] Subscription data from database:', subscriptionData)
+           console.log('[useSubscription] Subscription status:', subscriptionData?.status)
+           console.log('[useSubscription] Product ID:', subscriptionData?.dodo_product_id)
+           setSubscription(subscriptionData)
+        }
       } catch (err) {
         console.error('[useSubscription] Error:', err)
         setError(err instanceof Error ? err.message : 'An error occurred')
@@ -137,7 +148,7 @@ export function useHasActiveSubscription() {
         
         const { data, error } = await supabase
           .from('subscriptions')
-          .select('status')
+          .select('status, current_period_end')
           .eq('user_id', user.id)
           .in('status', ['active', 'trialing', 'renewed'])
           .order('created_at', { ascending: false })
@@ -149,8 +160,15 @@ export function useHasActiveSubscription() {
           throw error
         }
 
-        console.log('[useHasActiveSubscription] Result:', !!data)
-        setHasSubscription(!!data)
+        const subscription = data as { status: string, current_period_end: string | null } | null
+        
+        const now = new Date()
+        const currentPeriodEnd = subscription?.current_period_end ? new Date(subscription.current_period_end) : null
+        const isExpired = currentPeriodEnd ? currentPeriodEnd < now : false
+        const isActive = !!subscription && !isExpired
+
+        console.log('[useHasActiveSubscription] Result:', isActive)
+        setHasSubscription(isActive)
       } catch (err) {
         console.error('[useHasActiveSubscription] Error checking subscription:', err)
         setHasSubscription(false)

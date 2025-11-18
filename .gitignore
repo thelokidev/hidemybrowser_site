@@ -80,3 +80,7 @@ Reference/
 # MCP configuration (contains secrets)
 mcp.json
 .vercel
+
+# Large executable files
+*.exe
+public/*.exe
